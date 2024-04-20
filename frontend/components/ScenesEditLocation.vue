@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { useOrganizationsGetByUsername, useScenesGetScenesForOrganization } from '~/api'
+import { useQueryClient } from '@tanstack/vue-query'
+import {
+  getScenesGetScenesForOrganizationQueryKey,
+  useOrganizationsGetByUsername,
+  useScenesGetScenesForOrganization,
+  useScenesUpdate,
+} from '~/api'
 import { getFileUrl } from '~/api/file'
 
 const props = defineProps<{
@@ -8,55 +14,108 @@ const props = defineProps<{
   sceneId: string
 }>()
 
+const queryClient = useQueryClient()
 const { data: org } = useOrganizationsGetByUsername(props.orgUsername, { query: { retry: 0 } })
 const { data: scenes } = useScenesGetScenesForOrganization(props.orgId, { query: { retry: 0 } })
 
-const scene = ref(scenes.value?.data.find(scene => scene.id === props.sceneId))
-const data = ref({})
-const pannellum = ref(null)
+const { mutate: updateScene } = useScenesUpdate({
+  mutation: {
+    onSuccess(data, variables, context) {
+      queryClient.setQueryData(getScenesGetScenesForOrganizationQueryKey(props.orgId), (oldData: any) => {
+        if (!oldData)
+          return oldData
 
-function reload() {
-  scene.value = scenes.value?.data.find(scene => scene.id === props.sceneId)
-  data.value = scene.value
-    ? {
-        current: {
-          panorama: getFileUrl(scene.value.file),
-          title: scene.value.title,
-          hfov: 110,
-          yaw: scene.value.meta?.yaw || 0,
-          pitch: scene.value.meta?.pitch || 0,
-          type: 'equirectangular',
-        },
-      }
-    : {}
+        return {
+          ...oldData,
+          data: oldData.data.map((scene: any) => scene.id === data.data.id ? data.data : scene),
+        }
+      })
+    },
+  },
+})
+
+function composeSceneData(scene: any) {
+  return {
+    panorama: getFileUrl(scene.file),
+    title: scene.title,
+    type: 'equirectangular',
+    ...(scene.meta || {}),
+  }
 }
 
-watch(() => props.sceneId, reload)
-watch(() => scenes.value, reload)
+const scene = computed(() => scenes.value?.data.find(scene => scene.id === props.sceneId))
+const scenesData = ref(scene.value ? { current: composeSceneData(scene.value) } : {})
+const scenesDataId = ref<string>(scene.value?.id || '')
+watch(scene, () => {
+  if (!scene.value || scenesDataId.value === scene.value?.id)
+    return
+
+  scenesData.value = { current: composeSceneData(scene.value) }
+  scenesDataId.value = scene.value.id
+})
+
+const pannellum = ref(null)
+const sceneInfo = reactive({ title: scene.value?.title || '', yaw: scene.value?.meta?.yaw || 0, pitch: scene.value?.meta?.pitch || 0 })
+
+function savePosition() {
+  if (!scene.value || !pannellum.value)
+    return
+
+  updateScene({
+    id: scene.value.id,
+    data: {
+      meta: {
+        ...(scene.value.meta || {}),
+        yaw: pannellum.value.viewer.getYaw(),
+        pitch: pannellum.value.viewer.getPitch(),
+      },
+    },
+  })
+}
+
+function restorePosition() {
+  sceneInfo.yaw = scene.value?.meta?.yaw || 0
+  sceneInfo.pitch = scene.value?.meta?.pitch || 0
+}
 
 function save() {
+  if (!scene.value)
+    return
+
+  updateScene({ id: scene.value.id, data: { title: sceneInfo.title } })
 }
 </script>
 
 <template>
-  <UContainer v-if="org && scene">
-    <h3>Локация</h3>
-    <UButton @click="save">
-      Сохранить
-    </UButton>
+  <div class="flex flex-col gap-2">
+    <div class="flex justify-end">
+      <UButton @click="save">
+        Сохранить
+      </UButton>
+    </div>
+    <UInput v-model="sceneInfo.title" label="Название локации" />
     <ClientOnly>
       <VuePannellum
         ref="pannellum"
+        v-model:yaw="sceneInfo.yaw"
+        v-model:pitch="sceneInfo.pitch"
         :default="{
           firstScene: 'current',
           sceneFadeDuration: 1000,
         }"
-        :scenes="data"
-        :pitch="25"
+        :scenes="scenesData"
         auto-load
         show-fullscreen
         style="width: 100%; height: 300px;"
       />
     </ClientOnly>
-  </UContainer>
+    <div class="flex flex-row gap-2 justify-end">
+      <UButton variant="ghost" @click="savePosition">
+        Сохранить позицию
+      </UButton>
+      <UButton variant="ghost" @click="restorePosition">
+        Восстановить позицию
+      </UButton>
+    </div>
+  </div>
 </template>
