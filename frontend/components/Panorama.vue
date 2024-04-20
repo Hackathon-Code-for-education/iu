@@ -1,16 +1,45 @@
 <script>
+import { getFileUrl } from '~/api/file.ts'
+
 export default {
   computed: {
-    hotSpots() {
-      return []
-    },
     scenes() {
       return {
         main: {
           title: 'Университет',
           hfov: 110,
+          pitch: -3,
+          yaw: 117,
           type: 'equirectangular',
-          panorama: '/original.jpg',
+          panorama: getFileUrl('6623c9af9ef35baea042874f'),
+          hotSpots: [
+            {
+              pitch: 25,
+              yaw: 7,
+              type: 'scene',
+              text: 'Внутрь',
+              sceneId: 'hall',
+            },
+          ],
+        },
+
+        hall: {
+          title: 'Холл',
+          hfov: 110,
+          yaw: 5,
+          type: 'equirectangular',
+          panorama: getFileUrl('6623c9e09ef35baea0428750'),
+          hotSpots: [
+            {
+              pitch: -2,
+              yaw: 240,
+              type: 'scene',
+              text: 'Снаружи',
+              sceneId: 'main',
+              targetYaw: 25,
+              targetPitch: 2,
+            },
+          ],
         },
       }
     },
