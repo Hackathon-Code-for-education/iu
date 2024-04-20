@@ -1,6 +1,7 @@
 import process from 'node:process'
 
 export default defineNuxtConfig({
+  ssr: false,
   devtools: { enabled: true },
   modules: ['@nuxt/ui', '@nuxtjs/tailwindcss', '@nuxt/image'],
   tailwindcss: {},
