@@ -1,8 +1,8 @@
 # mypy: disable-error-code="assignment"
 from typing import Any
 
-from src.storages.mongo import Organization, File
-from src.storages.mongo.models.__base__ import CustomLink
+from beanie import PydanticObjectId
+
 from src.storages.mongo.models.scene import SceneSchema
 
 
@@ -11,6 +11,6 @@ class CreateScene(SceneSchema):
 
 
 class UpdateScene(SceneSchema):
-    organization: CustomLink[Organization] | None = None
-    file: CustomLink[File] | None = None
+    organization: PydanticObjectId | None = None
+    file: PydanticObjectId | None = None
     meta: Any = None

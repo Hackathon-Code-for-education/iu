@@ -26,5 +26,8 @@ class SceneRepository:
     async def delete(self, id: PydanticObjectId) -> bool:
         return await crud.delete(id)
 
+    async def read_for_organization(self, organization_id: PydanticObjectId) -> list[Scene]:
+        return await Scene.find({"organization": organization_id}).to_list()
+
 
 scene_repository: SceneRepository = SceneRepository()

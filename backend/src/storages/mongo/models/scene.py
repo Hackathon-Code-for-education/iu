@@ -1,13 +1,14 @@
 from typing import Any
 
+from beanie import PydanticObjectId
+
 from src.custom_pydantic import CustomModel
-from src.storages.mongo import File, Organization
-from src.storages.mongo.models.__base__ import CustomDocument, CustomLink
+from src.storages.mongo.models.__base__ import CustomDocument
 
 
 class SceneSchema(CustomModel):
-    organization: CustomLink[Organization]
-    file: CustomLink[File]
+    organization: PydanticObjectId
+    file: PydanticObjectId
     meta: Any | None = None
 
 

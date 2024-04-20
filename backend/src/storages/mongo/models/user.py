@@ -14,7 +14,7 @@ class UserSchema(CustomModel):
     "Имя пользователя"
     password_hash: str
     "Хэш пароля"
-    role: UserRole
+    role: UserRole = UserRole.DEFAULT
     "Роль пользователя"
 
     @property
