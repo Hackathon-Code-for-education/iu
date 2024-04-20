@@ -31,6 +31,27 @@ import type {
   MaybeRef
 } from 'vue'
 import { customFormData } from './form-data';
+export type ChattingGetDialogParams = {
+dialog_id: string;
+};
+
+export type ChattingPushMessageParams = {
+dialog_id: string;
+message: string;
+};
+
+export type ChattingLeaveDialogParams = {
+dialog_id: string;
+};
+
+export type ChattingUpdateStudentsQueue200 = OnlineOfQueue | JoinDialog;
+
+export type ChattingUpdateStudentsQueueParams = {
+organization_id: string;
+};
+
+export type ChattingUpdateQueue200 = OnlineOfQueue | JoinDialog;
+
 /**
  * Данные Telegram-аккаунта
  */
@@ -38,7 +59,15 @@ export type ViewUserTelegram = TelegramWidgetData | null;
 
 export type ViewUserStudentApprovementAnyOf = PendingApprovement | ApprovedApprovement | RejectedApprovement;
 
+/**
+ * Подтверждения статуса студента
+ */
 export type ViewUserStudentApprovement = ViewUserStudentApprovementAnyOf | null;
+
+/**
+ * Логин пользователя (уникальный)
+ */
+export type ViewUserLogin = string | null;
 
 export type ValidationErrorLocItem = string | number;
 
@@ -58,11 +87,15 @@ export const UserRole = {
 } as const;
 
 export interface ViewUser {
+  /** MongoDB document ObjectID */
   id: string;
-  login: string;
+  /** Логин пользователя (уникальный) */
+  login: ViewUserLogin;
+  /** Имя пользователя */
   name: string;
   /** Роль пользователя */
   role: UserRole;
+  /** Подтверждения статуса студента */
   student_approvement: ViewUserStudentApprovement;
   /** Данные Telegram-аккаунта */
   telegram: ViewUserTelegram;
@@ -87,6 +120,8 @@ export type UpdateOrganizationName = string | null;
 
 export type UpdateOrganizationMainScene = string | null;
 
+export type UpdateOrganizationLogo = string | null;
+
 export type UpdateOrganizationDocuments = unknown | null;
 
 export type UpdateOrganizationContacts = unknown | null;
@@ -94,6 +129,7 @@ export type UpdateOrganizationContacts = unknown | null;
 export interface UpdateOrganization {
   contacts?: UpdateOrganizationContacts;
   documents?: UpdateOrganizationDocuments;
+  logo?: UpdateOrganizationLogo;
   main_scene?: UpdateOrganizationMainScene;
   name?: UpdateOrganizationName;
   username?: UpdateOrganizationUsername;
@@ -122,6 +158,10 @@ export interface TelegramWidgetData {
   last_name?: TelegramWidgetDataLastName;
   photo_url?: TelegramWidgetDataPhotoUrl;
   username?: TelegramWidgetDataUsername;
+}
+
+export interface TelegramLoginResponse {
+  need_to_connect: boolean;
 }
 
 export type SceneMeta = unknown | null;
@@ -170,6 +210,11 @@ export interface PendingApprovement {
  */
 export type OrganizationMainScene = string | null;
 
+/**
+ * Логотип организации
+ */
+export type OrganizationLogo = string | null;
+
 export interface Organization {
   /** Контактные данные организации */
   contacts: unknown;
@@ -177,12 +222,52 @@ export interface Organization {
   documents: unknown;
   /** MongoDB document ObjectID */
   id: string;
+  /** Логотип организации */
+  logo: OrganizationLogo;
   /** Основная сцена организации */
   main_scene: OrganizationMainScene;
   /** Наименование организации */
   name: string;
   /** Псевдоним организации (уникальный) */
   username: string;
+}
+
+export type OnlineOfQueueType = typeof OnlineOfQueueType[keyof typeof OnlineOfQueueType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const OnlineOfQueueType = {
+  online: 'online',
+} as const;
+
+export interface OnlineOfQueue {
+  queue_enrollees_online: number;
+  queue_students_online: number;
+  type: OnlineOfQueueType;
+}
+
+export interface MessageSchema {
+  /** Дата отправки сообщения */
+  at: string;
+  /** ID сообщения */
+  id: string;
+  /** Текст сообщения */
+  text: string;
+  /** ID пользователя, отправившего сообщение */
+  user_id: string;
+}
+
+export type JoinDialogType = typeof JoinDialogType[keyof typeof JoinDialogType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const JoinDialogType = {
+  join_dialog: 'join_dialog',
+} as const;
+
+export interface JoinDialog {
+  dialog: DialogPair;
+  type: JoinDialogType;
 }
 
 export interface HTTPValidationError {
@@ -224,6 +309,27 @@ export interface File {
   type: FileType;
 }
 
+export interface DialogPair {
+  enrollee_id: string;
+  organization_id: string;
+  student_id: string;
+}
+
+export interface Dialog {
+  /** Закрыт ли диалог */
+  closed: boolean;
+  /** ID абитуриента */
+  enrollee_id: string;
+  /** MongoDB document ObjectID */
+  id: string;
+  /** Сообщения в диалоге */
+  messages: MessageSchema[];
+  /** ID организации */
+  organization_id: string;
+  /** ID студента */
+  student_id: string;
+}
+
 export type CreateSceneMeta = unknown | null;
 
 export interface CreateScene {
@@ -238,11 +344,18 @@ export interface CreateScene {
  */
 export type CreateOrganizationMainScene = string | null;
 
+/**
+ * Логотип организации
+ */
+export type CreateOrganizationLogo = string | null;
+
 export interface CreateOrganization {
   /** Контактные данные организации */
   contacts?: unknown;
   /** Документы организации */
   documents?: unknown;
+  /** Логотип организации */
+  logo?: CreateOrganizationLogo;
   /** Основная сцена организации */
   main_scene?: CreateOrganizationMainScene;
   /** Наименование организации */
@@ -253,6 +366,10 @@ export interface CreateOrganization {
 
 export interface BodyFilesUploadFile {
   upload_file_obj: Blob;
+}
+
+export interface BodyChattingJoinDialog {
+  dialog_pair: DialogPair;
 }
 
 export interface AuthCredentials {
@@ -352,6 +469,171 @@ export const useProvidersByCredentials = <TError = AxiosError<void | HTTPValidat
     }
     
 /**
+ * @summary Telegram Register
+ */
+export const providersTelegramRegister = (
+    telegramWidgetData: MaybeRef<TelegramWidgetData>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<unknown>> => {
+    telegramWidgetData = unref(telegramWidgetData);
+    return axios.post(
+      `/providers/telegram/register`,
+      telegramWidgetData,options
+    );
+  }
+
+
+
+export const getProvidersTelegramRegisterMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError,{data: TelegramWidgetData}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramRegister>>, {data: TelegramWidgetData}> = (props) => {
+          const {data} = props ?? {};
+
+          return  providersTelegramRegister(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProvidersTelegramRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegister>>>
+    export type ProvidersTelegramRegisterMutationBody = TelegramWidgetData
+    export type ProvidersTelegramRegisterMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Telegram Register
+ */
+export const useProvidersTelegramRegister = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof providersTelegramRegister>>,
+        TError,
+        {data: TelegramWidgetData},
+        TContext
+      > => {
+
+      const mutationOptions = getProvidersTelegramRegisterMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * @summary Telegram Connect
+ */
+export const providersTelegramConnect = (
+    telegramWidgetData: MaybeRef<TelegramWidgetData>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<unknown>> => {
+    telegramWidgetData = unref(telegramWidgetData);
+    return axios.post(
+      `/providers/telegram/connect`,
+      telegramWidgetData,options
+    );
+  }
+
+
+
+export const getProvidersTelegramConnectMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError,{data: TelegramWidgetData}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramConnect>>, {data: TelegramWidgetData}> = (props) => {
+          const {data} = props ?? {};
+
+          return  providersTelegramConnect(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProvidersTelegramConnectMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnect>>>
+    export type ProvidersTelegramConnectMutationBody = TelegramWidgetData
+    export type ProvidersTelegramConnectMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Telegram Connect
+ */
+export const useProvidersTelegramConnect = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof providersTelegramConnect>>,
+        TError,
+        {data: TelegramWidgetData},
+        TContext
+      > => {
+
+      const mutationOptions = getProvidersTelegramConnectMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * @summary Telegram Login
+ */
+export const providersTelegramLogin = (
+    telegramWidgetData: MaybeRef<TelegramWidgetData>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<TelegramLoginResponse>> => {
+    telegramWidgetData = unref(telegramWidgetData);
+    return axios.post(
+      `/providers/telegram/login`,
+      telegramWidgetData,options
+    );
+  }
+
+
+
+export const getProvidersTelegramLoginMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError,{data: TelegramWidgetData}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramLogin>>, {data: TelegramWidgetData}> = (props) => {
+          const {data} = props ?? {};
+
+          return  providersTelegramLogin(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProvidersTelegramLoginMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLogin>>>
+    export type ProvidersTelegramLoginMutationBody = TelegramWidgetData
+    export type ProvidersTelegramLoginMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Telegram Login
+ */
+export const useProvidersTelegramLogin = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof providersTelegramLogin>>,
+        TError,
+        {data: TelegramWidgetData},
+        TContext
+      > => {
+
+      const mutationOptions = getProvidersTelegramLoginMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
  * Получить данные текущего пользователя
  * @summary Get Me
  */
@@ -411,6 +693,61 @@ export const useUsersGetMe = <TData = Awaited<ReturnType<typeof usersGetMe>>, TE
 
 
 
+/**
+ * Выход из аккаунта
+ * @summary Logout
+ */
+export const usersLogout = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<unknown>> => {
+    
+    return axios.post(
+      `/users/logout`,undefined,options
+    );
+  }
+
+
+
+export const getUsersLogoutMutationOptions = <TError = AxiosError<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError,void, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersLogout>>, void> = () => {
+          
+
+          return  usersLogout(axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsersLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof usersLogout>>>
+    
+    export type UsersLogoutMutationError = AxiosError<void>
+
+    /**
+ * @summary Logout
+ */
+export const useUsersLogout = <TError = AxiosError<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof usersLogout>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getUsersLogoutMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
 /**
  * Получить пользователей с ожидающим подтверждением
  * @summary Get Users With Pending Approvement
@@ -1435,6 +1772,410 @@ export const useScenesGetScenesForOrganization = <TData = Awaited<ReturnType<typ
   ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
 
   const queryOptions = getScenesGetScenesForOrganizationQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * Обновить своё место в очереди абитуриентов
+ * @summary Update Queue
+ */
+export const chattingUpdateQueue = (
+    organizationId: MaybeRef<string>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<ChattingUpdateQueue200>> => {
+    organizationId = unref(organizationId);
+    return axios.post(
+      `/chatting/chat-queue/update-enrollee-queue/${organizationId}`,undefined,options
+    );
+  }
+
+
+
+export const getChattingUpdateQueueMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError,{organizationId: string}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError,{organizationId: string}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingUpdateQueue>>, {organizationId: string}> = (props) => {
+          const {organizationId} = props ?? {};
+
+          return  chattingUpdateQueue(organizationId,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChattingUpdateQueueMutationResult = NonNullable<Awaited<ReturnType<typeof chattingUpdateQueue>>>
+    
+    export type ChattingUpdateQueueMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Update Queue
+ */
+export const useChattingUpdateQueue = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError,{organizationId: string}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof chattingUpdateQueue>>,
+        TError,
+        {organizationId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getChattingUpdateQueueMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Обновить своё место в очереди студентов
+ * @summary Update Students Queue
+ */
+export const chattingUpdateStudentsQueue = (
+    params: MaybeRef<ChattingUpdateStudentsQueueParams>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<ChattingUpdateStudentsQueue200>> => {
+    params = unref(params);
+    return axios.post(
+      `/chatting/chat-queue/update-students-queue`,undefined,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
+    );
+  }
+
+
+
+export const getChattingUpdateStudentsQueueMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError,{params: ChattingUpdateStudentsQueueParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError,{params: ChattingUpdateStudentsQueueParams}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, {params: ChattingUpdateStudentsQueueParams}> = (props) => {
+          const {params} = props ?? {};
+
+          return  chattingUpdateStudentsQueue(params,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChattingUpdateStudentsQueueMutationResult = NonNullable<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>>
+    
+    export type ChattingUpdateStudentsQueueMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Update Students Queue
+ */
+export const useChattingUpdateStudentsQueue = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError,{params: ChattingUpdateStudentsQueueParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>,
+        TError,
+        {params: ChattingUpdateStudentsQueueParams},
+        TContext
+      > => {
+
+      const mutationOptions = getChattingUpdateStudentsQueueMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Присоединиться к диалогу
+ * @summary Join Dialog
+ */
+export const chattingJoinDialog = (
+    bodyChattingJoinDialog: MaybeRef<BodyChattingJoinDialog>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<Dialog>> => {
+    bodyChattingJoinDialog = unref(bodyChattingJoinDialog);
+    return axios.post(
+      `/chatting/dialogs/join-dialog`,
+      bodyChattingJoinDialog,options
+    );
+  }
+
+
+
+export const getChattingJoinDialogMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingJoinDialog>>, TError,{data: BodyChattingJoinDialog}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof chattingJoinDialog>>, TError,{data: BodyChattingJoinDialog}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingJoinDialog>>, {data: BodyChattingJoinDialog}> = (props) => {
+          const {data} = props ?? {};
+
+          return  chattingJoinDialog(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChattingJoinDialogMutationResult = NonNullable<Awaited<ReturnType<typeof chattingJoinDialog>>>
+    export type ChattingJoinDialogMutationBody = BodyChattingJoinDialog
+    export type ChattingJoinDialogMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Join Dialog
+ */
+export const useChattingJoinDialog = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingJoinDialog>>, TError,{data: BodyChattingJoinDialog}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof chattingJoinDialog>>,
+        TError,
+        {data: BodyChattingJoinDialog},
+        TContext
+      > => {
+
+      const mutationOptions = getChattingJoinDialogMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Покинуть диалог
+ * @summary Leave Dialog
+ */
+export const chattingLeaveDialog = (
+    params: MaybeRef<ChattingLeaveDialogParams>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<unknown>> => {
+    params = unref(params);
+    return axios.post(
+      `/chatting/dialogs/leave-dialog`,undefined,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
+    );
+  }
+
+
+
+export const getChattingLeaveDialogMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError,{params: ChattingLeaveDialogParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError,{params: ChattingLeaveDialogParams}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingLeaveDialog>>, {params: ChattingLeaveDialogParams}> = (props) => {
+          const {params} = props ?? {};
+
+          return  chattingLeaveDialog(params,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChattingLeaveDialogMutationResult = NonNullable<Awaited<ReturnType<typeof chattingLeaveDialog>>>
+    
+    export type ChattingLeaveDialogMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Leave Dialog
+ */
+export const useChattingLeaveDialog = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError,{params: ChattingLeaveDialogParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof chattingLeaveDialog>>,
+        TError,
+        {params: ChattingLeaveDialogParams},
+        TContext
+      > => {
+
+      const mutationOptions = getChattingLeaveDialogMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Отправить сообщение в диалог
+ * @summary Push Message
+ */
+export const chattingPushMessage = (
+    params: MaybeRef<ChattingPushMessageParams>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<unknown>> => {
+    params = unref(params);
+    return axios.post(
+      `/chatting/dialogs/push-message`,undefined,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
+    );
+  }
+
+
+
+export const getChattingPushMessageMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError,{params: ChattingPushMessageParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError,{params: ChattingPushMessageParams}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingPushMessage>>, {params: ChattingPushMessageParams}> = (props) => {
+          const {params} = props ?? {};
+
+          return  chattingPushMessage(params,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChattingPushMessageMutationResult = NonNullable<Awaited<ReturnType<typeof chattingPushMessage>>>
+    
+    export type ChattingPushMessageMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Push Message
+ */
+export const useChattingPushMessage = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError,{params: ChattingPushMessageParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof chattingPushMessage>>,
+        TError,
+        {params: ChattingPushMessageParams},
+        TContext
+      > => {
+
+      const mutationOptions = getChattingPushMessageMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Получить диалог
+ * @summary Get Dialog
+ */
+export const chattingGetDialog = (
+    params: MaybeRef<ChattingGetDialogParams>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<Dialog>> => {
+    params = unref(params);
+    return axios.get(
+      `/chatting/dialogs/get-dialog`,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
+    );
+  }
+
+
+export const getChattingGetDialogQueryKey = (params: MaybeRef<ChattingGetDialogParams>,) => {
+    return ['chatting','dialogs','get-dialog', ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getChattingGetDialogQueryOptions = <TData = Awaited<ReturnType<typeof chattingGetDialog>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ChattingGetDialogParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getChattingGetDialogQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chattingGetDialog>>> = ({ signal }) => chattingGetDialog(params, { signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData> 
+}
+
+export type ChattingGetDialogQueryResult = NonNullable<Awaited<ReturnType<typeof chattingGetDialog>>>
+export type ChattingGetDialogQueryError = AxiosError<void | HTTPValidationError>
+
+/**
+ * @summary Get Dialog
+ */
+export const useChattingGetDialog = <TData = Awaited<ReturnType<typeof chattingGetDialog>>, TError = AxiosError<void | HTTPValidationError>>(
+ params: MaybeRef<ChattingGetDialogParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getChattingGetDialogQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * Получить мои диалоги
+ * @summary Get My Dialogs
+ */
+export const chattingGetMyDialogs = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<Dialog[]>> => {
+    
+    return axios.get(
+      `/chatting/dialogs/get-my-dialogs`,options
+    );
+  }
+
+
+export const getChattingGetMyDialogsQueryKey = () => {
+    return ['chatting','dialogs','get-my-dialogs'] as const;
+    }
+
+    
+export const getChattingGetMyDialogsQueryOptions = <TData = Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getChattingGetMyDialogsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chattingGetMyDialogs>>> = ({ signal }) => chattingGetMyDialogs({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData> 
+}
+
+export type ChattingGetMyDialogsQueryResult = NonNullable<Awaited<ReturnType<typeof chattingGetMyDialogs>>>
+export type ChattingGetMyDialogsQueryError = AxiosError<void>
+
+/**
+ * @summary Get My Dialogs
+ */
+export const useChattingGetMyDialogs = <TData = Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError = AxiosError<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getChattingGetMyDialogsQueryOptions(options)
 
   const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
 

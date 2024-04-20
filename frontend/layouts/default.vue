@@ -9,6 +9,13 @@
               { label: 'ВУЗы', to: '/orgs' },
             ]"
           />
+          <div class="flex items-center">
+            <NuxtLink to="/login">
+              <UButton icon="i-octicon-sign-in-16" variant="outline">
+                Войти
+              </UButton>
+            </NuxtLink>
+          </div>
         </Card>
       </UContainer>
     </header>

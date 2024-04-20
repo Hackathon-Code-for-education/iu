@@ -4,9 +4,9 @@ defineProps<{
   bio: string
 }>()
 
-
-
-
+defineEmits<{
+  wantChatClick: []
+}>()
 </script>
 
 <template>
@@ -18,7 +18,6 @@ defineProps<{
           <div class="w-20 h-1 relative">
             <UAvatar
               class="absolute bottom-0 box-content border-4 border-neutral-900"
-              :src="logo"
               size="3xl"
             />
           </div>
@@ -33,7 +32,7 @@ defineProps<{
         </div>
         <div class="flex justify-between gap-2">
           <UButton>Буду поступать</UButton>
-          <UButton variant="outline">
+          <UButton variant="outline" @click="$emit('wantChatClick')">
             Написать студентам
           </UButton>
         </div>

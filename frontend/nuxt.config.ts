@@ -3,8 +3,7 @@ import process from 'node:process'
 export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
-  modules: ['@nuxt/ui', '@nuxtjs/tailwindcss', '@nuxt/image'],
-  tailwindcss: {},
+  modules: ['@nuxt/ui', '@nuxt/image', '@nuxt/eslint'],
   ui: {
     global: true,
     icons: ['mdi', 'heroicons', 'octicon'],
@@ -15,6 +14,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiUrl: process.env.API_URL,
+    },
+  },
+  eslint: {
+    config: {
+      standalone: false,
     },
   },
 })

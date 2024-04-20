@@ -1,10 +1,12 @@
 import antfu from '@antfu/eslint-config'
 import tailwindcss from 'eslint-plugin-tailwindcss'
 import vueParser from 'vue-eslint-parser'
+import nuxt from './.nuxt/eslint.config.mjs'
 
 export default antfu(
   {
     ignores: ['api/__generated__.ts'],
+    formatters: true,
   },
   {
     rules: {
@@ -23,4 +25,5 @@ export default antfu(
       parser: vueParser,
     },
   },
+  nuxt,
 )
