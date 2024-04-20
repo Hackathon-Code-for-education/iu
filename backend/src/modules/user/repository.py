@@ -17,14 +17,14 @@ class UserRepository:
 
         for user in settings.predefined.users:
             # check by login
-            _user_by_login = await self.read_by_login(user["login"])
+            _user_by_login = await self.read_by_login(user.login)
             if _user_by_login is not None:
                 continue
             user_dict = {
-                "login": user["login"],
-                "name": user["name"],
-                "password_hash": credentials_repository.get_password_hash(user["password"]),
-                "role": user["role"],
+                "login": user.login,
+                "name": user.name,
+                "password_hash": credentials_repository.get_password_hash(user.password),
+                "role": user.role,
             }
             await User.model_validate(user_dict).insert()
 
