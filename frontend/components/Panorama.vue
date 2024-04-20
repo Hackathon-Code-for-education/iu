@@ -28,7 +28,7 @@ export default {
           hfov: 110,
           yaw: 5,
           type: 'equirectangular',
-          panorama: getFileUrl('6623c9e09ef35baea0428750'),
+          panorama: getFileUrl('6623f6e34f5a9a64a37cedf8'),
           hotSpots: [
             {
               pitch: -2,
