@@ -1,8 +1,9 @@
 import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
-from beanie import Indexed, PydanticObjectId
-from pydantic import Discriminator
+from beanie import PydanticObjectId
+from pydantic import Discriminator, model_validator
+from pymongo import IndexModel
 
 from src.custom_pydantic import CustomModel
 from src.modules.providers.telegram.schemas import TelegramWidgetData
@@ -40,23 +41,51 @@ StudentApprovement = Annotated[PendingApprovement | ApprovedApprovement | Reject
 
 
 class UserSchema(CustomModel):
-    login: Annotated[str, Indexed(unique=True)]
-    "Логин пользователя (уникальный)"
     name: str
     "Имя пользователя"
-    password_hash: str
-    "Хэш пароля"
     role: UserRole = UserRole.DEFAULT
     "Роль пользователя"
-    telegram: TelegramWidgetData | None = None
-    "Данные Telegram-аккаунта"
     student_approvement: StudentApprovement | None = None
     "Подтверждения статуса студента"
+    # login-pass
+    login: str | None = None
+    "Логин пользователя (уникальный)"
+    password_hash: str | None = None
+    "Хэш пароля"
+    # telegram
+    telegram: TelegramWidgetData | None = None
+    "Данные Telegram-аккаунта"
 
     @property
     def is_admin(self) -> bool:
         return self.role == UserRole.ADMIN
 
+    @model_validator(mode="after")
+    def validate_user_registration(self) -> Self:
+        # registered via telegram
+        if self.telegram is not None:
+            return self
+
+        # reqistered via login-pass
+        if self.login is not None and self.password_hash is not None:
+            return self
+
+        raise ValueError("Пользователь должен быть зарегистрирован через Telegram или через логин-пароль")
+
 
 class User(UserSchema, CustomDocument):
-    pass
+    class Settings:
+        indexes = [
+            IndexModel(
+                "login",
+                name="login_unique_index",
+                unique=True,
+                partialFilterExpression={"login": {"$exists": True, "$type": "string"}},
+            ),
+            IndexModel(
+                "telegram.id",
+                name="telegram_id_unique_index",
+                unique=True,
+                partialFilterExpression={"telegram.id": {"$exists": True, "$type": "number"}},
+            ),
+        ]

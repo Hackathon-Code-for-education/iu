@@ -42,20 +42,24 @@ if settings.telegram:
         responses={
             200: {"description": "Success"},
             **InvalidTelegramWidgetHash.responses,
-            **UnauthorizedException.responses,
-            **AlreadyExists,
+            **AlreadyExists.responses,
         },
         status_code=200,
     )
-    async def telegram_register(telegram_data: TelegramWidgetData, user_id: OptionalUserIdDep):
+    async def telegram_register(
+        telegram_data: TelegramWidgetData, user_id: OptionalUserIdDep, request: Request
+    ) -> None:
         if user_id is not None:
-            raise AlreadyExists("Пользователь уже зарегистрирован")
+            raise AlreadyExists("Пользователь уже зарегистрирован (есть сессия)")
         if not validate_widget_hash(telegram_data):
             raise InvalidTelegramWidgetHash()
         user_by_telegram_id = await user_repository.read_by_telegram_id(telegram_data.id)
         if user_by_telegram_id is not None:
             raise AlreadyExists("Пользователь с таким telegram id уже существует")
-        await user_repository.create_telegram(telegram_data)
+        user = await user_repository.create_telegram(telegram_data)
+        request.session.clear()
+        request.session["uid"] = str(user.id)
+        return None
 
     @router.post(
         "/connect",

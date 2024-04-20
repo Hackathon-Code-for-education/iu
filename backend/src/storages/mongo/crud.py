@@ -7,7 +7,7 @@ from beanie.odm.operators.update.general import Set
 from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
 
-from src.exceptions import AlreadyExists
+from src.exceptions import unwrap_duplicate_error
 
 D = TypeVar("D", bound=Document)
 Projection = TypeVar("Projection", bound=BaseModel)
@@ -72,15 +72,8 @@ class CRUD(Generic[D, Create, Update]):
             return None
         try:
             updated = await obj.update(Set(data.model_dump(exclude_unset=True)))
-        except RevisionIdWasChanged as e:
-            if e.__context__ is not None and isinstance(e.__context__, DuplicateKeyError):
-                duplicate_key_error = e.__context__
-
-                detals = {"keyValue": None}
-                if duplicate_key_error.details:
-                    detals["keyValue"] = duplicate_key_error.details.get("keyValue")
-                raise AlreadyExists(f"Объект с такими свойствами уже существует: {detals}")
-            raise e
+        except (RevisionIdWasChanged, DuplicateKeyError) as e:
+            raise unwrap_duplicate_error(e)
         return updated
 
     async def delete(self, id: PydanticObjectId) -> bool:

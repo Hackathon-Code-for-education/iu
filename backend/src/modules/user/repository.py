@@ -2,6 +2,7 @@ __all__ = ["UserRepository", "user_repository"]
 
 from beanie import PydanticObjectId
 
+from src.exceptions import AlreadyExists
 from src.modules.providers.telegram.schemas import TelegramWidgetData
 from src.storages.mongo import User
 
@@ -33,9 +34,13 @@ class UserRepository:
         user = await User.find_one({"login": login})
         return user
 
-    async def create_telegram(self, telegram_data: TelegramWidgetData) -> User | None:
-        # TODO: Implement this method when login-pass will be not required
-        raise NotImplementedError
+    async def create_telegram(self, telegram_data: TelegramWidgetData) -> User:
+        # check if exists
+        _user_by_tg = await self.read_by_telegram_id(telegram_data.id)
+        if _user_by_tg is not None:
+            raise AlreadyExists("Пользователь с таким telegram id уже существует")
+        user = await User(name=telegram_data.first_name, telegram=telegram_data).insert()
+        return user
 
     async def update_telegram(self, user_id: PydanticObjectId, telegram_data: TelegramWidgetData) -> User | None:
         user = await self.read(user_id)
@@ -46,6 +51,10 @@ class UserRepository:
     async def read_by_telegram_id(self, telegram_id: int) -> User | None:
         user = await User.find_one({"telegram.id": telegram_id})
         return user
+
+    async def read_with_pending_approvement(self) -> list[User]:
+        users = await User.find({"student_approvement.status": "pending"}).to_list()
+        return users
 
 
 user_repository: UserRepository = UserRepository()

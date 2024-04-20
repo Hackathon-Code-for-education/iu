@@ -34,6 +34,7 @@ class CredentialsRepository:
 
         user = await user_repository.read_by_login(login)
         if user:
+            assert user.password_hash is not None
             return UserCredentialsFromDB(user_id=user.id, password_hash=user.password_hash)
         return None
 

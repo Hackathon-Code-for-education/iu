@@ -1,6 +1,7 @@
 from typing import ClassVar, Any
 
 from fastapi import HTTPException
+from pymongo.errors import DuplicateKeyError
 from starlette import status
 
 
@@ -83,3 +84,18 @@ class AlreadyExists(CustomHTTPException):
         )
 
     responses = {409: {"description": "Объект уже существует"}}
+
+
+def unwrap_duplicate_error(e: Exception) -> Exception:
+    duplicate_key_error: DuplicateKeyError | None = None
+    if isinstance(e, DuplicateKeyError):
+        duplicate_key_error = e
+    elif e.__context__ is not None and isinstance(e.__context__, DuplicateKeyError):
+        duplicate_key_error = e.__context__
+
+    if duplicate_key_error is not None:
+        detals = {"keyValue": None}
+        if duplicate_key_error.details:
+            detals["keyValue"] = duplicate_key_error.details.get("keyValue")
+        return AlreadyExists(f"Объект с такими свойствами уже существует: {detals}")
+    return e
