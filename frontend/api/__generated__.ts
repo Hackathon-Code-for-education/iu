@@ -31,6 +31,15 @@ import type {
   MaybeRef
 } from 'vue'
 import { customFormData } from './form-data';
+/**
+ * Данные Telegram-аккаунта
+ */
+export type ViewUserTelegram = TelegramWidgetData | null;
+
+export type ViewUserStudentApprovementAnyOf = PendingApprovement | ApprovedApprovement | RejectedApprovement;
+
+export type ViewUserStudentApprovement = ViewUserStudentApprovementAnyOf | null;
+
 export type ValidationErrorLocItem = string | number;
 
 export interface ValidationError {
@@ -52,7 +61,11 @@ export interface ViewUser {
   id: string;
   login: string;
   name: string;
+  /** Роль пользователя */
   role: UserRole;
+  student_approvement: ViewUserStudentApprovement;
+  /** Данные Telegram-аккаунта */
+  telegram: ViewUserTelegram;
 }
 
 export type UpdateSceneTitle = string | null;
@@ -95,6 +108,22 @@ export interface UpdateFile {
   must_be_uploaded?: UpdateFileMustBeUploaded;
 }
 
+export type TelegramWidgetDataUsername = string | null;
+
+export type TelegramWidgetDataPhotoUrl = string | null;
+
+export type TelegramWidgetDataLastName = string | null;
+
+export interface TelegramWidgetData {
+  auth_date: number;
+  first_name: string;
+  hash: string;
+  id: number;
+  last_name?: TelegramWidgetDataLastName;
+  photo_url?: TelegramWidgetDataPhotoUrl;
+  username?: TelegramWidgetDataUsername;
+}
+
 export type SceneMeta = unknown | null;
 
 export interface Scene {
@@ -104,6 +133,36 @@ export interface Scene {
   meta: SceneMeta;
   organization: string;
   title: string;
+}
+
+export type RejectedApprovementStatus = typeof RejectedApprovementStatus[keyof typeof RejectedApprovementStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const RejectedApprovementStatus = {
+  rejected: 'rejected',
+} as const;
+
+export interface RejectedApprovement {
+  /** Дата отклонения студента */
+  at: string;
+  /** Комментарий по какой причине отклонен студент */
+  comment: string;
+  /** ID модератора, отклонившего студента */
+  moderator_id: string;
+  status: RejectedApprovementStatus;
+}
+
+export type PendingApprovementStatus = typeof PendingApprovementStatus[keyof typeof PendingApprovementStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PendingApprovementStatus = {
+  pending: 'pending',
+} as const;
+
+export interface PendingApprovement {
+  status: PendingApprovementStatus;
 }
 
 /**
@@ -201,6 +260,31 @@ export interface AuthCredentials {
   login?: string;
   /** User password */
   password?: string;
+}
+
+export type ApprovedApprovementStatus = typeof ApprovedApprovementStatus[keyof typeof ApprovedApprovementStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ApprovedApprovementStatus = {
+  approved: 'approved',
+} as const;
+
+/**
+ * ID организации к которой будет привязан студент
+ */
+export type ApprovedApprovementOrganizationId = string | null;
+
+export interface ApprovedApprovement {
+  /** Дата подтверждения студента */
+  at: string;
+  /** ID модератора, подтвердившего студента */
+  moderator_id: string;
+  /** ID организации к которой будет привязан студент */
+  organization_id: ApprovedApprovementOrganizationId;
+  /** Наименование организации к которой будет привязан студент (если организация не существует в системе) */
+  organization_name: string;
+  status: ApprovedApprovementStatus;
 }
 
 
@@ -316,6 +400,66 @@ export const useUsersGetMe = <TData = Awaited<ReturnType<typeof usersGetMe>>, TE
   ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
 
   const queryOptions = getUsersGetMeQueryOptions(options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * Получить пользователей с ожидающим подтверждением
+ * @summary Get Users With Pending Approvement
+ */
+export const usersGetUsersWithPendingApprovement = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<ViewUser[]>> => {
+    
+    return axios.get(
+      `/users/with-pending-approvement`,options
+    );
+  }
+
+
+export const getUsersGetUsersWithPendingApprovementQueryKey = () => {
+    return ['users','with-pending-approvement'] as const;
+    }
+
+    
+export const getUsersGetUsersWithPendingApprovementQueryOptions = <TData = Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getUsersGetUsersWithPendingApprovementQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>> = ({ signal }) => usersGetUsersWithPendingApprovement({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData> 
+}
+
+export type UsersGetUsersWithPendingApprovementQueryResult = NonNullable<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>>
+export type UsersGetUsersWithPendingApprovementQueryError = AxiosError<void>
+
+/**
+ * @summary Get Users With Pending Approvement
+ */
+export const useUsersGetUsersWithPendingApprovement = <TData = Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError = AxiosError<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getUsersGetUsersWithPendingApprovementQueryOptions(options)
 
   const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
 
@@ -899,6 +1043,65 @@ export const useOrganizationsDelete = <TError = AxiosError<void | HTTPValidation
       return useMutation(mutationOptions);
     }
     
+/**
+ * @summary Get By Username
+ */
+export const organizationsGetByUsername = (
+    username: MaybeRef<string>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<Organization>> => {
+    username = unref(username);
+    return axios.get(
+      `/organizations/by-username/${username}`,options
+    );
+  }
+
+
+export const getOrganizationsGetByUsernameQueryKey = (username: MaybeRef<string>,) => {
+    return ['organizations','by-username',username] as const;
+    }
+
+    
+export const getOrganizationsGetByUsernameQueryOptions = <TData = Awaited<ReturnType<typeof organizationsGetByUsername>>, TError = AxiosError<void | HTTPValidationError>>(username: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getOrganizationsGetByUsernameQueryKey(username);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsGetByUsername>>> = ({ signal }) => organizationsGetByUsername(username, { signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: computed(() => !!(unref(username))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData> 
+}
+
+export type OrganizationsGetByUsernameQueryResult = NonNullable<Awaited<ReturnType<typeof organizationsGetByUsername>>>
+export type OrganizationsGetByUsernameQueryError = AxiosError<void | HTTPValidationError>
+
+/**
+ * @summary Get By Username
+ */
+export const useOrganizationsGetByUsername = <TData = Awaited<ReturnType<typeof organizationsGetByUsername>>, TError = AxiosError<void | HTTPValidationError>>(
+ username: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getOrganizationsGetByUsernameQueryOptions(username,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
 /**
  * @summary Read All
  */
