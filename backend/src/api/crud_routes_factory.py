@@ -37,11 +37,13 @@ def setup_based_on_methods(
     crud: Any,
     routes: Optional[dict[str, str]] = None,
     responses: Optional[dict[str, dict[int | str, dict[str, Any]]]] = None,
-    dependencies: Optional[dict[str, list[Depends]]] = None,
+    dependencies: Optional[dict[str, list[Depends] | Depends]] = None,
 ):
     routes = DEFAULT_ROUTES if routes is None else DEFAULT_ROUTES | routes
     responses = DEFAULT_RESPONSES if responses is None else DEFAULT_RESPONSES | responses
     dependencies = dependencies or {}
+    # make all dependencies list
+    dependencies = {k: [v] if not isinstance(v, list) else v for k, v in dependencies.items()}
 
     # check if crud has `create` method and not abstract
     if hasattr(crud, "create") and not inspect.isabstract(crud.create):

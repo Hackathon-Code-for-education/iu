@@ -1,24 +1,35 @@
 __all__ = ["router"]
 
 from beanie import PydanticObjectId
+from fastapi import Depends, APIRouter
 
 from src.api.crud_routes_factory import setup_based_on_methods
 
-from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
+from src.api.dependencies import get_user
 from src.modules.scene.repository import scene_repository
 from src.storages.mongo.models.scene import Scene
 
-router = EnsureAuthenticatedAPIRouter(prefix="/scenes", tags=["Scenes"])
+router = APIRouter(prefix="/scenes", tags=["Scenes"])
 
-setup_based_on_methods(router, crud=scene_repository)
+_user_dep = Depends(get_user)
+
+setup_based_on_methods(
+    router,
+    crud=scene_repository,
+    dependencies={
+        "create": _user_dep,
+        "update": _user_dep,
+        "delete": _user_dep,
+    },
+)
 
 
 @router.get(
-    "/for-organization/{organization_id}",
+    "/for-organization/{id}",
     responses={200: {"description": "Сцены организации"}},
 )
-async def get_scenes_for_organization(organization_id: PydanticObjectId) -> list[Scene]:
+async def get_scenes_for_organization(id: PydanticObjectId) -> list[Scene]:
     """
     Получить сцены организации
     """
-    return await scene_repository.read_for_organization(organization_id)
+    return await scene_repository.read_for_organization(id)
