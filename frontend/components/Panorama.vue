@@ -19,15 +19,17 @@ export default {
 </script>
 
 <template>
-  <VuePannellum
-    :default="{
-      firstScene: 'main',
-      sceneFadeDuration: 1000,
-    }"
-    :scenes="scenes"
-    :pitch="25"
-    auto-load
-    show-fullscreen
-    style="width: 100%; height: 300px;"
-  />
+  <ClientOnly>
+    <VuePannellum
+      :default="{
+        firstScene: 'main',
+        sceneFadeDuration: 1000,
+      }"
+      :scenes="scenes"
+      :pitch="25"
+      auto-load
+      show-fullscreen
+      style="width: 100%; height: 300px;"
+    />
+  </ClientOnly>
 </template>

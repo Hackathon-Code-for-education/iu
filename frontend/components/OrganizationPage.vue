@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import logo from '~/assets/images/logo.jpg'
-
 defineProps<{
   title: string
   bio: string
 }>()
+
+
+
+
 </script>
 
 <template>
   <UContainer>
     <Card class="bg-neutral-900">
-      <NuxtImg src="bg.jpg" class="w-full h-auto max-h-[300px]" />
+      <Panorama/>
       <div class="px-12 flex py-4 justify-between items-start">
         <div class="flex justify-between gap-5 items-end">
           <div class="w-20 h-1 relative">
@@ -59,10 +61,8 @@ defineProps<{
           />
         </div>
       </Card>
-      <Card class="p-4">
-        <h3>FAQ</h3>
-        <div class="flex flex-col gap-2" />
-      </Card>
+      <Card class="p-4"><h3>FAQ</h3></Card>
+      <Card class="p-4"><h3>Контакты</h3></Card>
     </div>
   </UContainer>
 </template>
