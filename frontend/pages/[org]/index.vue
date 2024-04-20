@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { createError, useRoute } from '#app'
 import { useChattingJoinDialog, useChattingUpdateQueue, useOrganizationsGetByUsername } from '~/api'
+import { getFileUrl } from '~/api/file'
 
 const route = useRoute()
 const {
@@ -72,6 +73,7 @@ watch(chatModalOpen, (isOpen) => {
     :main-scene-id="org.data.main_scene || undefined"
     :title="org.data.name"
     bio="Example."
+    :logo-url="org.data.logo ? getFileUrl(org.data.logo) : undefined"
     @want-chat-click="handleWantChatClick"
   />
   <UContainer v-else-if="isLoading">

@@ -5,6 +5,7 @@ defineProps<{
   mainSceneId?: string
   title: string
   bio: string
+  logoUrl?: string
 }>()
 
 defineEmits<{
@@ -22,6 +23,7 @@ defineEmits<{
             <UAvatar
               class="absolute bottom-0 box-content border-4 border-neutral-900"
               size="3xl"
+              :src="logoUrl"
             />
           </div>
           <div>
