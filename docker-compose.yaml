@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  # Nginx proxy forwards requests to the appropriate service
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      # Proxy 80 port
+      - "80:80"
+    volumes:
+      # Add configuration file for Nginx, read-only
+      - "./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+    network_mode: host
