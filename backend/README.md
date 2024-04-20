@@ -52,6 +52,10 @@ GitHub поддерживает генерацию
         uri: mongodb://user:password@localhost:27017/db?authSource=admin
       ```
    </details>
+7. Установка библиотек для работы с файлами:
+   ```bash
+   sudo apt-get install --no-install-recommends libmagic1
+   ```
 
 **Интеграции в PyCharm**
 

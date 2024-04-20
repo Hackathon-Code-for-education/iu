@@ -1,40 +1,27 @@
 import re
-from inspect import cleandoc
-from types import ModuleType
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 
-import src.modules.providers.router
-import src.modules.user.router
 from src.config import settings
 
 # API version
 VERSION = "0.1.0"
 
 # Info for OpenAPI specification
-TITLE = "Abitura API"
+TITLE = "AbiTour API"
 SUMMARY = "Сервис абитурента"
 
 DESCRIPTION = None
 
-CONTACT_INFO = None
-
-LICENSE_INFO = None
-
-
-def safe_cleandoc(doc: str | None) -> str:
-    return cleandoc(doc) if doc else ""
-
-
-def doc_from_module(module: ModuleType) -> str:
-    return safe_cleandoc(module.__doc__)
-
+CONTACT_INFO = {"url": "https://t.me/one_zero_eight"}
+LICENSE_INFO = {"name": "MIT License"}
 
 TAGS_INFO = [
-    {"name": "Users", "description": doc_from_module(src.modules.user.router)},
-    {"name": "Providers", "description": doc_from_module(src.modules.providers.router)},
+    {"name": "Users", "description": "Модуль для работы с пользователями"},
+    {"name": "Providers", "description": "Модуль для работы с провайдерами авторизации"},
+    {"name": "Files", "description": "Модуль для работы с файлами"},
 ]
 
 

@@ -41,12 +41,16 @@ async def setup_database() -> AsyncIOMotorClient:
 
 async def setup_predefined() -> None:
     from src.modules.user.repository import user_repository
+    from src.modules.files.repository import files_repository
 
     if not await user_repository.read_by_login(settings.predefined.first_superuser_login):
         await user_repository.create_superuser(
             login=settings.predefined.first_superuser_login,
             password=settings.predefined.first_superuser_password,
         )
+
+    await files_repository.insert_all_existing_files()
+    await files_repository.check_existing_files()
 
 
 @asynccontextmanager

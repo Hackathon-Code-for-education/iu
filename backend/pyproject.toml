@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "hackathon-code-of-education"
+name = "hackathon-abitour"
 version = "0.1.0"
 description = ""
 authors = ["one-zero-eight <https://t.me/one_zero_eight>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 fastapi = { extras = ["all"], version = "^0.110.0" }
 pydantic = "^2.7.0"
 cryptography = "^42.0.5"
@@ -16,10 +16,9 @@ bcrypt = "^4.1.2"
 motor = "^3.4.0"
 pyyaml = "^6.0.1"
 uvicorn = "^0.29.0"
-python-socketio = "^5.11.1"
 colorlog = "^6.8.2"
 beanie = "^1.25.0"
-orjson = "^3.10.0"
+python-magic = "^0.4.27"
 
 [tool.poetry.group.prod.dependencies]
 gunicorn = "21.2.0"
