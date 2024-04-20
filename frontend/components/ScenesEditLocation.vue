@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query'
 import {
+  getOrganizationsGetByUsernameQueryKey,
+  getOrganizationsReadQueryKey,
   getScenesGetScenesForOrganizationQueryKey,
   useOrganizationsGetByUsername,
+  useOrganizationsUpdate,
   useScenesGetScenesForOrganization,
   useScenesUpdate,
 } from '~/api'
@@ -34,6 +37,19 @@ const { mutate: updateScene } = useScenesUpdate({
   },
 })
 
+const { mutate: updateOrg } = useOrganizationsUpdate({
+  mutation: {
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: getOrganizationsReadQueryKey(props.orgId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getOrganizationsGetByUsernameQueryKey(props.orgUsername),
+      })
+    },
+  },
+})
+
 function composeSceneData(scene: any) {
   return {
     panorama: getFileUrl(scene.file),
@@ -44,6 +60,7 @@ function composeSceneData(scene: any) {
 }
 
 const scene = computed(() => scenes.value?.data.find(scene => scene.id === props.sceneId))
+const isMainOrgScene = computed(() => org.value?.data.main_scene === props.sceneId)
 const scenesData = ref(scene.value ? { current: composeSceneData(scene.value) } : {})
 const scenesDataId = ref<string>(scene.value?.id || '')
 watch(scene, () => {
@@ -84,16 +101,35 @@ function save() {
 
   updateScene({ id: scene.value.id, data: { title: sceneInfo.title } })
 }
+
+function setAsMain() {
+  if (!scene.value)
+    return
+
+  updateOrg({ id: props.orgId, data: { main_scene: props.sceneId } })
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-2">
-    <div class="flex justify-end">
-      <UButton @click="save">
+    <UButton
+      :variant="isMainOrgScene ? 'ghost' : 'ghost'"
+      :disabled="isMainOrgScene"
+      icon="i-mdi-check"
+      @click="setAsMain"
+    >
+      Сделать основной на главной странице
+    </UButton>
+    <div class="flex w-full gap-2">
+      <UInput v-model="sceneInfo.title" class="w-full" label="Название локации" />
+      <UButton
+        :variant="sceneInfo.title !== scene?.title ? undefined : 'ghost'"
+        :disabled="sceneInfo.title === scene?.title"
+        @click="save"
+      >
         Сохранить
       </UButton>
     </div>
-    <UInput v-model="sceneInfo.title" label="Название локации" />
     <ClientOnly>
       <VuePannellum
         ref="pannellum"
@@ -107,15 +143,16 @@ function save() {
         auto-load
         show-fullscreen
         style="width: 100%; height: 300px;"
-      />
+      >
+        <div v-if="sceneInfo.yaw !== scene?.meta?.yaw" class="flex flex-col gap-2 justify-end right-0">
+          <UButton @click="savePosition">
+            Сохранить позицию
+          </UButton>
+          <UButton @click="restorePosition">
+            Восстановить позицию
+          </UButton>
+        </div>
+      </VuePannellum>
     </ClientOnly>
-    <div class="flex flex-row gap-2 justify-end">
-      <UButton variant="ghost" @click="savePosition">
-        Сохранить позицию
-      </UButton>
-      <UButton variant="ghost" @click="restorePosition">
-        Восстановить позицию
-      </UButton>
-    </div>
   </div>
 </template>

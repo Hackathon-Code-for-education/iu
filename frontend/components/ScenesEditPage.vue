@@ -6,10 +6,10 @@ const props = defineProps<{
   orgId: string
 }>()
 
-const sceneId = ref('')
-
 const { data: org } = useOrganizationsGetByUsername(props.orgUsername, { query: { retry: 0 } })
 const { data: scenes } = useScenesGetScenesForOrganization(props.orgId, { query: { retry: 0 } })
+
+const sceneId = ref(org.value?.data.main_scene)
 </script>
 
 <template>
@@ -38,7 +38,7 @@ const { data: scenes } = useScenesGetScenesForOrganization(props.orgId, { query:
             :variant="sceneId !== scene.id ? 'ghost' : 'solid'"
             icon="i-mdi-location"
             size="sm"
-            color="gray"
+            :color="org.data.main_scene === scene.id ? 'green' : 'gray'"
             @click="sceneId = scene.id"
           />
           <UButton
