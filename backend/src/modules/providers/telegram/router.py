@@ -3,7 +3,8 @@ __all__ = ["router"]
 import hashlib
 import hmac
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from starlette.responses import HTMLResponse
 
 from src.api.dependencies import UserIdDep, OptionalUserIdDep
 from src.config import settings
@@ -37,7 +38,7 @@ if settings.telegram:
             return evaluated_hash == received_hash
         return False
 
-    @router.post(
+    @router.get(
         "/register",
         responses={
             200: {"description": "Success"},
@@ -47,7 +48,7 @@ if settings.telegram:
         status_code=200,
     )
     async def telegram_register(
-        telegram_data: TelegramWidgetData, user_id: OptionalUserIdDep, request: Request
+        user_id: OptionalUserIdDep, request: Request, telegram_data: TelegramWidgetData = Depends()
     ) -> None:
         if user_id is not None:
             raise AlreadyExists("Пользователь уже зарегистрирован (есть сессия)")
@@ -61,7 +62,7 @@ if settings.telegram:
         request.session["uid"] = str(user.id)
         return None
 
-    @router.post(
+    @router.get(
         "/connect",
         responses={
             200: {"description": "Success"},
@@ -70,12 +71,12 @@ if settings.telegram:
         },
         status_code=200,
     )
-    async def telegram_connect(telegram_data: TelegramWidgetData, user_id: UserIdDep):
+    async def telegram_connect(user_id: UserIdDep, telegram_data: TelegramWidgetData = Depends()):
         if not validate_widget_hash(telegram_data):
             raise InvalidTelegramWidgetHash()
         await user_repository.update_telegram(user_id, telegram_data)
 
-    @router.post(
+    @router.get(
         "/login",
         responses={
             200: {"description": "Success", "model": TelegramLoginResponse},
@@ -84,7 +85,7 @@ if settings.telegram:
         },
     )
     async def telegram_login(
-        telegram_data: TelegramWidgetData, user_id: OptionalUserIdDep, request: Request
+        user_id: OptionalUserIdDep, request: Request, telegram_data: TelegramWidgetData = Depends()
     ) -> TelegramLoginResponse:
         if not validate_widget_hash(telegram_data):
             raise InvalidTelegramWidgetHash()
@@ -96,3 +97,99 @@ if settings.telegram:
         request.session.clear()
         request.session["uid"] = str(user_by_telegram_id.id)
         return TelegramLoginResponse(need_to_connect=False)
+
+    @router.get(
+        "/register.html",
+        responses={200: {"description": "Success"}},
+        response_class=HTMLResponse,
+    )
+    async def telegram_register_html(request: Request) -> HTMLResponse:
+        register_url = request.url_for("telegram_register")
+
+        script = f"""
+        <script
+            async src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="{settings.telegram.bot_username}"
+            data-size="large"
+            data-auth-url="{register_url}">
+        </script>
+        """
+
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Telegram Register Widget</title>
+            </head>
+            <body>
+                <h1>Регистрация через Telegram</h1>
+                {script}
+            </body>
+        </html>
+        """
+
+        return HTMLResponse(content=html)
+
+    @router.get(
+        "/connect.html",
+        responses={200: {"description": "Success"}},
+        response_class=HTMLResponse,
+    )
+    async def telegram_connect_html(request: Request) -> HTMLResponse:
+        connect_url = request.url_for("telegram_connect")
+
+        script = f"""
+        <script
+            async src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="{settings.telegram.bot_username}"
+            data-size="large"
+            data-auth-url="{connect_url}">
+        </script>
+        """
+
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Telegram Login Widget</title>
+            </head>
+            <body>
+                <h1>Подключение Telegram</h1>
+                {script}
+            </body>
+        </html>
+        """
+
+        return HTMLResponse(content=html)
+
+    @router.get(
+        "/login.html",
+        responses={200: {"description": "Success"}},
+        response_class=HTMLResponse,
+    )
+    async def telegram_login_html(request: Request) -> HTMLResponse:
+        login_url = request.url_for("telegram_login")
+
+        script = f"""
+        <script
+            async src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="{settings.telegram.bot_username}"
+            data-size="large"
+            data-auth-url="{login_url}">
+        </script>
+        """
+
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Telegram Login Widget</title>
+            </head>
+            <body>
+                <h1>Вход через Telegram</h1>
+                {script}
+            </body>
+        </html>
+        """
+
+        return HTMLResponse(content=html)
