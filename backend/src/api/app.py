@@ -43,7 +43,7 @@ if settings.cors_allow_origins:
     )
 
 # Authorization
-same_site = "lax" if settings.environment == Environment.PRODUCTION else "none"
+same_site = "lax"
 session_cookie = "__Secure-abitura-session" if settings.environment == Environment.PRODUCTION else "abitura-session"
 # noinspection PyTypeChecker
 app.add_middleware(
@@ -53,7 +53,7 @@ app.add_middleware(
     max_age=14 * 24 * 60 * 60,  # 14 days, in seconds
     path=settings.app_root_path or "/",
     same_site=same_site,
-    https_only=True,
+    https_only=settings.environment == Environment.PRODUCTION,
     domain=None,
 )
 

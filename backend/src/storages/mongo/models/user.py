@@ -60,6 +60,15 @@ class UserSchema(CustomModel):
     def is_admin(self) -> bool:
         return self.role == UserRole.ADMIN
 
+    def is_approved(self, organization_id: PydanticObjectId) -> bool:
+        if self.student_approvement is None:
+            return False
+
+        if self.student_approvement.status == "approved":
+            return self.student_approvement.organization_id == organization_id
+
+        return False
+
     @model_validator(mode="after")
     def validate_user_registration(self) -> Self:
         # registered via telegram

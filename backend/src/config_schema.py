@@ -64,7 +64,7 @@ class Settings(CustomModel):
 
     environment: Environment = Environment.DEVELOPMENT
     "App environment flag"
-    app_root_path: str = ""
+    app_root_path: str = "/api"
     "Prefix for the API path (e.g. '/api/v0')"
     database: Database
     "MongoDB database settings"
