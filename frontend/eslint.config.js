@@ -3,7 +3,9 @@ import tailwindcss from 'eslint-plugin-tailwindcss'
 import vueParser from 'vue-eslint-parser'
 
 export default antfu(
-  {},
+  {
+    ignores: ['api/__generated__.ts'],
+  },
   {
     rules: {
       'tailwindcss/classnames-order': 'error',
