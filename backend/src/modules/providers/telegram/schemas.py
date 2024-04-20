@@ -1,7 +1,5 @@
 __all__ = ["TelegramWidgetData", "TelegramLoginResponse"]
 
-from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -10,9 +8,9 @@ class TelegramWidgetData(BaseModel):
     id: int
     auth_date: int
     first_name: str
-    last_name: Optional[str] = None
-    username: Optional[str] = None
-    photo_url: Optional[str] = None
+    last_name: str | None = None
+    username: str | None = None
+    photo_url: str | None = None
 
     @property
     def string_to_hash(self) -> str:
