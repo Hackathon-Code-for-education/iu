@@ -51,6 +51,7 @@ class UserSchema(CustomModel):
     telegram: TelegramWidgetData | None = None
     "Данные Telegram-аккаунта"
     student_approvement: StudentApprovement | None = None
+    "Подтверждения статуса студента"
 
     @property
     def is_admin(self) -> bool:
