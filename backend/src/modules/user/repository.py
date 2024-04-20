@@ -56,5 +56,15 @@ class UserRepository:
         users = await User.find({"student_approvement.status": "pending"}).to_list()
         return users
 
+    async def filter_user_ids_belongs_to_organization(
+        self, organization_id: PydanticObjectId, user_ids: list[PydanticObjectId]
+    ) -> list[PydanticObjectId]:
+        if not user_ids:
+            return []
+        users = await User.find(
+            {"_id": {"$in": user_ids}, "student_approvement.organization_id": organization_id}
+        ).to_list()
+        return [user.id for user in users]
+
 
 user_repository: UserRepository = UserRepository()
