@@ -1,12 +1,13 @@
 <template>
-  <div>
-    <header class="my-6">
+  <div class="py-4">
+    <header>
       <UContainer>
-        <Card class="px-16 py-2 flex items-center justify-between">
+        <Card class="px-16 py-2 flex mb-4 items-center justify-between">
           <UHorizontalNavigation
             :links="[
               { label: 'Главная', to: '/' },
               { label: 'ВУЗы', to: '/orgs' },
+              { label: 'Чаты', to: '/chats' },
             ]"
           />
           <div class="flex items-center">
