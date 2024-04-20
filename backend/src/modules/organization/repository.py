@@ -26,5 +26,8 @@ class OrganizationRepository:
     async def delete(self, id: PydanticObjectId) -> bool:
         return await crud.delete(id)
 
+    async def read_by_username(self, username: str) -> Organization | None:
+        return await Organization.find_one({"username": username})
+
 
 organization_repository: OrganizationRepository = OrganizationRepository()
