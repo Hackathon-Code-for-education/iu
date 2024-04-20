@@ -2,9 +2,9 @@ from enum import StrEnum
 from pathlib import Path
 
 import yaml
-from pydantic import Field, SecretStr, ConfigDict, field_validator
+from pydantic import Field, SecretStr, ConfigDict, field_validator, BaseModel
 
-from src.custom_pydantic import CustomModel
+from src.storages.mongo.schemas import UserRole
 
 
 class Environment(StrEnum):
@@ -13,14 +13,18 @@ class Environment(StrEnum):
     TESTING = "testing"
 
 
-class Authentication(CustomModel):
+class SettingsEntityModel(BaseModel):
+    model_config = ConfigDict(use_attribute_docstrings=True, extra="forbid")
+
+
+class Authentication(SettingsEntityModel):
     allowed_domains: list[str] = ["localhost", "127.0.0.1", "0.0.0.0"]
     "Allowed domains for redirecting after authentication"
     session_secret_key: SecretStr
     "Secret key for sessions. Use 'openssl rand -hex 32' to generate keys"
 
 
-class StaticFiles(CustomModel):
+class StaticFiles(SettingsEntityModel):
     mount_path: str = "/static"
     mount_name: str = "static"
     directory: Path = Path("static")
@@ -34,28 +38,32 @@ class StaticFiles(CustomModel):
         return value
 
 
-class Database(CustomModel):
+class Database(SettingsEntityModel):
     uri: SecretStr
     "Database URI. If not set, will be generated from other settings"
 
 
-class Predefined(CustomModel):
+class PredefinedUser(SettingsEntityModel):
+    role: UserRole = UserRole.DEFAULT
+    name: str
+    login: str
+    password: str
+
+
+class Predefined(SettingsEntityModel):
     """Predefined settings. Will be used in setup stage."""
 
-    first_superuser_login: str = "admin"
-    "Login for the first superuser"
-    first_superuser_password: str = "admin"
-    "Password for the first superuser"
+    users: list[PredefinedUser] = []
 
 
-class Telegram(CustomModel):
+class Telegram(SettingsEntityModel):
     bot_username: str
     "Bot username for Telegram"
     bot_token: SecretStr
     "Bot token for Telegram"
 
 
-class Settings(CustomModel):
+class Settings(SettingsEntityModel):
     """
     Settings for the application.
     """

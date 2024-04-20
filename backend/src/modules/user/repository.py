@@ -2,6 +2,7 @@ __all__ = ["UserRepository", "user_repository"]
 
 from beanie import PydanticObjectId
 
+from src.config import settings
 from src.exceptions import AlreadyExists, ObjectNotFound
 from src.modules.providers.telegram.schemas import TelegramWidgetData
 from src.storages.mongo import User
@@ -11,6 +12,22 @@ from src.utils import aware_utcnow
 
 # noinspection PyMethodMayBeStatic
 class UserRepository:
+    async def create_predefined_users(self):
+        from src.modules.providers.credentials.repository import credentials_repository
+
+        for user in settings.predefined.users:
+            # check by login
+            _user_by_login = await self.read_by_login(user["login"])
+            if _user_by_login is not None:
+                continue
+            user_dict = {
+                "login": user["login"],
+                "name": user["name"],
+                "password_hash": credentials_repository.get_password_hash(user["password"]),
+                "role": user["role"],
+            }
+            await User.model_validate(user_dict).insert()
+
     async def create_superuser(self, login: str, password: str) -> User:
         from src.modules.providers.credentials.repository import credentials_repository
 

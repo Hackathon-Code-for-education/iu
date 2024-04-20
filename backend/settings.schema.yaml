@@ -1,6 +1,7 @@
 $schema: https://json-schema.org/draft-07/schema#
 $defs:
   Authentication:
+    additionalProperties: false
     properties:
       allowed_domains:
         default:
@@ -24,6 +25,7 @@ $defs:
     title: Authentication
     type: object
   Database:
+    additionalProperties: false
     properties:
       uri:
         description: Database URI. If not set, will be generated from other settings
@@ -43,21 +45,41 @@ $defs:
     title: Environment
     type: string
   Predefined:
+    additionalProperties: false
     description: Predefined settings. Will be used in setup stage.
     properties:
-      first_superuser_login:
-        default: admin
-        description: Login for the first superuser
-        title: First Superuser Login
-        type: string
-      first_superuser_password:
-        default: admin
-        description: Password for the first superuser
-        title: First Superuser Password
-        type: string
+      users:
+        default: []
+        items:
+          $ref: '#/$defs/PredefinedUser'
+        title: Users
+        type: array
     title: Predefined
     type: object
+  PredefinedUser:
+    additionalProperties: false
+    properties:
+      role:
+        allOf:
+        - $ref: '#/$defs/UserRole'
+        default: default
+      name:
+        title: Name
+        type: string
+      login:
+        title: Login
+        type: string
+      password:
+        title: Password
+        type: string
+    required:
+    - name
+    - login
+    - password
+    title: PredefinedUser
+    type: object
   StaticFiles:
+    additionalProperties: false
     properties:
       mount_path:
         default: /static
@@ -75,6 +97,7 @@ $defs:
     title: StaticFiles
     type: object
   Telegram:
+    additionalProperties: false
     properties:
       bot_username:
         description: Bot username for Telegram
@@ -91,6 +114,13 @@ $defs:
     - bot_token
     title: Telegram
     type: object
+  UserRole:
+    enum:
+    - admin
+    - moderator
+    - default
+    title: UserRole
+    type: string
 description: Settings for the application.
 properties:
   environment:
@@ -99,7 +129,7 @@ properties:
     default: development
     description: App environment flag
   app_root_path:
-    default: ''
+    default: /api
     description: Prefix for the API path (e.g. '/api/v0')
     title: App Root Path
     type: string
