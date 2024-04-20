@@ -3,6 +3,7 @@ from typing import Annotated
 from beanie import Indexed
 
 from src.custom_pydantic import CustomModel
+from src.modules.providers.telegram.schemas import TelegramWidgetData
 from src.storages.mongo.models.__base__ import CustomDocument
 from src.storages.mongo.schemas import UserRole
 
@@ -16,6 +17,8 @@ class UserSchema(CustomModel):
     "Хэш пароля"
     role: UserRole = UserRole.DEFAULT
     "Роль пользователя"
+    telegram: TelegramWidgetData | None = None
+    "Данные Telegram-аккаунта"
 
     @property
     def is_admin(self) -> bool:

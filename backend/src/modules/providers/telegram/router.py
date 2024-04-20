@@ -49,8 +49,7 @@ if settings.telegram:
     async def telegram_connect(telegram_data: TelegramWidgetData, user_id: UserIdDep):
         if not validate_widget_hash(telegram_data):
             raise InvalidTelegramWidgetHash()
-        # TODO: Implement
-        await user_repository.update_telegram(user_id, telegram_data)  # type: ignore[attr-defined]
+        await user_repository.update_telegram(user_id, telegram_data)
 
     @router.post(
         "/login",
@@ -65,13 +64,8 @@ if settings.telegram:
     ) -> TelegramLoginResponse:
         if not validate_widget_hash(telegram_data):
             raise InvalidTelegramWidgetHash()
-        # TODO: Implement
-        user_by_telegram_id = await user_repository.read_by_telegram_id(telegram_data.id)  # type: ignore[attr-defined]
+        user_by_telegram_id = await user_repository.read_by_telegram_id(telegram_data.id)
         if user_by_telegram_id is None and user_id is not None:
-            # connect a telegram account
-            # await user_repository.update_telegram(user_id, telegram_data)
-            # request.session.clear()
-            # request.session["uid"] = str(user_id)
             return TelegramLoginResponse(need_to_connect=True)
         if user_by_telegram_id is None:
             raise UnauthorizedException("Пользователь с таким telegram id не найден")
