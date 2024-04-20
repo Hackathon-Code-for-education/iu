@@ -58,6 +58,10 @@ export default {
       this.$el.innerHTML = ''
       this.$nextTick(this.load)
     },
+    scenes(val) {
+      this.$el.innerHTML = ''
+      this.$nextTick(this.load)
+    },
     hfov(val) {
       if (this.viewer)
         this.viewer.setHfov(val, false)
@@ -100,8 +104,6 @@ export default {
     },
   },
   mounted() {
-    if (window) {
-    }
     this.load()
     this.rafId = window.requestAnimationFrame(this.loop)
   },
