@@ -29,6 +29,8 @@ class DialogSchema(CustomModel):
     "Сообщения в диалоге"
     closed: bool = False
     "Закрыт ли диалог"
+    title: str | None = None
+    "Название диалога"
 
 
 class Dialog(DialogSchema, CustomDocument):

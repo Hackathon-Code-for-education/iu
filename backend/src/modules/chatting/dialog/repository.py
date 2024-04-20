@@ -7,6 +7,12 @@ from src.storages.mongo.models.dialog import Dialog, MessageSchema
 # noinspection PyMethodMayBeStatic
 class DialogRepository:
     async def create(self, obj: CreateDialog) -> Dialog:
+        if obj.title is None:
+            from src.modules.organization.repository import organization_repository
+
+            organization = await organization_repository.read(obj.organization_id)
+            title = f"{organization.name} - Студент X"
+            obj.title = title
         return await Dialog.model_validate(obj.model_dump()).insert()
 
     async def read(self, obj_id: PydanticObjectId) -> Dialog | None:
