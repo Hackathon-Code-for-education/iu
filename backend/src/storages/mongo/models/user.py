@@ -13,22 +13,24 @@ from src.storages.mongo.schemas import UserRole
 
 class PendingApprovement(CustomModel):
     status: Literal["pending"] = "pending"
+    organization_id: PydanticObjectId
+    "ID организации к которой будет привязан студент"
 
 
 class ApprovedApprovement(CustomModel):
     status: Literal["approved"] = "approved"
+    organization_id: PydanticObjectId
+    "ID организации к которой будет привязан студент"
     moderator_id: PydanticObjectId
     "ID модератора, подтвердившего студента"
     at: datetime.datetime
     "Дата подтверждения студента"
-    organization_name: str
-    "Наименование организации к которой будет привязан студент (если организация не существует в системе)"
-    organization_id: PydanticObjectId | None
-    "ID организации к которой будет привязан студент"
 
 
 class RejectedApprovement(CustomModel):
     status: Literal["rejected"] = "rejected"
+    organization_id: PydanticObjectId
+    "ID организации к которой будет привязан студент"
     moderator_id: PydanticObjectId
     "ID модератора, отклонившего студента"
     at: datetime.datetime
@@ -55,6 +57,8 @@ class UserSchema(CustomModel):
     # telegram
     telegram: TelegramWidgetData | None = None
     "Данные Telegram-аккаунта"
+    documents: list[PydanticObjectId] = []
+    "Список документов пользователя"
 
     @property
     def is_admin(self) -> bool:

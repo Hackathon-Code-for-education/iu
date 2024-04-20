@@ -2,9 +2,11 @@ __all__ = ["UserRepository", "user_repository"]
 
 from beanie import PydanticObjectId
 
-from src.exceptions import AlreadyExists
+from src.exceptions import AlreadyExists, ObjectNotFound
 from src.modules.providers.telegram.schemas import TelegramWidgetData
 from src.storages.mongo import User
+from src.storages.mongo.models.user import PendingApprovement, ApprovedApprovement, RejectedApprovement
+from src.utils import aware_utcnow
 
 
 # noinspection PyMethodMayBeStatic
@@ -65,6 +67,53 @@ class UserRepository:
             {"_id": {"$in": user_ids}, "student_approvement.organization_id": organization_id}
         ).to_list()
         return [user.id for user in users]
+
+    async def set_documents(self, user_id: PydanticObjectId, document_ids: list[PydanticObjectId]) -> User | None:
+        user = await self.read(user_id)
+        if user is None:
+            return None
+        return await user.update({"$set": {"documents": document_ids}})
+
+    async def request_approvement(self, user_id: PydanticObjectId, organization_id: PydanticObjectId) -> User | None:
+        user = await self.read(user_id)
+        if user is None:
+            return None
+
+        _approvement = PendingApprovement(organization_id=organization_id)
+        return await user.update({"$set": {"student_approvement": _approvement}})
+
+    async def approve_user(
+        self, user_id: PydanticObjectId, source_user_id: PydanticObjectId, is_approve: bool, comment: str = ""
+    ) -> User:
+        user = await self.read(user_id)
+        if user is None:
+            raise ObjectNotFound("Пользователь не найден")
+        _prev_approvement = user.student_approvement
+
+        if _prev_approvement is None:
+            raise ObjectNotFound("Пользователь не запрашивал подтверждения")
+
+        if not isinstance(_prev_approvement, PendingApprovement):
+            raise AlreadyExists("Пользователь уже одобрен или отклонен")
+
+        _approvement: ApprovedApprovement | RejectedApprovement
+        if is_approve:
+            _approvement = ApprovedApprovement(
+                organization_id=_prev_approvement.organization_id,
+                moderator_id=source_user_id,
+                at=aware_utcnow(),
+            )
+        else:
+            _approvement = RejectedApprovement(
+                organization_id=_prev_approvement.organization_id,
+                moderator_id=source_user_id,
+                at=aware_utcnow(),
+                comment=comment,
+            )
+
+        user.student_approvement = _approvement
+        await user.save()
+        return user
 
 
 user_repository: UserRepository = UserRepository()
