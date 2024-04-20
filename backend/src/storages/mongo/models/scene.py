@@ -7,6 +7,7 @@ from src.storages.mongo.models.__base__ import CustomDocument
 
 
 class SceneSchema(CustomModel):
+    title: str
     organization: PydanticObjectId
     file: PydanticObjectId
     meta: Any | None = None

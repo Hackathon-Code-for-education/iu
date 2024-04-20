@@ -1,13 +1,13 @@
-from typing import Any
+from typing import Any, Annotated
 
-from beanie import Indexed
+from beanie import Indexed, PydanticObjectId
 
 from src.custom_pydantic import CustomModel
 from src.storages.mongo.models.__base__ import CustomDocument
 
 
 class OrganizationSchema(CustomModel):
-    username: Indexed(str, unique=True)
+    username: Annotated[str, Indexed(unique=True)]
     "Псевдоним организации (уникальный)"
     name: str
     "Наименование организации"
@@ -15,6 +15,8 @@ class OrganizationSchema(CustomModel):
     "Контактные данные организации"
     documents: Any = None
     "Документы организации"
+    main_scene: PydanticObjectId | None = None
+    "Основная сцена организации"
 
 
 class Organization(OrganizationSchema, CustomDocument):

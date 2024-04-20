@@ -11,6 +11,7 @@ class CreateScene(SceneSchema):
 
 
 class UpdateScene(SceneSchema):
+    title: str | None = None
     organization: PydanticObjectId | None = None
     file: PydanticObjectId | None = None
     meta: Any = None
