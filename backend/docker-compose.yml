@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  api:
+    depends_on: [ db ]
+    build:
+      dockerfile: ./deploy/Dockerfile
+      context: .
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./settings.yaml:/code/settings.yaml:ro"
+      - "./static:/code/static:rw"
+    env_file: .env
+
+  db:
+    image: "mongo:7.0"
+    restart: always
+    volumes:
+      - "mongodb:/data/db"
+    ports:
+      - "27017:27017"
+    env_file: .env
+
+volumes:
+  mongodb:

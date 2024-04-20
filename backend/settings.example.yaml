@@ -1,0 +1,11 @@
+$schema: "./settings.schema.yaml"
+# ---------- Application settings ----- #
+database:
+  uri: mongodb://user:password@localhost:27017/db?authSource=admin
+# Predefined
+predefined:
+  first_superuser_login: admin
+  first_superuser_password: admin
+auth:
+    # Run 'openssl rand -hex 32' to generate key
+    session_secret_key: "secret"

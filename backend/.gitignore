@@ -1,0 +1,25 @@
+### PyCharm ###
+.idea
+
+### VSCode ###
+.vscode
+
+### Cache ###
+__pycache__
+.ruff_cache
+
+### Environment ###
+.env
+settings.yaml
+static
+venv
+
+### Sensible ###
+/private.pem
+/public.pem
+
+### macOS Specific ###
+.DS_Store
+
+### Parsing
+parsed/

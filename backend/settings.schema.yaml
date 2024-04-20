@@ -1,0 +1,137 @@
+$schema: https://json-schema.org/draft-07/schema#
+$defs:
+  Authentication:
+    properties:
+      allowed_domains:
+        default:
+        - localhost
+        - 127.0.0.1
+        - 0.0.0.0
+        description: Allowed domains for redirecting after authentication
+        items:
+          type: string
+        title: Allowed Domains
+        type: array
+      session_secret_key:
+        description: Secret key for sessions. Use 'openssl rand -hex 32' to generate
+          keys
+        format: password
+        title: Session Secret Key
+        type: string
+        writeOnly: true
+    required:
+    - session_secret_key
+    title: Authentication
+    type: object
+  Database:
+    properties:
+      uri:
+        description: Database URI. If not set, will be generated from other settings
+        format: password
+        title: Uri
+        type: string
+        writeOnly: true
+    required:
+    - uri
+    title: Database
+    type: object
+  Environment:
+    enum:
+    - development
+    - production
+    - testing
+    title: Environment
+    type: string
+  Predefined:
+    description: Predefined settings. Will be used in setup stage.
+    properties:
+      first_superuser_login:
+        default: admin
+        description: Login for the first superuser
+        title: First Superuser Login
+        type: string
+      first_superuser_password:
+        default: admin
+        description: Password for the first superuser
+        title: First Superuser Password
+        type: string
+    title: Predefined
+    type: object
+  StaticFiles:
+    properties:
+      mount_path:
+        default: /static
+        title: Mount Path
+        type: string
+      mount_name:
+        default: static
+        title: Mount Name
+        type: string
+      directory:
+        default: static
+        format: path
+        title: Directory
+        type: string
+    title: StaticFiles
+    type: object
+  Telegram:
+    properties:
+      bot_username:
+        description: Bot username for Telegram
+        title: Bot Username
+        type: string
+      bot_token:
+        description: Bot token for Telegram
+        format: password
+        title: Bot Token
+        type: string
+        writeOnly: true
+    required:
+    - bot_username
+    - bot_token
+    title: Telegram
+    type: object
+description: Settings for the application.
+properties:
+  environment:
+    allOf:
+    - $ref: '#/$defs/Environment'
+    default: development
+    description: App environment flag
+  app_root_path:
+    default: ''
+    description: Prefix for the API path (e.g. '/api/v0')
+    title: App Root Path
+    type: string
+  database:
+    allOf:
+    - $ref: '#/$defs/Database'
+    description: MongoDB database settings
+  predefined:
+    allOf:
+    - $ref: '#/$defs/Predefined'
+    description: Predefined settings
+  static_files:
+    allOf:
+    - $ref: '#/$defs/StaticFiles'
+    description: Static files settings
+  cors_allow_origins:
+    description: CORS origins, used by FastAPI CORSMiddleware
+    items:
+      type: string
+    title: Cors Allow Origins
+    type: array
+  auth:
+    allOf:
+    - $ref: '#/$defs/Authentication'
+    description: Authentication settings
+  telegram:
+    anyOf:
+    - $ref: '#/$defs/Telegram'
+    - type: 'null'
+    default: null
+required:
+- database
+- auth
+title: Settings
+type: object
