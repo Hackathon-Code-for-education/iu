@@ -16,3 +16,4 @@ class UpdateOrganization(OrganizationSchema):
     contacts: Any | None = None
     documents: Any | None = None
     main_scene: PydanticObjectId | None = None
+    logo: PydanticObjectId | None = None

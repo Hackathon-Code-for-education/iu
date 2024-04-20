@@ -17,6 +17,8 @@ class OrganizationSchema(CustomModel):
     "Документы организации"
     main_scene: PydanticObjectId | None = None
     "Основная сцена организации"
+    logo: PydanticObjectId | None = None
+    "Логотип организации"
 
 
 class Organization(OrganizationSchema, CustomDocument):
