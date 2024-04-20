@@ -13,4 +13,4 @@ class CreateScene(SceneSchema):
 class UpdateScene(SceneSchema):
     organization: CustomLink[Organization] | None = None
     file: CustomLink[File] | None = None
-    meta: Any | None = None
+    meta: Any = None
