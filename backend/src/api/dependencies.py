@@ -1,4 +1,4 @@
-__all__ = ["UserIdDep", "OptionalUserIdDep", "UserDep", "AdminDep", "get_user"]
+__all__ = ["UserIdDep", "OptionalUserIdDep", "UserDep", "ModeratorDep", "get_user", "get_moderator"]
 
 from typing import Annotated
 from fastapi import Request, Depends
@@ -37,13 +37,13 @@ async def get_user(request: Request) -> User:
     return user
 
 
-async def _get_admin_dep(user: User = Depends(get_user)) -> User:
-    if not user.is_admin:
-        raise NotEnoughPermissionsException("У вас недостаточно прав")
+async def get_moderator(user: User = Depends(get_user)) -> User:
+    if not user.is_moderator_plus:
+        raise NotEnoughPermissionsException("У вас нет модераторских прав")
     return user
 
 
 UserIdDep = Annotated[PydanticObjectId, Depends(_get_uid_from_session)]
 OptionalUserIdDep = Annotated[PydanticObjectId | None, Depends(_get_optional_uid_from_session, use_cache=False)]
 UserDep = Annotated[User, Depends(get_user)]
-AdminDep = Annotated[User, Depends(_get_admin_dep)]
+ModeratorDep = Annotated[User, Depends(get_moderator)]

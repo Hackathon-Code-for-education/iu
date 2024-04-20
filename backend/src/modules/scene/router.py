@@ -5,21 +5,21 @@ from fastapi import Depends, APIRouter
 
 from src.api.crud_routes_factory import setup_based_on_methods
 
-from src.api.dependencies import get_user
+from src.api.dependencies import get_moderator
 from src.modules.scene.repository import scene_repository
 from src.storages.mongo.models.scene import Scene
 
 router = APIRouter(prefix="/scenes", tags=["Scenes"])
 
-_user_dep = Depends(get_user)
+_moder_dep = Depends(get_moderator)
 
 setup_based_on_methods(
     router,
     crud=scene_repository,
     dependencies={
-        "create": _user_dep,
-        "update": _user_dep,
-        "delete": _user_dep,
+        "create": _moder_dep,
+        "update": _moder_dep,
+        "delete": _moder_dep,
     },
 )
 

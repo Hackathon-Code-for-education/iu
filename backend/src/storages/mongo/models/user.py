@@ -61,8 +61,8 @@ class UserSchema(CustomModel):
     "Список документов пользователя"
 
     @property
-    def is_admin(self) -> bool:
-        return self.role == UserRole.ADMIN
+    def is_moderator_plus(self) -> bool:
+        return self.role == UserRole.ADMIN or self.role == UserRole.MODERATOR
 
     def is_approved(self, organization_id: PydanticObjectId) -> bool:
         if self.student_approvement is None:

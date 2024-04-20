@@ -7,7 +7,7 @@ __all__ = ["router"]
 from beanie import PydanticObjectId
 
 from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
-from src.api.dependencies import UserDep
+from src.api.dependencies import UserDep, ModeratorDep
 from src.exceptions import NotEnoughPermissionsException
 from src.modules.user.repository import user_repository
 from src.modules.user.schemas import ViewUser
@@ -61,14 +61,10 @@ async def logout(request: Request) -> None:
         **NotEnoughPermissionsException.responses,
     },
 )
-async def get_users_with_pending_approvement(user: UserDep) -> list[ViewUser]:
+async def get_users_with_pending_approvement(_moder: ModeratorDep) -> list[ViewUser]:
     """
     Получить пользователей с ожидающим подтверждением
     """
-
-    if not user.is_admin:
-        raise NotEnoughPermissionsException("У вас нет модераторских прав")
-
     users = await user_repository.read_with_pending_approvement()
     return [ViewUser.model_validate(user.model_dump()) for user in users]
 
@@ -76,13 +72,10 @@ async def get_users_with_pending_approvement(user: UserDep) -> list[ViewUser]:
 @router.get(
     "/by-id/{user_id}", responses={200: {"description": "Пользователь"}, **NotEnoughPermissionsException.responses}
 )
-async def get_user_by_id(user: UserDep, user_id: PydanticObjectId) -> ViewUser:
+async def get_user_by_id(_moder: ModeratorDep, user_id: PydanticObjectId) -> ViewUser:
     """
     Получить пользователя по идентификатору
     """
-
-    if not user.is_admin:
-        raise NotEnoughPermissionsException("У вас нет модераторских прав")
 
     target_user = await user_repository.read(user_id)
     return ViewUser.model_validate(target_user.model_dump())
@@ -93,16 +86,13 @@ async def get_user_by_id(user: UserDep, user_id: PydanticObjectId) -> ViewUser:
     responses={200: {"description": "Пользователь одобрен или отклонен"}, **NotEnoughPermissionsException.responses},
 )
 async def approve_user(
-    user: UserDep, user_id: PydanticObjectId, is_approve: bool, comment: str | None = None
+    moder: ModeratorDep, user_id: PydanticObjectId, is_approve: bool, comment: str | None = None
 ) -> ViewUser:
     """
     Одобрить или отклонить пользователя
     """
 
-    if not user.is_admin:
-        raise NotEnoughPermissionsException("У вас нет модераторских прав")
-
     target_user = await user_repository.approve_user(
-        is_approve=is_approve, user_id=user_id, source_user_id=user.id, comment=comment or ""
+        is_approve=is_approve, user_id=user_id, source_user_id=moder.id, comment=comment or ""
     )
     return ViewUser.model_validate(target_user.model_dump())
