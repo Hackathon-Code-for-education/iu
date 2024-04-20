@@ -52,6 +52,45 @@ organization_id: string;
 
 export type ChattingUpdateQueue200 = OnlineOfQueue | JoinDialog;
 
+export type UsersApproveUserParams = {
+is_approve: boolean;
+comment?: string | null;
+};
+
+export type UsersRequestApprovementParams = {
+organization_id: string;
+};
+
+export type ProvidersTelegramLoginParams = {
+hash: string;
+id: number;
+auth_date: number;
+first_name: string;
+last_name?: string | null;
+username?: string | null;
+photo_url?: string | null;
+};
+
+export type ProvidersTelegramConnectParams = {
+hash: string;
+id: number;
+auth_date: number;
+first_name: string;
+last_name?: string | null;
+username?: string | null;
+photo_url?: string | null;
+};
+
+export type ProvidersTelegramRegisterParams = {
+hash: string;
+id: number;
+auth_date: number;
+first_name: string;
+last_name?: string | null;
+username?: string | null;
+photo_url?: string | null;
+};
+
 /**
  * Данные Telegram-аккаунта
  */
@@ -69,6 +108,23 @@ export type ViewUserStudentApprovement = ViewUserStudentApprovementAnyOf | null;
  */
 export type ViewUserLogin = string | null;
 
+export interface ViewUser {
+  /** Список документов пользователя */
+  documents: string[];
+  /** MongoDB document ObjectID */
+  id: string;
+  /** Логин пользователя (уникальный) */
+  login: ViewUserLogin;
+  /** Имя пользователя */
+  name: string;
+  /** Роль пользователя */
+  role: UserRole;
+  /** Подтверждения статуса студента */
+  student_approvement: ViewUserStudentApprovement;
+  /** Данные Telegram-аккаунта */
+  telegram: ViewUserTelegram;
+}
+
 export type ValidationErrorLocItem = string | number;
 
 export interface ValidationError {
@@ -83,23 +139,9 @@ export type UserRole = typeof UserRole[keyof typeof UserRole];
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UserRole = {
   admin: 'admin',
+  moderator: 'moderator',
   default: 'default',
 } as const;
-
-export interface ViewUser {
-  /** MongoDB document ObjectID */
-  id: string;
-  /** Логин пользователя (уникальный) */
-  login: ViewUserLogin;
-  /** Имя пользователя */
-  name: string;
-  /** Роль пользователя */
-  role: UserRole;
-  /** Подтверждения статуса студента */
-  student_approvement: ViewUserStudentApprovement;
-  /** Данные Telegram-аккаунта */
-  telegram: ViewUserTelegram;
-}
 
 export type UpdateSceneTitle = string | null;
 
@@ -190,6 +232,8 @@ export interface RejectedApprovement {
   comment: string;
   /** ID модератора, отклонившего студента */
   moderator_id: string;
+  /** ID организации к которой будет привязан студент */
+  organization_id: string;
   status: RejectedApprovementStatus;
 }
 
@@ -202,6 +246,8 @@ export const PendingApprovementStatus = {
 } as const;
 
 export interface PendingApprovement {
+  /** ID организации к которой будет привязан студент */
+  organization_id: string;
   status: PendingApprovementStatus;
 }
 
@@ -315,6 +361,11 @@ export interface DialogPair {
   student_id: string;
 }
 
+/**
+ * Название диалога
+ */
+export type DialogTitle = string | null;
+
 export interface Dialog {
   /** Закрыт ли диалог */
   closed: boolean;
@@ -328,6 +379,8 @@ export interface Dialog {
   organization_id: string;
   /** ID студента */
   student_id: string;
+  /** Название диалога */
+  title: DialogTitle;
 }
 
 export type CreateSceneMeta = unknown | null;
@@ -387,20 +440,13 @@ export const ApprovedApprovementStatus = {
   approved: 'approved',
 } as const;
 
-/**
- * ID организации к которой будет привязан студент
- */
-export type ApprovedApprovementOrganizationId = string | null;
-
 export interface ApprovedApprovement {
   /** Дата подтверждения студента */
   at: string;
   /** ID модератора, подтвердившего студента */
   moderator_id: string;
   /** ID организации к которой будет привязан студент */
-  organization_id: ApprovedApprovementOrganizationId;
-  /** Наименование организации к которой будет привязан студент (если организация не существует в системе) */
-  organization_name: string;
+  organization_id: string;
   status: ApprovedApprovementStatus;
 }
 
@@ -472,167 +518,362 @@ export const useProvidersByCredentials = <TError = AxiosError<void | HTTPValidat
  * @summary Telegram Register
  */
 export const providersTelegramRegister = (
-    telegramWidgetData: MaybeRef<TelegramWidgetData>, options?: AxiosRequestConfig
+    params: MaybeRef<ProvidersTelegramRegisterParams>, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<unknown>> => {
-    telegramWidgetData = unref(telegramWidgetData);
-    return axios.post(
-      `/providers/telegram/register`,
-      telegramWidgetData,options
+    params = unref(params);
+    return axios.get(
+      `/providers/telegram/register`,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
     );
   }
 
 
+export const getProvidersTelegramRegisterQueryKey = (params: MaybeRef<ProvidersTelegramRegisterParams>,) => {
+    return ['providers','telegram','register', ...(params ? [params]: [])] as const;
+    }
 
-export const getProvidersTelegramRegisterMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError,{data: TelegramWidgetData}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+    
+export const getProvidersTelegramRegisterQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getProvidersTelegramRegisterQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegister>>> = ({ signal }) => providersTelegramRegister(params, { signal, ...axiosOptions });
 
       
 
+      
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramRegister>>, {data: TelegramWidgetData}> = (props) => {
-          const {data} = props ?? {};
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData> 
+}
 
-          return  providersTelegramRegister(data,axiosOptions)
-        }
+export type ProvidersTelegramRegisterQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegister>>>
+export type ProvidersTelegramRegisterQueryError = AxiosError<void | HTTPValidationError>
 
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProvidersTelegramRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegister>>>
-    export type ProvidersTelegramRegisterMutationBody = TelegramWidgetData
-    export type ProvidersTelegramRegisterMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Telegram Register
  */
-export const useProvidersTelegramRegister = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
-        Awaited<ReturnType<typeof providersTelegramRegister>>,
-        TError,
-        {data: TelegramWidgetData},
-        TContext
-      > => {
+export const useProvidersTelegramRegister = <TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(
+ params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig}
 
-      const mutationOptions = getProvidersTelegramRegisterMutationOptions(options);
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
 
-      return useMutation(mutationOptions);
-    }
-    
+  const queryOptions = getProvidersTelegramRegisterQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
 /**
  * @summary Telegram Connect
  */
 export const providersTelegramConnect = (
-    telegramWidgetData: MaybeRef<TelegramWidgetData>, options?: AxiosRequestConfig
+    params: MaybeRef<ProvidersTelegramConnectParams>, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<unknown>> => {
-    telegramWidgetData = unref(telegramWidgetData);
-    return axios.post(
-      `/providers/telegram/connect`,
-      telegramWidgetData,options
+    params = unref(params);
+    return axios.get(
+      `/providers/telegram/connect`,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
     );
   }
 
 
+export const getProvidersTelegramConnectQueryKey = (params: MaybeRef<ProvidersTelegramConnectParams>,) => {
+    return ['providers','telegram','connect', ...(params ? [params]: [])] as const;
+    }
 
-export const getProvidersTelegramConnectMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError,{data: TelegramWidgetData}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+    
+export const getProvidersTelegramConnectQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getProvidersTelegramConnectQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnect>>> = ({ signal }) => providersTelegramConnect(params, { signal, ...axiosOptions });
 
       
 
+      
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramConnect>>, {data: TelegramWidgetData}> = (props) => {
-          const {data} = props ?? {};
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData> 
+}
 
-          return  providersTelegramConnect(data,axiosOptions)
-        }
+export type ProvidersTelegramConnectQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnect>>>
+export type ProvidersTelegramConnectQueryError = AxiosError<void | HTTPValidationError>
 
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProvidersTelegramConnectMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnect>>>
-    export type ProvidersTelegramConnectMutationBody = TelegramWidgetData
-    export type ProvidersTelegramConnectMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Telegram Connect
  */
-export const useProvidersTelegramConnect = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
-        Awaited<ReturnType<typeof providersTelegramConnect>>,
-        TError,
-        {data: TelegramWidgetData},
-        TContext
-      > => {
+export const useProvidersTelegramConnect = <TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(
+ params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig}
 
-      const mutationOptions = getProvidersTelegramConnectMutationOptions(options);
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
 
-      return useMutation(mutationOptions);
-    }
-    
+  const queryOptions = getProvidersTelegramConnectQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
 /**
  * @summary Telegram Login
  */
 export const providersTelegramLogin = (
-    telegramWidgetData: MaybeRef<TelegramWidgetData>, options?: AxiosRequestConfig
+    params: MaybeRef<ProvidersTelegramLoginParams>, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<TelegramLoginResponse>> => {
-    telegramWidgetData = unref(telegramWidgetData);
-    return axios.post(
-      `/providers/telegram/login`,
-      telegramWidgetData,options
+    params = unref(params);
+    return axios.get(
+      `/providers/telegram/login`,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
     );
   }
 
 
+export const getProvidersTelegramLoginQueryKey = (params: MaybeRef<ProvidersTelegramLoginParams>,) => {
+    return ['providers','telegram','login', ...(params ? [params]: [])] as const;
+    }
 
-export const getProvidersTelegramLoginMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError,{data: TelegramWidgetData}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+    
+export const getProvidersTelegramLoginQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getProvidersTelegramLoginQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLogin>>> = ({ signal }) => providersTelegramLogin(params, { signal, ...axiosOptions });
 
       
 
+      
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramLogin>>, {data: TelegramWidgetData}> = (props) => {
-          const {data} = props ?? {};
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData> 
+}
 
-          return  providersTelegramLogin(data,axiosOptions)
-        }
+export type ProvidersTelegramLoginQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLogin>>>
+export type ProvidersTelegramLoginQueryError = AxiosError<void | HTTPValidationError>
 
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProvidersTelegramLoginMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLogin>>>
-    export type ProvidersTelegramLoginMutationBody = TelegramWidgetData
-    export type ProvidersTelegramLoginMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Telegram Login
  */
-export const useProvidersTelegramLogin = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError,{data: TelegramWidgetData}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
-        Awaited<ReturnType<typeof providersTelegramLogin>>,
-        TError,
-        {data: TelegramWidgetData},
-        TContext
-      > => {
+export const useProvidersTelegramLogin = <TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(
+ params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig}
 
-      const mutationOptions = getProvidersTelegramLoginMutationOptions(options);
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
 
-      return useMutation(mutationOptions);
-    }
+  const queryOptions = getProvidersTelegramLoginQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Telegram Register Html
+ */
+export const providersTelegramRegisterHtml = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<string>> => {
     
+    return axios.get(
+      `/providers/telegram/register.html`,options
+    );
+  }
+
+
+export const getProvidersTelegramRegisterHtmlQueryKey = () => {
+    return ['providers','telegram','register.html'] as const;
+    }
+
+    
+export const getProvidersTelegramRegisterHtmlQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getProvidersTelegramRegisterHtmlQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>> = ({ signal }) => providersTelegramRegisterHtml({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData> 
+}
+
+export type ProvidersTelegramRegisterHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>>
+export type ProvidersTelegramRegisterHtmlQueryError = AxiosError<unknown>
+
+/**
+ * @summary Telegram Register Html
+ */
+export const useProvidersTelegramRegisterHtml = <TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getProvidersTelegramRegisterHtmlQueryOptions(options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Telegram Connect Html
+ */
+export const providersTelegramConnectHtml = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<string>> => {
+    
+    return axios.get(
+      `/providers/telegram/connect.html`,options
+    );
+  }
+
+
+export const getProvidersTelegramConnectHtmlQueryKey = () => {
+    return ['providers','telegram','connect.html'] as const;
+    }
+
+    
+export const getProvidersTelegramConnectHtmlQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getProvidersTelegramConnectHtmlQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnectHtml>>> = ({ signal }) => providersTelegramConnectHtml({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData> 
+}
+
+export type ProvidersTelegramConnectHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnectHtml>>>
+export type ProvidersTelegramConnectHtmlQueryError = AxiosError<unknown>
+
+/**
+ * @summary Telegram Connect Html
+ */
+export const useProvidersTelegramConnectHtml = <TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getProvidersTelegramConnectHtmlQueryOptions(options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Telegram Login Html
+ */
+export const providersTelegramLoginHtml = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<string>> => {
+    
+    return axios.get(
+      `/providers/telegram/login.html`,options
+    );
+  }
+
+
+export const getProvidersTelegramLoginHtmlQueryKey = () => {
+    return ['providers','telegram','login.html'] as const;
+    }
+
+    
+export const getProvidersTelegramLoginHtmlQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getProvidersTelegramLoginHtmlQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLoginHtml>>> = ({ signal }) => providersTelegramLoginHtml({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData> 
+}
+
+export type ProvidersTelegramLoginHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLoginHtml>>>
+export type ProvidersTelegramLoginHtmlQueryError = AxiosError<unknown>
+
+/**
+ * @summary Telegram Login Html
+ */
+export const useProvidersTelegramLoginHtml = <TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getProvidersTelegramLoginHtmlQueryOptions(options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
 /**
  * Получить данные текущего пользователя
  * @summary Get Me
@@ -693,6 +934,119 @@ export const useUsersGetMe = <TData = Awaited<ReturnType<typeof usersGetMe>>, TE
 
 
 
+/**
+ * Установить документы пользователя
+ * @summary Set Documents
+ */
+export const usersSetDocuments = (
+    usersSetDocumentsBody: MaybeRef<string[]>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<unknown>> => {
+    usersSetDocumentsBody = unref(usersSetDocumentsBody);
+    return axios.put(
+      `/users/me/set-documents`,
+      usersSetDocumentsBody,options
+    );
+  }
+
+
+
+export const getUsersSetDocumentsMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError,{data: string[]}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError,{data: string[]}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersSetDocuments>>, {data: string[]}> = (props) => {
+          const {data} = props ?? {};
+
+          return  usersSetDocuments(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsersSetDocumentsMutationResult = NonNullable<Awaited<ReturnType<typeof usersSetDocuments>>>
+    export type UsersSetDocumentsMutationBody = string[]
+    export type UsersSetDocumentsMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Set Documents
+ */
+export const useUsersSetDocuments = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError,{data: string[]}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof usersSetDocuments>>,
+        TError,
+        {data: string[]},
+        TContext
+      > => {
+
+      const mutationOptions = getUsersSetDocumentsMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Отправить запрос на подтверждение
+ * @summary Request Approvement
+ */
+export const usersRequestApprovement = (
+    params: MaybeRef<UsersRequestApprovementParams>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<unknown>> => {
+    params = unref(params);
+    return axios.put(
+      `/users/me/request-approvement`,undefined,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
+    );
+  }
+
+
+
+export const getUsersRequestApprovementMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError,{params: UsersRequestApprovementParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError,{params: UsersRequestApprovementParams}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersRequestApprovement>>, {params: UsersRequestApprovementParams}> = (props) => {
+          const {params} = props ?? {};
+
+          return  usersRequestApprovement(params,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsersRequestApprovementMutationResult = NonNullable<Awaited<ReturnType<typeof usersRequestApprovement>>>
+    
+    export type UsersRequestApprovementMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Request Approvement
+ */
+export const useUsersRequestApprovement = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError,{params: UsersRequestApprovementParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof usersRequestApprovement>>,
+        TError,
+        {params: UsersRequestApprovementParams},
+        TContext
+      > => {
+
+      const mutationOptions = getUsersRequestApprovementMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
 /**
  * Выход из аккаунта
  * @summary Logout
@@ -808,6 +1162,125 @@ export const useUsersGetUsersWithPendingApprovement = <TData = Awaited<ReturnTyp
 
 
 
+/**
+ * Получить пользователя по идентификатору
+ * @summary Get User By Id
+ */
+export const usersGetUserById = (
+    userId: MaybeRef<string>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<ViewUser>> => {
+    userId = unref(userId);
+    return axios.get(
+      `/users/by-id/${userId}`,options
+    );
+  }
+
+
+export const getUsersGetUserByIdQueryKey = (userId: MaybeRef<string>,) => {
+    return ['users','by-id',userId] as const;
+    }
+
+    
+export const getUsersGetUserByIdQueryOptions = <TData = Awaited<ReturnType<typeof usersGetUserById>>, TError = AxiosError<void | HTTPValidationError>>(userId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getUsersGetUserByIdQueryKey(userId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetUserById>>> = ({ signal }) => usersGetUserById(userId, { signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: computed(() => !!(unref(userId))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData> 
+}
+
+export type UsersGetUserByIdQueryResult = NonNullable<Awaited<ReturnType<typeof usersGetUserById>>>
+export type UsersGetUserByIdQueryError = AxiosError<void | HTTPValidationError>
+
+/**
+ * @summary Get User By Id
+ */
+export const useUsersGetUserById = <TData = Awaited<ReturnType<typeof usersGetUserById>>, TError = AxiosError<void | HTTPValidationError>>(
+ userId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getUsersGetUserByIdQueryOptions(userId,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * Одобрить или отклонить пользователя
+ * @summary Approve User
+ */
+export const usersApproveUser = (
+    userId: MaybeRef<string>,
+    params: MaybeRef<UsersApproveUserParams>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<ViewUser>> => {
+    userId = unref(userId);
+params = unref(params);
+    return axios.post(
+      `/users/by-id/${userId}/approve`,undefined,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
+    );
+  }
+
+
+
+export const getUsersApproveUserMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError,{userId: string;params: UsersApproveUserParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError,{userId: string;params: UsersApproveUserParams}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersApproveUser>>, {userId: string;params: UsersApproveUserParams}> = (props) => {
+          const {userId,params} = props ?? {};
+
+          return  usersApproveUser(userId,params,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsersApproveUserMutationResult = NonNullable<Awaited<ReturnType<typeof usersApproveUser>>>
+    
+    export type UsersApproveUserMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Approve User
+ */
+export const useUsersApproveUser = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError,{userId: string;params: UsersApproveUserParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof usersApproveUser>>,
+        TError,
+        {userId: string;params: UsersApproveUserParams},
+        TContext
+      > => {
+
+      const mutationOptions = getUsersApproveUserMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
 /**
  * Загрузить файл в static.
  * @summary Upload File
