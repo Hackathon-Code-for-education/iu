@@ -7,7 +7,7 @@ from fastapi import APIRouter, Request
 
 from src.api.dependencies import UserIdDep, OptionalUserIdDep
 from src.config import settings
-from src.exceptions import InvalidTelegramWidgetHash, UnauthorizedException
+from src.exceptions import InvalidTelegramWidgetHash, UnauthorizedException, AlreadyExists
 from src.modules.providers.telegram.schemas import TelegramWidgetData, TelegramLoginResponse
 from src.modules.user.repository import user_repository
 from src.utils import aware_utcnow
@@ -36,6 +36,26 @@ if settings.telegram:
         if _now - 5 * 60 < telegram_data.auth_date < _now + 5 * 60:
             return evaluated_hash == received_hash
         return False
+
+    @router.post(
+        "/register",
+        responses={
+            200: {"description": "Success"},
+            **InvalidTelegramWidgetHash.responses,
+            **UnauthorizedException.responses,
+            **AlreadyExists,
+        },
+        status_code=200,
+    )
+    async def telegram_register(telegram_data: TelegramWidgetData, user_id: OptionalUserIdDep):
+        if user_id is not None:
+            raise AlreadyExists("Пользователь уже зарегистрирован")
+        if not validate_widget_hash(telegram_data):
+            raise InvalidTelegramWidgetHash()
+        user_by_telegram_id = await user_repository.read_by_telegram_id(telegram_data.id)
+        if user_by_telegram_id is not None:
+            raise AlreadyExists("Пользователь с таким telegram id уже существует")
+        await user_repository.create_telegram(telegram_data)
 
     @router.post(
         "/connect",

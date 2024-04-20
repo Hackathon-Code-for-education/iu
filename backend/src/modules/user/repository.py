@@ -33,6 +33,10 @@ class UserRepository:
         user = await User.find_one({"login": login})
         return user
 
+    async def create_telegram(self, telegram_data: TelegramWidgetData) -> User | None:
+        # TODO: Implement this method when login-pass will be not required
+        raise NotImplementedError
+
     async def update_telegram(self, user_id: PydanticObjectId, telegram_data: TelegramWidgetData) -> User | None:
         user = await self.read(user_id)
         if user is None:
