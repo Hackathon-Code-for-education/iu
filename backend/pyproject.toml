@@ -67,6 +67,10 @@ ignore_missing_imports = true
 # ignore authlib types
 module = "authlib.jose.*"
 ignore_missing_imports = true
+[[tool.mypy.overrides]]
+# ignore socketio types
+module = "pyvips.*"
+ignore_missing_imports = true
 
 
 [tool.pytest.ini_options]

@@ -104,6 +104,7 @@ if settings.telegram:
         response_class=HTMLResponse,
     )
     async def telegram_register_html(request: Request) -> HTMLResponse:
+        assert settings.telegram is not None
         register_url = request.url_for("telegram_register")
 
         script = f"""
@@ -136,6 +137,8 @@ if settings.telegram:
         response_class=HTMLResponse,
     )
     async def telegram_connect_html(request: Request) -> HTMLResponse:
+        assert settings.telegram is not None
+
         connect_url = request.url_for("telegram_connect")
 
         script = f"""
@@ -168,6 +171,8 @@ if settings.telegram:
         response_class=HTMLResponse,
     )
     async def telegram_login_html(request: Request) -> HTMLResponse:
+        assert settings.telegram is not None
+
         login_url = request.url_for("telegram_login")
 
         script = f"""
