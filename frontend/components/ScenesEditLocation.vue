@@ -115,10 +115,11 @@ function setAsMain() {
     <UButton
       :variant="isMainOrgScene ? 'ghost' : 'ghost'"
       :disabled="isMainOrgScene"
-      icon="i-mdi-check"
+      :icon="isMainOrgScene ? 'i-mdi-check' : 'i-mdi-star'"
+      class="w-fit"
       @click="setAsMain"
     >
-      Сделать основной на главной странице
+      {{ isMainOrgScene ? 'Основная локация' : 'Сделать основной локацией' }}
     </UButton>
     <div class="flex w-full gap-2">
       <UInput v-model="sceneInfo.title" class="w-full" label="Название локации" />
