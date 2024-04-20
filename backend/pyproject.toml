@@ -19,6 +19,7 @@ uvicorn = "^0.29.0"
 colorlog = "^6.8.2"
 beanie = "^1.25.0"
 python-magic = "^0.4.27"
+pyvips = "^2.2.2"
 
 [tool.poetry.group.prod.dependencies]
 gunicorn = "21.2.0"

@@ -5,6 +5,8 @@
 __all__ = ["router"]
 
 import os
+
+import pyvips
 from beanie import PydanticObjectId
 from fastapi import UploadFile, BackgroundTasks
 
@@ -23,8 +25,13 @@ async def upload_file(upload_file_obj: UploadFile) -> File:
     """
     Загрузить файл в static.
     """
-
+    content_type = upload_file_obj.content_type
     bytes_ = await upload_file_obj.read()
+    # convert to webp
+    if content_type in ("image/jpeg", "image/png"):
+        image = pyvips.Image.new_from_buffer(bytes_, "")
+        bytes_ = image.write_to_buffer(".webp")
+
     obj_id = PydanticObjectId()
     path_to_upload = settings.static_files.directory / str(obj_id)
     friendly_name = upload_file_obj.filename

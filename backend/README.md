@@ -54,7 +54,7 @@ GitHub поддерживает генерацию
    </details>
 7. Установка библиотек для работы с файлами:
    ```bash
-   sudo apt-get install --no-install-recommends libmagic1
+   sudo apt-get install --no-install-recommends libmagic1 libvips-dev
    ```
 
 **Интеграции в PyCharm**

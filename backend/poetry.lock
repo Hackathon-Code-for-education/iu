@@ -859,6 +859,17 @@ build-docs = ["cloud-sptheme (>=1.10.1)", "sphinx (>=1.6)", "sphinxcontrib-fullt
 totp = ["cryptography"]
 
 [[package]]
+name = "pkgconfig"
+version = "1.5.5"
+description = "Interface Python with pkg-config"
+optional = false
+python-versions = ">=3.3,<4.0"
+files = [
+    {file = "pkgconfig-1.5.5-py3-none-any.whl", hash = "sha256:d20023bbeb42ee6d428a0fac6e0904631f545985a10cdd71a20aa58bc47a4209"},
+    {file = "pkgconfig-1.5.5.tar.gz", hash = "sha256:deb4163ef11f75b520d822d9505c1f462761b4309b1bb713d08689759ea8b899"},
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.2.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -1189,6 +1200,24 @@ files = [
 
 [package.extras]
 dev = ["atomicwrites (==1.4.1)", "attrs (==23.2.0)", "coverage (==7.4.1)", "hatch", "invoke (==2.2.0)", "more-itertools (==10.2.0)", "pbr (==6.0.0)", "pluggy (==1.4.0)", "py (==1.11.0)", "pytest (==8.0.0)", "pytest-cov (==4.1.0)", "pytest-timeout (==2.2.0)", "pyyaml (==6.0.1)", "ruff (==0.2.1)"]
+
+[[package]]
+name = "pyvips"
+version = "2.2.2"
+description = "binding for the libvips image processing library, API mode"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyvips-2.2.2.tar.gz", hash = "sha256:2aa169f2130e8f9d9b0d442fad10a70ff1c3d1bb6add099ce058987faa1f6829"},
+]
+
+[package.dependencies]
+cffi = ">=1.0.0"
+pkgconfig = "*"
+
+[package.extras]
+doc = ["sphinx", "sphinx_rtd_theme"]
+test = ["cffi (>=1.0.0)", "pyperf", "pytest"]
 
 [[package]]
 name = "pyyaml"
@@ -1753,4 +1782,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "c5b813113a5a35d1a928d91336fba4372459d8827004dff38622b55c8237b6f3"
+content-hash = "5d8eeddab5cb8a2ef85682a34a7866be63d8a59290039ab627b15e53efc0e943"
