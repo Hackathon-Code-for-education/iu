@@ -1,5 +1,8 @@
 <script setup lang="ts">
 defineProps<{
+  orgUsername: string
+  orgId: string
+  mainSceneId?: string
   title: string
   bio: string
 }>()
@@ -12,7 +15,7 @@ defineEmits<{
 <template>
   <UContainer>
     <Card class="bg-neutral-900">
-      <Panorama/>
+      <OrganizationPanorama :org-username="orgUsername" :org-id="orgId" :main-scene-id="mainSceneId" />
       <div class="px-12 flex py-4 justify-between items-start">
         <div class="flex justify-between gap-5 items-end">
           <div class="w-20 h-1 relative">
@@ -60,8 +63,12 @@ defineEmits<{
           />
         </div>
       </Card>
-      <Card class="p-4"><h3>FAQ</h3></Card>
-      <Card class="p-4"><h3>Контакты</h3></Card>
+      <Card class="p-4">
+        <h3>FAQ</h3>
+      </Card>
+      <Card class="p-4">
+        <h3>Контакты</h3>
+      </Card>
     </div>
   </UContainer>
 </template>

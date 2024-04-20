@@ -67,6 +67,9 @@ watch(chatModalOpen, (isOpen) => {
   <ErrorPage v-if="error" :error="error" />
   <OrganizationPage
     v-else-if="org"
+    :org-username="org.data.username"
+    :org-id="org.data.id"
+    :main-scene-id="org.data.main_scene || undefined"
     :title="org.data.name"
     bio="Example."
     @want-chat-click="handleWantChatClick"
