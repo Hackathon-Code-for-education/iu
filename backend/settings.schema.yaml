@@ -100,6 +100,11 @@ $defs:
         default: null
         description: Meta information for panorama view
         title: Meta
+      is_main:
+        default: false
+        description: Is main scene
+        title: Is Main
+        type: boolean
     required:
     - id
     - title
