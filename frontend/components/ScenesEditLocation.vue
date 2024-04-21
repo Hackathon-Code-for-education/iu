@@ -258,9 +258,7 @@ function handleHotspotSceneChange(index: number, v: string) {
           icon="i-mdi-pencil"
           :variant="sceneInfo.editingHotSpotNumber === index ? undefined : 'ghost'"
           @click="sceneInfo.editingHotSpotNumber = sceneInfo.editingHotSpotNumber === index ? -1 : index"
-        >
-          {{ index }}
-        </UButton>
+        />
         <UInput :model-value="hotspot.text" label="Подпись" placeholder="Подпись" @update:model-value="(v) => handleHotspotTitleChange(index, v)" />
         <USelect :model-value="hotspot.sceneId" label="Переход на локацию" placeholder="Переход на локацию" :options="scenesOptions" @update:model-value="(v) => handleHotspotSceneChange(index, v)" />
         <UButton icon="i-mdi-trash" variant="ghost" color="red" @click="removeHotSpot(index)" />
