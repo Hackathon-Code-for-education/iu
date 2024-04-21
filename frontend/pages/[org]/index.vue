@@ -72,7 +72,7 @@ watch(chatModalOpen, (isOpen) => {
     :org-id="org.data.id"
     :main-scene-id="org.data.main_scene || undefined"
     :title="org.data.name"
-    bio="Example."
+    :bio="org.data.region_name ?? '—'"
     :logo-url="org.data.logo ? getFileUrl(org.data.logo) : undefined"
     @want-chat-click="handleWantChatClick"
   />
