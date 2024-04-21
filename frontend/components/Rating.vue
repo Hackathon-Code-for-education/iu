@@ -2,6 +2,8 @@
 const props = defineProps<{
   modelValue: number
   disabled?: boolean
+  size?: 'sm' | 'md'
+  readonly?: boolean
 }>()
 const emit = defineEmits<{
   'update:modelValue': [v: number]
@@ -16,14 +18,20 @@ function handleStarClick(v: number) {
 <template>
   <div
     class="flex gap-2"
-    :class="[disabled && 'cursor-not-allowed opacity-85']"
+    :class="[
+      (!readonly && disabled && 'cursor-not-allowed opacity-85'),
+    ]"
   >
     <UIcon
       v-for="(_, i) in new Array(5).fill(null)"
       :key="i"
       :name="modelValue >= (i + 1) ? 'i-octicon-star-fill-24' : 'i-octicon-star-24'"
-      class="text-yellow-400 text-[32px] cursor-pointer"
-      :class="modelValue >= (i + 1) ? 'rated' : ''"
+      class="text-yellow-400 text-[32px]"
+      :class="[
+        (!readonly && !disabled && 'cursor-pointer'),
+        size === 'sm' ? 'text-[24px]' : 'text-[32px]',
+        modelValue >= (i + 1) ? 'rated' : '',
+      ]"
       @click="handleStarClick(i + 1)"
     />
   </div>

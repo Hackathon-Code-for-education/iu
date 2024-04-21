@@ -159,7 +159,7 @@ function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
       </div>
     </Card>
     <div class="grid grid-cols-3 gap-4 mt-4">
-      <Card class="p-4">
+      <Card class="p-4 self-start">
         <h3 class="font-medium text-lg mb-2">
           Контакты
         </h3>
@@ -178,29 +178,35 @@ function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
           </UButton>
         </div>
       </Card>
-      <Card class="p-4 col-span-2">
+      <Card v-if="reviews" class="p-4 col-span-2">
         <h3 class="font-medium text-lg mb-2">
           Отзывы
         </h3>
-        <div v-if="reviews" class="flex flex-col gap-2">
-          <Card v-for="review in reviews.data" :key="review.id" class="p-4 flex flex-col gap-2">
+        <div v-if="reviews.data.length > 0" class="flex flex-col gap-2">
+          <div v-for="review in reviews.data" :key="review.id" class="p-4 flex flex-col gap-2 border-b dark:border-gray-700 last:border-0">
             <div class="flex justify-between">
-              <Rating disabled :model-value="review.rate" />
-              <p v-if="!review.mine">
+              <Rating readonly :model-value="review.rate" size="sm" />
+              <p class="italic text-md">
                 {{ review.anonymous_name }}
-              </p>
-              <p v-else>
-                {{ review.anonymous_name }} (это вы)
+                {{ review.mine && '(это вы)' }}
               </p>
             </div>
             <p>{{ review.text }}</p>
             <div class="flex justify-between">
-              <UButton :icon="review.liked_by_me ? 'i-mdi-heart' : 'i-mdi-heart-outline'" color="red" variant="ghost" :label="review.likes.toString()" class="w-fit" />
-              <p>{{ new Date(review.at).toLocaleString("ru-RU") }}</p>
+              <UButton :icon="review.liked_by_me ? 'i-mdi-heart' : 'i-mdi-heart-outline'" color="red" variant="ghost" :label="review.likes.toString()" />
+              <date class="text-sm opacity-60">
+                {{ new Date(review.at).toLocaleDateString("ru-RU") }}
+              </date>
             </div>
-          </Card>
+          </div>
+        </div>
+        <div v-else class="w-full my-auto flex items-center justify-center">
+          <span class="opacity-40 text-lg">
+            Здесь ещё нет отзывов
+          </span>
         </div>
       </Card>
+      <USkeleton v-else class="col-span-2 h-full min-[80px]" />
     </div>
     <UModal v-model="reviewModalOpen">
       <UCard>

@@ -140,7 +140,7 @@ function handleToggleChatting(newVal: boolean) {
         <div v-if="reviews" class="flex flex-col gap-2">
           <Card v-for="review in reviews.data" :key="review.id" class="p-4 flex flex-col gap-2">
             <div class="flex justify-between">
-              <Rating disabled :model-value="review.rate" />
+              <Rating readonly size="sm" :model-value="review.rate" />
               <UButton
                 :to="`/${review.organization_username}`"
                 :label="review.organization_name"
