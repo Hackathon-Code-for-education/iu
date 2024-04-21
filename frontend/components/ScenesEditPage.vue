@@ -33,16 +33,22 @@ const sceneId = ref(org.value?.data.main_scene)
           <UButton
             icon="i-mdi-plus"
             size="sm"
-            variant="ghost"
+            :variant="sceneId !== 'NEW' ? 'ghost' : 'solid'"
             color="gray"
             label="Добавить локацию"
-            @click="console.log('!')"
+            @click="sceneId = 'NEW'"
           />
         </div>
       </Card>
       <Card class="p-4 col-span-2">
+        <ScenesCreateNew
+          v-if="sceneId === 'NEW'"
+          :org-username="props.orgUsername"
+          :org-id="props.orgId"
+          @set-scene-id="(id) => sceneId = id"
+        />
         <ScenesEditLocation
-          v-if="sceneId && scenes"
+          v-else-if="sceneId && scenes"
           :org-username="props.orgUsername"
           :org-id="props.orgId"
           :scene-id="sceneId"
