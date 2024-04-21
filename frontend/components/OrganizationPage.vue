@@ -204,7 +204,7 @@ function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
               <Rating readonly :model-value="review.rate" size="sm" />
               <p class="italic text-md">
                 {{ review.anonymous_name }}
-                {{ review.mine && '(это вы)' }}
+                {{ review.mine ? '(это вы)' : '' }}
               </p>
             </div>
             <p>{{ review.text }}</p>
