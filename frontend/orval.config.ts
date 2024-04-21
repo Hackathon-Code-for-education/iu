@@ -18,6 +18,12 @@ export default defineConfig({
               name: 'customFormData',
             },
           },
+          organizations_import_organizations: {
+            formData: {
+              path: './api/form-data.ts',
+              name: 'customFormData',
+            },
+          },
         },
       },
     },

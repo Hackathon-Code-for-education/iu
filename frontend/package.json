@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "postinstall": "nuxt prepare",
-    "generate-api": "orval --config ./orval.config.ts && nr lint:fix"
+    "generate-api": "orval --config ./orval.config.ts && eslint api/__generated__.ts --fix --no-ignore"
   },
   "dependencies": {
     "@iconify-json/heroicons": "^1.1.20",
