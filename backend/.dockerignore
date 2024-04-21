@@ -3,6 +3,7 @@
 
 # Except code
 !/src/
+!/scripts/
 !/deploy/
 !/pyproject.toml
 !/poetry.lock
