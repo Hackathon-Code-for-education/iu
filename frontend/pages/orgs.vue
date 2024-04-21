@@ -11,7 +11,7 @@ const { data: orgs } = useOrganizationsReadAll()
       <NuxtLink v-for="org in orgs.data" :key="org.id" :to="`/${org.username}`">
         <Card class="px-4 h-[80px] flex gap-4 items-center hover:dark:border-green-700">
           <UAvatar size="xl" :src="org.logo ? getFileUrl(org.logo) : undefined" />
-          <h3 class="text-xl">
+          <h3 class="text-xl line-clamp-2">
             {{ org.name }}
           </h3>
         </Card>
