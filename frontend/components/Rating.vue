@@ -41,7 +41,6 @@ function handleStarClick(v: number) {
 }
 
 .rated {
-  color: #ffd700;
   animation: rated-anim 0.5s;
 }
 </style>

@@ -124,7 +124,7 @@ function handleSubmit(event: FormSubmitEvent<{ feedback: string, rating: number 
           <UButton v-if="contacts.website" icon="i-heroicons-globe-alt" variant="link" :to="contacts.website" target="_blank">
             {{ contacts.website }}
           </UButton>
-          <UButton v-if="contacts.email" icon="i-heroicons-envelope" variant="link" :to="`mailto:${contacts.website}`" target="_blank">
+          <UButton v-if="contacts.email" icon="i-heroicons-envelope" variant="link" :to="`mailto:${contacts.email}`" target="_blank">
             {{ contacts.email }}
           </UButton>
           <UButton v-if="contacts.phone" icon="i-heroicons-phone" variant="link" :to="`tel:${contacts.phone}`" target="_blank">
