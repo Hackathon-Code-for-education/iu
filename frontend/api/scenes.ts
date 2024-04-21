@@ -17,10 +17,10 @@ export interface HotSpot {
   yaw: number
   pitch: number
   type: 'scene' | 'info'
-  scene: string
+  sceneId: string
 }
 
-export function composeSceneData(scene: SceneExtended) {
+export function composeSceneData(scene: SceneExtended, enableScenes: boolean = true) {
   return {
     panorama: getFileUrl(scene.file),
     title: scene.title,
@@ -31,7 +31,7 @@ export function composeSceneData(scene: SceneExtended) {
       yaw: hotSpot.yaw || 0,
       pitch: hotSpot.pitch || 0,
       type: hotSpot.type || 'scene',
-      scene: hotSpot.scene,
+      sceneId: enableScenes ? hotSpot.sceneId || undefined : undefined,
     })) || [],
   }
 }

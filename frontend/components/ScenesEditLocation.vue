@@ -57,7 +57,7 @@ const scenesOptions = computed(() => scenes.value?.data.map(scene => ({
 
 const scene = computed(() => scenes.value?.data.find(scene => scene.id === props.sceneId) as SceneExtended | undefined)
 const isMainOrgScene = computed(() => org.value?.data.main_scene === props.sceneId)
-const scenesData = ref(scene.value ? { current: composeSceneData(scene.value) } : {})
+const scenesData = ref(scene.value ? { current: composeSceneData(scene.value, false) } : {})
 
 const pannellum = ref(null)
 const sceneInfo = reactive({
@@ -142,7 +142,7 @@ function newHotSpot() {
       yaw: 0,
       pitch: 0,
       text: '',
-      scene: '',
+      sceneId: '',
       type: 'scene',
     },
   ]
@@ -192,7 +192,7 @@ function handleHotspotSceneChange(index: number, v: string) {
     if (i === index) {
       return {
         ...hotSpot,
-        scene: v,
+        sceneId: v,
       }
     }
     return hotSpot
@@ -262,7 +262,7 @@ function handleHotspotSceneChange(index: number, v: string) {
           {{ index }}
         </UButton>
         <UInput :model-value="hotspot.text" label="Подпись" placeholder="Подпись" @update:model-value="(v) => handleHotspotTitleChange(index, v)" />
-        <USelect :model-value="hotspot.scene" label="Переход на локацию" placeholder="Переход на локацию" :options="scenesOptions" @update:model-value="(v) => handleHotspotSceneChange(index, v)" />
+        <USelect :model-value="hotspot.sceneId" label="Переход на локацию" placeholder="Переход на локацию" :options="scenesOptions" @update:model-value="(v) => handleHotspotSceneChange(index, v)" />
         <UButton icon="i-mdi-trash" variant="ghost" color="red" @click="removeHotSpot(index)" />
       </div>
       <div class="flex gap-2">
