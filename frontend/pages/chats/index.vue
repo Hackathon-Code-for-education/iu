@@ -8,7 +8,7 @@ const {
   data: chats,
   error,
   isLoading,
-} = useChattingGetMyDialogs({ query: { refetchInterval: 1500 } })
+} = useChattingGetMyDialogs({ query: { refetchInterval: 500 } })
 const route = useRoute()
 const chatId = ref<string | null>(null)
 
