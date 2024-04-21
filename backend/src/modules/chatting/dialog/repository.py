@@ -7,7 +7,19 @@ from src.storages.mongo.models.dialog import Dialog, MessageSchema
 
 # noinspection PyMethodMayBeStatic
 class DialogRepository:
-    async def create(self, obj: CreateDialog) -> Dialog:
+    async def create_if_not_exists(self, obj: CreateDialog) -> Dialog:
+        # check for existing dialog
+        existing = await Dialog.find_one(
+            {
+                "organization_id": obj.organization_id,
+                "student_id": obj.student_id,
+                "enrollee_id": obj.enrollee_id,
+                "closed": False,
+            }
+        )
+        if existing is not None:
+            return existing
+
         if obj.title is None:
             from src.modules.organization.repository import organization_repository
 

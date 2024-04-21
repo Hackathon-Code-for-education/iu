@@ -1,37 +1,13 @@
 from beanie import PydanticObjectId
-from fastapi import Body
 
 from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
 from src.api.dependencies import UserDep
 from src.exceptions import NotEnoughPermissionsException, ObjectNotFound
-from src.modules.chatting.chat_queue.repository import DialogPair, chat_queue_repository
 from src.modules.chatting.dialog.repository import dialog_repository
-from src.modules.chatting.dialog.schemas import CreateDialog
 from src.storages.mongo.models.dialog import Dialog, MessageSchema
 from src.utils import aware_utcnow
 
 router = EnsureAuthenticatedAPIRouter(prefix="/dialogs")
-
-
-@router.post(
-    "/join-dialog",
-    responses={200: {"description": "Success"}, **NotEnoughPermissionsException.responses},
-)
-async def join_dialog(user: UserDep, dialog_pair: DialogPair = Body(embed=True)) -> Dialog:
-    """
-    Присоединиться к диалогу
-    """
-    # check if user is in dialog pair
-    if user.id not in [dialog_pair.student_id, dialog_pair.enrollee_id]:
-        raise NotEnoughPermissionsException("У вас недостаточно прав для вступления в этот диалог")
-
-    chat_queue_repository.remove_dialog_pair(dialog_pair)
-    _create_dialog = CreateDialog(
-        organization_id=dialog_pair.organization_id,
-        student_id=dialog_pair.student_id,
-        enrollee_id=dialog_pair.enrollee_id,
-    )
-    return await dialog_repository.create(_create_dialog)
 
 
 @router.post(

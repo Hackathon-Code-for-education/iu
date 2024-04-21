@@ -1,14 +1,14 @@
 from typing import Literal, Annotated
 
+from beanie import PydanticObjectId
 from pydantic import Discriminator
 
 from src.custom_pydantic import CustomModel
-from src.modules.chatting.chat_queue.repository import DialogPair
 
 
 class JoinDialog(CustomModel):
     type: Literal["join_dialog"] = "join_dialog"
-    dialog: DialogPair
+    dialog_id: PydanticObjectId
 
 
 class OnlineOfQueue(CustomModel):

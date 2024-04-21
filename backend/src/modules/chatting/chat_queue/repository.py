@@ -21,7 +21,8 @@ class DialogPair(CustomModel):
 
 
 class ChatQueueRepository:
-    _dict: dict[PydanticObjectId, ChatQueueItem]
+    _queue: dict[PydanticObjectId, ChatQueueItem]
+    _stashed: dict[PydanticObjectId, DialogPair]
 
     def __init__(self):
         self._queue = dict()
@@ -97,6 +98,14 @@ class ChatQueueRepository:
         queue = self._queue[dialog_pair.organization_id]
         queue.students_queue.pop(dialog_pair.student_id, None)
         queue.enrollees_queue.pop(dialog_pair.enrollee_id, None)
+
+    def leave_queue(self, user_id: PydanticObjectId, organization_id: PydanticObjectId) -> None:
+        if organization_id not in self._queue:
+            return
+
+        queue = self._queue[organization_id]
+        queue.students_queue.pop(user_id, None)
+        queue.enrollees_queue.pop(user_id, None)
 
 
 chat_queue_repository: ChatQueueRepository = ChatQueueRepository()
