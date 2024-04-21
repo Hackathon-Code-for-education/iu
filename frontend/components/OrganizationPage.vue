@@ -11,6 +11,8 @@ defineProps<{
 defineEmits<{
   wantChatClick: []
 }>()
+
+const { me } = useMe()
 </script>
 
 <template>
@@ -35,10 +37,21 @@ defineEmits<{
             </p>
           </div>
         </div>
-        <div class="flex justify-between gap-2">
-          <UButton>Буду поступать</UButton>
-          <UButton variant="outline" @click="$emit('wantChatClick')">
-            Написать студентам
+        <div class="flex flex-col gap-2 items-end">
+          <div class="flex justify-between gap-2">
+            <UButton>Буду поступать</UButton>
+            <UButton variant="outline" @click="$emit('wantChatClick')">
+              Написать студентам
+            </UButton>
+          </div>
+          <UButton
+            v-if="me?.role === 'admin' || me?.role === 'moderator'"
+            variant="outline"
+            :to="`/${orgUsername}/scenes`"
+            class="w-fit"
+            icon="i-mdi-pencil"
+          >
+            Редактировать
           </UButton>
         </div>
       </div>
