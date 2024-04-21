@@ -3,17 +3,23 @@ import { useOrganizationsRead, useUsersGetMyReviews } from '~/api'
 
 const { me, loggedIn } = useMe()
 const { data: reviews } = useUsersGetMyReviews()
+const { state: chattingState, startChatting, stopChatting } = useChattingAsStudent()
 
 watch(loggedIn, (newLoggedIn) => {
   if (newLoggedIn === false)
     navigateTo('/login')
 }, { immediate: true })
 
-const readyForChatting = ref(false)
-
 const approvementOrganizationId = computed(() => me.value?.student_approvement?.organization_id ?? '')
 const suspendApprovementOrganizationFetching = computed(() => approvementOrganizationId.value === '')
 const { data: org } = useOrganizationsRead(approvementOrganizationId, { query: { suspense: suspendApprovementOrganizationFetching } })
+
+function handleToggleChatting(newVal: boolean) {
+  if (newVal)
+    startChatting()
+  else
+    stopChatting()
+}
 </script>
 
 <template>
@@ -69,7 +75,11 @@ const { data: org } = useOrganizationsRead(approvementOrganizationId, { query: {
                 </template>
               </UPopover>
             </template>
-            <UToggle v-model="readyForChatting" />
+            <UToggle
+              :model-value="chattingState !== 'idle'"
+              :disabled="chattingState === 'starting' || chattingState === 'stopping'"
+              @update:model-value="handleToggleChatting"
+            />
           </UFormGroup>
         </div>
       </Card>

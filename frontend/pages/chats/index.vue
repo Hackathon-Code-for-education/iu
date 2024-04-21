@@ -9,12 +9,17 @@ const {
   error,
   isLoading,
 } = useChattingGetMyDialogs({ query: { refetchInterval: 3000 } })
+const route = useRoute()
+const chatId = ref<string | null>(null)
+
+watch(() => route.fullPath, () => {
+  chatId.value = route.query.chatId as string | null ?? null
+}, { immediate: true })
 
 const { me } = useMe()
 const sendMessage = useChattingPushMessage()
 const draftMessages = ref<Record<string, string | undefined>>({})
 
-const chatId = ref < string | null > (null)
 const selectedChat = computed<{ id: string, title: string, messages: Message[] } | null>(() => {
   const selected = chats.value?.data.find(({ id }) => id === chatId.value) ?? null
 
@@ -33,6 +38,10 @@ const selectedChat = computed<{ id: string, title: string, messages: Message[] }
     })),
   }
 })
+
+function handleSelectChat(newChatId: string | null) {
+  navigateTo({ query: { chatId: newChatId } })
+}
 
 function handleSelectedChatInput(value: string) {
   if (!selectedChat.value)
@@ -96,7 +105,7 @@ function handleSendMessage() {
           :key="chat.id"
           class="basis-[80px] p-3 grow-0 shrink-0 rounded-none border-b border-gray-700 cursor-pointer"
           :class="[chat.id === selectedChat?.id && 'bg-gray-900']"
-          @click="chatId = chat.id"
+          @click="handleSelectChat(chat.id)"
         >
           <h4 class="font-medium text-sm">
             {{ chat.title }}

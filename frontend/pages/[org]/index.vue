@@ -43,7 +43,7 @@ function startKeepaliveChatQueue(orgId: string) {
       .then((res) => {
         const resp = res.data
         if (resp.type === 'join_dialog')
-          navigateTo({ path: '/chats', query: { chat: resp.dialog_id } })
+          navigateTo({ path: '/chats', query: { chatId: resp.dialog_id } })
         else
           studentsOnline.value = resp.queue_students_online
       })
