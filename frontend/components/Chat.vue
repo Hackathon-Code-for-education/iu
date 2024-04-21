@@ -57,15 +57,17 @@ const messagesGrouped = computed(() => {
     <div class="flex basis-auto shrink-0 grow-0 gap-4 py-2 px-4 items-start border-t border-gray-700">
       <UTextarea
         class="w-full"
+        variant="none"
+        placeholder="Сообщение..."
+        autoresize
         :maxrows="5"
         :rows="1"
-        autoresize
         :model-value="input"
         :disabled="inputDisabled"
-        @change="(val) => $emit('update:input', val)"
+        @update:model-value="(val) => $emit('update:input', val)"
       />
       <UButton
-        :disabled="inputDisabled"
+        :disabled="inputDisabled || !(input.trim())"
         icon="i-heroicons-paper-airplane"
         @click="$emit('send')"
       />

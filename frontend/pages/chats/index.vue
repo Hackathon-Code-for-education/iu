@@ -10,7 +10,7 @@ const {
   isLoading,
 } = useChattingGetMyDialogs({ query: { refetchInterval: 3000 } })
 
-const { data: me } = useUsersGetMe()
+const { me } = useMe()
 const sendMessage = useChattingPushMessage()
 const draftMessages = ref<Record<string, string | undefined>>({})
 
@@ -29,7 +29,7 @@ const selectedChat = computed<{ id: string, title: string, messages: Message[] }
       date: new Date(m.at),
       content: m.text,
       // @todo
-      incoming: me.value?.data.id !== m.user_id,
+      incoming: me.value?.id !== m.user_id,
     })),
   }
 })
