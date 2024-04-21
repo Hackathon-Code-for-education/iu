@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createError, useRoute } from '#app'
-import { useChattingJoinDialog, useChattingUpdateQueue, useOrganizationsGetByUsername } from '~/api'
+import { useChattingUpdateQueue, useOrganizationsGetByUsername } from '~/api'
 import { getFileUrl } from '~/api/file'
 
 const route = useRoute()
@@ -22,7 +22,6 @@ const error = computed(() => {
 
 const chatModalOpen = ref(false)
 const updateChattingQueue = useChattingUpdateQueue()
-const joinDialog = useChattingJoinDialog()
 
 function handleWantChatClick() {
   if (!org)
@@ -32,35 +31,35 @@ function handleWantChatClick() {
 }
 
 const studentsOnline = ref(0)
-const repeatTimeout = ref < any > (null)
+const keepaliveChatQueueInterval = ref<any>(null)
 
-watch(chatModalOpen, (isOpen) => {
-  if (repeatTimeout.value)
-    clearTimeout(repeatTimeout.value)
+function startKeepaliveChatQueue(orgId: string) {
+  if (keepaliveChatQueueInterval.value)
+    clearInterval(keepaliveChatQueueInterval.value)
 
-  if (isOpen && org.value?.data) {
+  const start = () => {
     updateChattingQueue
-      .mutateAsync({ organizationId: org.value.data.id })
+      .mutateAsync({ organizationId: orgId })
       .then((res) => {
         const resp = res.data
-        if (resp.type === 'join_dialog') {
-          //
-          joinDialog
-            .mutateAsync({ data: { dialog_pair: resp.dialog } })
-            .then((res) => {
-              const resp = res.data
-              navigateTo(`/chats/${resp.id}`)
-            })
-        }
-        else {
+        if (resp.type === 'join_dialog')
+          navigateTo({ path: '/chats', query: { chat: resp.dialog_id } })
+        else
           studentsOnline.value = resp.queue_students_online
-          const timeoutId = setTimeout(() => {}, 500)
-          repeatTimeout.value = timeoutId
-        }
       })
   }
 
-  return () => {}
+  keepaliveChatQueueInterval.value = setInterval(start, 1500)
+  start()
+}
+
+watch(chatModalOpen, (isOpen, _, onCleanup) => {
+  if (isOpen && org.value?.data)
+    startKeepaliveChatQueue(org.value.data.id)
+
+  onCleanup(() => {
+    clearInterval(keepaliveChatQueueInterval.value)
+  })
 }, { immediate: true })
 </script>
 
@@ -85,8 +84,52 @@ watch(chatModalOpen, (isOpen) => {
     <USkeleton class="w-full h-[300px] rounded-xl" />
   </UContainer>
   <UModal v-model="chatModalOpen">
-    <div class="p-4">
-      Студентов онлайн: {{ studentsOnline }}
-    </div>
+    <UCard>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+            Чат со студентом
+          </h3>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="chatModalOpen = false" />
+        </div>
+      </template>
+      <div class="flex gap-2 items-center">
+        <span class="live-circle" />
+        Студентов онлайн: {{ studentsOnline }}
+      </div>
+    </UCard>
   </UModal>
 </template>
+
+<style scoped>
+@keyframes live-circle-anim {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.live-circle {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: #00c853;
+}
+
+.live-circle::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #00c853;
+  animation: live-circle-anim 1.25s infinite;
+  animation-timing-function: ease-in-out;
+}
+</style>
