@@ -1,8 +1,17 @@
 $schema: "./settings.schema.yaml"
-# ---------- Application settings ----- #
+# ---------- Параметры приложения ----- #
+environment: production
+
+# Настройки безопасности запросов от браузера
+https_only_cookie: false
+secure_prefix_cookie: false
+wildcard_allow_origin_regex: false
+
+# Параметры подключения к базе данных MongoDB
 database:
-  uri: mongodb://user:password@localhost:27017/db?authSource=admin
-# Predefined
+  uri: mongodb://mongoadmin:secret@localhost:27017/db?authSource=admin
+
+# Предопределенные пользователи для первого запуска
 predefined:
     users:
     - login: admin
@@ -15,12 +24,16 @@ predefined:
       name: Moderator
     - login: user
       password: user
-      role: user
+      role: default
       name: User
+
+# Параметры аутентификации
 auth:
-    # Run 'openssl rand -hex 32' to generate key
+    # Запустите 'openssl rand -hex 32' для генерации ключа
     session_secret_key: "secret"
+
+# Подключение Telegram как метода входа в систему
 telegram:
-    # Get your bot token from @BotFather
+    # Создайте бота через @BotFather
     bot_username: YourBotName
     bot_token: YourBotToken
