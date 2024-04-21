@@ -62,6 +62,7 @@ const messagesGrouped = computed(() => {
         :model-value="input"
         :disabled="inputDisabled"
         @update:model-value="(val) => $emit('update:input', val)"
+        @keydown.exact.enter.prevent="$emit('send')"
       />
       <UButton
         :disabled="inputDisabled || !(input.trim())"
