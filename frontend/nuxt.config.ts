@@ -23,6 +23,6 @@ export default defineNuxtConfig({
   },
   css: ['~/assets/css/main.css'],
   app: {
-    rootId: 'root'
-  }
+    rootId: 'root',
+  },
 })

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Message } from './Chat.vue';
+import type { Message } from './Chat.vue'
 
 defineProps<{
   message: Message

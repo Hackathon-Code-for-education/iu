@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import ChatBubble from './ChatBubble.vue'
 
-export type Message = {
-  id: string;
-  content: string;
-  date: Date;
-  incoming: boolean;
+export interface Message {
+  id: string
+  content: string
+  date: Date
+  incoming: boolean
 }
 
 const props = defineProps<{
-  title: string;
-  messages: Message[];
+  title: string
+  messages: Message[]
   input: string
   inputDisabled: boolean
 }>()
@@ -25,9 +25,9 @@ const messagesGrouped = computed(() => {
   msgs.sort((a, b) => a.date.getTime() - b.date.getTime())
   const groups = msgs.reduce((acc, msg) => {
     const key = msg.date.toLocaleDateString()
-    if (!acc[key]) {
+    if (!acc[key])
       acc[key] = []
-    }
+
     acc[key].push(msg)
     return acc
   }, {} as Record<string, Message[]>)
@@ -44,7 +44,8 @@ const messagesGrouped = computed(() => {
       <div class="overflow-y-auto flex flex-col-reverse w-full absolute max-h-full px-4 bg-fixed bg-repeat bg-[url('/img/chat-pattern-white.svg')] dark:bg-[url('/img/chat-pattern-black.svg')]">
         <div v-for="messageGroup in messagesGrouped" :key="messageGroup[0].date.getTime()" class="relative pt-2 max-h-full">
           <h3
-            class="sticky inline-block top-0 left-1/2 -translate-x-1/2 text-[16px] leading-[16px] px-[8px] py-[2px] rounded-full bg-gray-500 bg-opacity-25 backdrop-blur-sm">
+            class="sticky inline-block top-0 left-1/2 -translate-x-1/2 text-[16px] leading-[16px] px-[8px] py-[2px] rounded-full bg-gray-500 bg-opacity-25 backdrop-blur-sm"
+          >
             {{ messageDate(messageGroup[0].date) }}
           </h3>
           <div class="flex flex-col gap-2 py-2">
@@ -60,13 +61,13 @@ const messagesGrouped = computed(() => {
         :rows="1"
         autoresize
         :model-value="input"
-        @change="(val) => $emit('update:input', val)"
         :disabled="inputDisabled"
+        @change="(val) => $emit('update:input', val)"
       />
       <UButton
-        @click="$emit('send')"
         :disabled="inputDisabled"
         icon="i-heroicons-paper-airplane"
+        @click="$emit('send')"
       />
     </div>
   </div>

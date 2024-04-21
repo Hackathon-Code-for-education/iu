@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useQueryClient } from '@tanstack/vue-query';
-import { getChattingGetMyDialogsQueryKey, useChattingGetMyDialogs, useChattingPushMessage, useUsersGetMe, usersGetMe } from '~/api'
-import type { Message } from '~/components/Chat.vue';
+import { useQueryClient } from '@tanstack/vue-query'
+import { getChattingGetMyDialogsQueryKey, useChattingGetMyDialogs, useChattingPushMessage, useUsersGetMe } from '~/api'
+import type { Message } from '~/components/Chat.vue'
 
 const client = useQueryClient()
 const {
@@ -18,53 +18,58 @@ const chatId = ref < string | null > (null)
 const selectedChat = computed<{ id: string, title: string, messages: Message[] } | null>(() => {
   const selected = chats.value?.data.find(({ id }) => id === chatId.value) ?? null
 
-  if (!selected) return null
+  if (!selected)
+    return null
 
   return {
     id: selected.id,
-    title: selected.title ?? "—",
-    messages: selected.messages.map((m) => ({
+    title: selected.title ?? '—',
+    messages: selected.messages.map(m => ({
       id: m.id,
       date: new Date(m.at),
       content: m.text,
       // @todo
       incoming: me.value?.data.id !== m.user_id,
-    }))
+    })),
   }
 })
 
 function handleSelectedChatInput(value: string) {
-  if (!selectedChat.value) return
+  if (!selectedChat.value)
+    return
 
   draftMessages.value = {
     ...draftMessages.value,
-    [selectedChat.value.id]: value
+    [selectedChat.value.id]: value,
   }
 }
 
 function handleSendMessage() {
-  if (sendMessage.isPending.value) return
+  if (sendMessage.isPending.value)
+    return
 
-  if (!selectedChat.value) return
+  if (!selectedChat.value)
+    return
 
   const message = draftMessages.value[selectedChat.value.id]?.trim() ?? ''
-  if (!message) return
+  if (!message)
+    return
 
   const chatId = selectedChat.value.id
 
-  sendMessage.mutateAsync({params: {
+  sendMessage.mutateAsync({ params: {
     dialog_id: selectedChat.value.id,
     message,
-  }})
+  } })
     .then(() => {
       draftMessages.value = {
         ...draftMessages.value,
-        [chatId]: undefined
+        [chatId]: undefined,
       }
     })
     .finally(() => {
-      return client.invalidateQueries({ 
-        queryKey: getChattingGetMyDialogsQueryKey()
+      return client.invalidateQueries({
+        queryKey: getChattingGetMyDialogsQueryKey(),
       })
     })
 }
@@ -89,9 +94,9 @@ function handleSendMessage() {
         <div
           v-for="chat in (chats?.data ?? [])"
           :key="chat.id"
-          @click="chatId = chat.id"
           class="basis-[80px] p-3 grow-0 shrink-0 rounded-none border-b border-gray-700 cursor-pointer"
           :class="[chat.id === selectedChat?.id && 'bg-gray-900']"
+          @click="chatId = chat.id"
         >
           <h4 class="font-medium text-sm">
             {{ chat.title }}
@@ -107,8 +112,8 @@ function handleSendMessage() {
         :title="selectedChat.title"
         :messages="selectedChat.messages"
         :input="draftMessages[selectedChat.id] ?? ''"
-        @update:input="handleSelectedChatInput"
         :input-disabled="sendMessage.isPending.value"
+        @update:input="handleSelectedChatInput"
         @send="handleSendMessage"
       />
     </Card>
