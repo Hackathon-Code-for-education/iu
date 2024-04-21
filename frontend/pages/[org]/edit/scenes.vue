@@ -3,12 +3,13 @@ import { createError, useRoute } from '#app'
 import { useOrganizationsGetByUsername } from '~/api'
 
 const route = useRoute()
+const orgUsername = route.params.org as string
 
 const {
   data: org,
   error: queryError,
   isLoading,
-} = useOrganizationsGetByUsername((route.params.org as string), { query: { retry: 0 } })
+} = useOrganizationsGetByUsername(orgUsername, { query: { retry: 0 } })
 
 const error = computed(() => {
   const err = queryError.value
@@ -24,9 +25,14 @@ const error = computed(() => {
 
 <template>
   <ErrorPage v-if="error" :error="error" />
+  <OrganizationEditHeader
+    v-if="org"
+    :org-username="orgUsername"
+    :org-id="org.data.id"
+  />
   <ScenesEditPage
-    v-else-if="org"
-    :org-username="org.data.username"
+    v-if="org"
+    :org-username="orgUsername"
     :org-id="org.data.id"
   />
   <UContainer v-else-if="isLoading">

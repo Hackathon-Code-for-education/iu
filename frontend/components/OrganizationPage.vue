@@ -47,7 +47,7 @@ const { me } = useMe()
           <UButton
             v-if="me?.role === 'admin' || me?.role === 'moderator'"
             variant="outline"
-            :to="`/${orgUsername}/scenes`"
+            :to="`/${orgUsername}/edit/scenes`"
             class="w-fit"
             icon="i-mdi-pencil"
           >
