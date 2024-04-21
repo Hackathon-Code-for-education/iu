@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getFileUrl } from '~/api/file'
 import { useScenesGetScenesForOrganization } from '~/api'
+import { type SceneExtended, composeSceneData } from '~/api/scenes'
 
 const props = defineProps<{
   orgUsername: string
@@ -10,16 +10,9 @@ const props = defineProps<{
 
 const { data: scenes } = useScenesGetScenesForOrganization(props.orgId, { query: { retry: 0 } })
 
-function composeSceneData(scene: any) {
-  return {
-    panorama: getFileUrl(scene.file),
-    title: scene.title,
-    type: 'equirectangular',
-    ...(scene.meta || {}),
-  }
-}
-
-const scenesData = computed(() => scenes?.value?.data && Object.fromEntries(scenes.value.data.map(scene => [scene.id, composeSceneData(scene)])))
+const scenesData = computed(() => scenes?.value?.data && Object.fromEntries(
+  scenes.value.data.map(scene => [scene.id, composeSceneData(scene as SceneExtended)]),
+))
 </script>
 
 <template>
