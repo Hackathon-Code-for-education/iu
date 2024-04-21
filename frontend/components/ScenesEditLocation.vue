@@ -236,9 +236,7 @@ function handleHotspotSceneChange(index: number, v: string) {
         <UButton @click="save">
           Сохранить
         </UButton>
-        <UButton color="red" @click="remove">
-          Удалить
-        </UButton>
+        <UButton color="red" icon="i-mdi-trash" variant="ghost" @click="remove" />
       </div>
     </div>
     <UInput v-model="sceneInfo.title" class="w-full" label="Название локации" />
