@@ -17,21 +17,7 @@ const emit = defineEmits<{
 
 const queryClient = useQueryClient()
 
-const { mutate: uploadFile } = useFilesUploadFile({
-  mutation: {
-    onSuccess(res) {
-      createScene({
-        data: {
-          organization: props.orgId,
-          title: 'Новая локация',
-          meta: {},
-          file: res.data.id,
-        },
-      })
-    },
-  },
-})
-const { mutate: createScene } = useScenesCreate({
+const { mutate: createScene, isPending: createScenePending } = useScenesCreate({
   mutation: {
     onSuccess(data) {
       queryClient.setQueryData(getScenesGetScenesForOrganizationQueryKey(props.orgId), (oldData: any) => {
@@ -44,6 +30,21 @@ const { mutate: createScene } = useScenesCreate({
         }
       })
       emit('setSceneId', data.data.id)
+    },
+  },
+})
+
+const { mutate: uploadFile, isPending: uploadFilePending } = useFilesUploadFile({
+  mutation: {
+    onSuccess(res) {
+      createScene({
+        data: {
+          organization: props.orgId,
+          title: 'Новая локация',
+          meta: {},
+          file: res.data.id,
+        },
+      })
     },
   },
 })
@@ -64,6 +65,17 @@ function create(fileList: FileList | null) {
 
     <div class="py-8 flex items-center">
       <UInput type="file" size="sm" accept=".jpg" @change="create" />
+      <UButton
+        v-if="uploadFilePending || createScenePending"
+        size="sm"
+        variant="ghost"
+        color="gray"
+        icon="i-mdi-loading"
+        class="ml-2"
+        loading
+      >
+        Загрузка...
+      </UButton>
     </div>
   </div>
 </template>
