@@ -1,75 +1,26 @@
-# Nuxt 3 Minimal Starter
+# Сайт | АбиТур
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Технологии
 
-## Setup
+- Node.js 20, TypeScript
+- Vue, Nuxt.js
+- Tailwind CSS, NuxtUI
+- Pannellum
+- Docker, Docker Compose
 
-Make sure to install the dependencies:
+## Разработка
 
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- Установите Node.js 20+ и pnpm
+- Установите зависимости
+    ```bash
+    pnpm install
+    ```
+- Скопируйте файл `.env.example` в `.env` и укажите в нем переменные окружения
+    ```bash
+      cp .env.example .env
+    ```
+- Запустите проект в режиме разработке
+    ```bash
+    pnpm run dev
+    ```
+- Откройте [http://localhost:3000](http://localhost:3000) в браузере
