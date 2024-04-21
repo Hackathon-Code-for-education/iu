@@ -8,7 +8,7 @@ const {
   data: org,
   error: queryError,
   isLoading,
-} = useOrganizationsGetByUsername((route.params.org), { query: { retry: 0 } })
+} = useOrganizationsGetByUsername((route.params.org as string), { query: { retry: 0 } })
 const error = computed(() => {
   const err = queryError.value
   if (err && err.response?.status === 404) {
