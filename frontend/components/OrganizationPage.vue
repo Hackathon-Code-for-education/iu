@@ -20,6 +20,7 @@ const props = defineProps<{
     phone?: string
     email?: string
     website?: string
+    documentsUrl?: string
   }
 }>()
 
@@ -101,13 +102,13 @@ function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
 
 <template>
   <UContainer>
-    <Card class="bg-neutral-900">
+    <Card class="dark:bg-neutral-900 bg-neutral-50">
       <OrganizationPanorama v-if="mainSceneId" :org-username="orgUsername" :org-id="orgId" :main-scene-id="mainSceneId" />
       <div class="px-4 flex py-4 justify-between items-start">
         <div class="flex justify-between gap-5 items-end">
           <div v-if="logoUrl" class="w-20 h-1 relative">
             <UAvatar
-              class="absolute bottom-0 box-content border-4 border-neutral-900"
+              class="absolute bottom-0 box-content border-4 dark:border-neutral-900 border-neutral-50"
               size="3xl"
               :src="logoUrl"
             />
@@ -171,6 +172,9 @@ function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
           </UButton>
           <UButton v-if="contacts.phone" icon="i-heroicons-phone" variant="link" :to="`tel:${contacts.phone}`" target="_blank">
             {{ contacts.phone }}
+          </UButton>
+          <UButton v-if="contacts.documentsUrl" icon="i-heroicons-document-text" variant="link" :to="contacts.documentsUrl" target="_blank">
+            Документы
           </UButton>
         </div>
       </Card>

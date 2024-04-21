@@ -15,6 +15,20 @@ const logout = useUsersLogout({
 function handleLogout() {
   logout.mutate()
 }
+
+const colorMode = useColorMode()
+const isDark = computed({
+  get() {
+    return colorMode.value === 'dark'
+  },
+  set() {
+    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  },
+})
+
+function handleThemeToggle() {
+  isDark.value = !isDark.value
+}
 </script>
 
 <template>
@@ -35,7 +49,10 @@ function handleLogout() {
               v-else-if="me"
               mode="hover"
               :items="[
-                [{ label: 'Профиль', icon: 'i-heroicons-user-circle', href: '/profile' }],
+                [
+                  { label: 'Профиль', icon: 'i-heroicons-user-circle', href: '/profile' },
+                  { label: 'Тёмная тема', icon: isDark ? 'i-heroicons-moon' : 'i-heroicons-sun', click: handleThemeToggle },
+                ],
                 [{ label: 'Выйти', icon: 'i-heroicons-arrow-right-start-on-rectangle', click: handleLogout, disabled: logout.isPending.value }],
               ]"
             >

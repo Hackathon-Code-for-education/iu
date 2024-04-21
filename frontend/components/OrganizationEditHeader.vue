@@ -11,7 +11,7 @@ const { data: org } = useOrganizationsGetByUsername(props.orgUsername, { query: 
 
 <template>
   <UContainer v-if="org">
-    <Card class="bg-neutral-900 p-4 gap-2 flex flex-col mb-4">
+    <Card class="p-4 gap-2 flex flex-col mb-4">
       <div class="flex justify-between items-start">
         <h1 class="text-2xl font-medium">
           {{ org.data.name }}

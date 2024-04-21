@@ -37,14 +37,11 @@ const messagesGrouped = computed(() => {
 
 <template>
   <div class="h-full w-full min-h-[500px] flex flex-col items-stretch">
-    <!-- <header class="basis-auto shrink-0 grow-0">
-      <h2>{{ title }}</h2>
-    </header> -->
     <div class="flex-auto relative">
       <div class="overflow-y-auto flex flex-col-reverse w-full absolute max-h-full px-4 bg-fixed bg-repeat bg-[url('/img/chat-pattern-white.svg')] dark:bg-[url('/img/chat-pattern-black.svg')]">
         <div v-for="messageGroup in messagesGrouped" :key="messageGroup[0].date.getTime()" class="relative pt-2 max-h-full">
           <h3
-            class="sticky inline-block top-0 left-1/2 -translate-x-1/2 text-[16px] leading-[16px] px-[8px] py-[2px] rounded-full bg-gray-500 bg-opacity-25 backdrop-blur-sm"
+            class="sticky inline-block top-0 left-1/2 -translate-x-1/2 text-[16px] leading-[16px] px-[8px] py-[3px] rounded-full dark:bg-gray-500 bg-gray-400 bg-opacity-25 backdrop-blur-sm"
           >
             {{ messageDate(messageGroup[0].date) }}
           </h3>
@@ -54,7 +51,7 @@ const messagesGrouped = computed(() => {
         </div>
       </div>
     </div>
-    <div class="flex basis-auto shrink-0 grow-0 gap-4 py-2 px-4 items-start border-t border-gray-700">
+    <div class="flex basis-auto shrink-0 grow-0 gap-4 py-2 px-4 items-start border-t dark:border-gray-700 border-gray-200">
       <UTextarea
         class="w-full"
         variant="none"

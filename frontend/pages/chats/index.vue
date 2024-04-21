@@ -8,7 +8,7 @@ const {
   data: chats,
   error,
   isLoading,
-} = useChattingGetMyDialogs({ query: { refetchInterval: 3000 } })
+} = useChattingGetMyDialogs({ query: { refetchInterval: 1500 } })
 const route = useRoute()
 const chatId = ref<string | null>(null)
 
@@ -92,7 +92,7 @@ function handleSendMessage() {
       </h2>
     </div>
     <Card v-else class="flex">
-      <div class="flex flex-col basis-[300px] grow-0 shrink-0 border-r border-gray-700">
+      <div class="flex flex-col basis-[300px] grow-0 shrink-0 border-r dark:border-gray-700 border-gray-200">
         <template v-if="isLoading">
           <USkeleton
             v-for="i in new Array(5).fill(null)"
@@ -103,8 +103,8 @@ function handleSendMessage() {
         <div
           v-for="chat in (chats?.data ?? [])"
           :key="chat.id"
-          class="basis-[80px] p-3 grow-0 shrink-0 rounded-none border-b border-gray-700 cursor-pointer"
-          :class="[chat.id === selectedChat?.id && 'bg-gray-900']"
+          class="basis-[80px] p-3 grow-0 shrink-0 rounded-none border-b dark:border-gray-700 border-gray-200 cursor-pointer"
+          :class="[chat.id === selectedChat?.id && 'dark:bg-gray-900 bg-gray-100']"
           @click="handleSelectChat(chat.id)"
         >
           <h4 class="font-medium text-sm">

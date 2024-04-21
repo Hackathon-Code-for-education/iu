@@ -9,7 +9,7 @@ const { data: orgs } = useOrganizationsReadAll()
   <UContainer>
     <div v-if="orgs" class="grid grid-cols-3 gap-4">
       <NuxtLink v-for="org in orgs.data" :key="org.id" :to="`/${org.username}`">
-        <Card class="px-4 h-[80px] flex gap-4 items-center hover:dark:border-green-700">
+        <Card class="px-4 h-[80px] flex gap-4 items-center hover:dark:border-green-700 hover:border-green-600">
           <UAvatar size="xl" :src="org.logo ? getFileUrl(org.logo) : undefined" />
           <h3 class="text-xl line-clamp-2">
             {{ org.name }}

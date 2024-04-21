@@ -77,6 +77,7 @@ watch(chatModalOpen, (isOpen, _, onCleanup) => {
       phone: org.data.contacts?.phone ?? undefined,
       email: org.data.contacts?.email ?? undefined,
       website: org.data.contacts?.website ?? undefined,
+      documentsUrl: org.data.contacts?.docs_url ?? undefined,
     }"
     @want-chat-click="handleWantChatClick"
   />

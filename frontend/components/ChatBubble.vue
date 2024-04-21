@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bubble relative bg-green-900 px-2 pt-1 pb-[24px] rounded-md" :class="[message.incoming ? 'self-start' : 'self-end']">
+  <div class="bubble relative dark:bg-green-900 bg-green-200 px-2 pt-1 pb-[24px] rounded-md" :class="[message.incoming ? 'self-start' : 'self-end']">
     <div>
       {{ message.content }}
     </div>
