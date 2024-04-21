@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useQueryClient } from '@tanstack/vue-query'
-import { getChattingGetMyDialogsQueryKey, useChattingGetMyDialogs, useChattingPushMessage, useUsersGetMe } from '~/api'
+import { getChattingGetMyDialogsQueryKey, useChattingGetMyDialogs, useChattingPushMessage } from '~/api'
 import type { Message } from '~/components/Chat.vue'
 
 const client = useQueryClient()

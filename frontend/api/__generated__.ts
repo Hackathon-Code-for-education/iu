@@ -156,24 +156,78 @@ export interface UpdateScene {
   title?: UpdateSceneTitle;
 }
 
+/**
+ * Псевдоним организации (уникальный)
+ */
 export type UpdateOrganizationUsername = string | null;
 
+/**
+ * Наименование региона
+ */
+export type UpdateOrganizationRegionName = string | null;
+
+/**
+ * Наименование организации
+ */
 export type UpdateOrganizationName = string | null;
 
+/**
+ * Основная сцена организации
+ */
 export type UpdateOrganizationMainScene = string | null;
 
+/**
+ * Логотип организации
+ */
 export type UpdateOrganizationLogo = string | null;
 
-export type UpdateOrganizationDocuments = unknown | null;
+/**
+ * Идентификатор организации в реестре
+ */
+export type UpdateOrganizationInRegistryId = string | null;
 
-export type UpdateOrganizationContacts = unknown | null;
+/**
+ * Полное наименование организации
+ */
+export type UpdateOrganizationFullName = string | null;
+
+/**
+ * Наименование федерального округа
+ */
+export type UpdateOrganizationFederalDistrictName = string | null;
+
+/**
+ * Образовательные программы организации
+ */
+export type UpdateOrganizationEducationalPrograms = EducationalPrograsSchemaInput[] | null;
+
+/**
+ * Контактные данные организации
+ */
+export type UpdateOrganizationContacts = ContactsSchemaInput | null;
 
 export interface UpdateOrganization {
+  /** Контактные данные организации */
   contacts?: UpdateOrganizationContacts;
-  documents?: UpdateOrganizationDocuments;
+  /** Документы организации */
+  documents?: unknown;
+  /** Образовательные программы организации */
+  educational_programs?: UpdateOrganizationEducationalPrograms;
+  /** Наименование федерального округа */
+  federal_district_name?: UpdateOrganizationFederalDistrictName;
+  /** Полное наименование организации */
+  full_name?: UpdateOrganizationFullName;
+  /** Идентификатор организации в реестре */
+  in_registry_id?: UpdateOrganizationInRegistryId;
+  /** Логотип организации */
   logo?: UpdateOrganizationLogo;
+  /** Основная сцена организации */
   main_scene?: UpdateOrganizationMainScene;
+  /** Наименование организации */
   name?: UpdateOrganizationName;
+  /** Наименование региона */
+  region_name?: UpdateOrganizationRegionName;
+  /** Псевдоним организации (уникальный) */
   username?: UpdateOrganizationUsername;
 }
 
@@ -252,6 +306,11 @@ export interface PendingApprovement {
 }
 
 /**
+ * Наименование региона
+ */
+export type OrganizationRegionName = string | null;
+
+/**
  * Основная сцена организации
  */
 export type OrganizationMainScene = string | null;
@@ -261,19 +320,44 @@ export type OrganizationMainScene = string | null;
  */
 export type OrganizationLogo = string | null;
 
+/**
+ * Идентификатор организации в реестре
+ */
+export type OrganizationInRegistryId = string | null;
+
+/**
+ * Наименование федерального округа
+ */
+export type OrganizationFederalDistrictName = string | null;
+
+/**
+ * Контактные данные организации
+ */
+export type OrganizationContacts = ContactsSchemaOutput | null;
+
 export interface Organization {
   /** Контактные данные организации */
-  contacts: unknown;
+  contacts: OrganizationContacts;
   /** Документы организации */
   documents: unknown;
+  /** Образовательные программы организации */
+  educational_programs: EducationalPrograsSchemaOutput[];
+  /** Наименование федерального округа */
+  federal_district_name: OrganizationFederalDistrictName;
+  /** Полное наименование организации */
+  full_name: string;
   /** MongoDB document ObjectID */
   id: string;
+  /** Идентификатор организации в реестре */
+  in_registry_id: OrganizationInRegistryId;
   /** Логотип организации */
   logo: OrganizationLogo;
   /** Основная сцена организации */
   main_scene: OrganizationMainScene;
   /** Наименование организации */
   name: string;
+  /** Наименование региона */
+  region_name: OrganizationRegionName;
   /** Псевдоним организации (уникальный) */
   username: string;
 }
@@ -355,6 +439,64 @@ export interface File {
   type: FileType;
 }
 
+/**
+ * Квалификация выпускника
+ */
+export type EducationalPrograsSchemaOutputQualification = string | null;
+
+/**
+ * Нормативный срок обучения
+ */
+export type EducationalPrograsSchemaOutputEduNormativePeriod = string | null;
+
+export interface EducationalPrograsSchemaOutput {
+  /** Наименование уровня образования */
+  edu_level_name: string;
+  /** Нормативный срок обучения */
+  edu_normative_period: EducationalPrograsSchemaOutputEduNormativePeriod;
+  /** Идентификатор образовательной программы в реестре */
+  in_registry_id: string;
+  /** Код образовательной программы */
+  program_code: string;
+  /** Наименование образовательной программы */
+  program_name: string;
+  /** Квалификация выпускника */
+  qualification: EducationalPrograsSchemaOutputQualification;
+  /** Код направления подготовки */
+  ugs_code: string;
+  /** Наименование направления подготовки */
+  ugs_name: string;
+}
+
+/**
+ * Квалификация выпускника
+ */
+export type EducationalPrograsSchemaInputQualification = string | null;
+
+/**
+ * Нормативный срок обучения
+ */
+export type EducationalPrograsSchemaInputEduNormativePeriod = string | null;
+
+export interface EducationalPrograsSchemaInput {
+  /** Наименование уровня образования */
+  edu_level_name: string;
+  /** Нормативный срок обучения */
+  edu_normative_period?: EducationalPrograsSchemaInputEduNormativePeriod;
+  /** Идентификатор образовательной программы в реестре */
+  in_registry_id: string;
+  /** Код образовательной программы */
+  program_code: string;
+  /** Наименование образовательной программы */
+  program_name: string;
+  /** Квалификация выпускника */
+  qualification?: EducationalPrograsSchemaInputQualification;
+  /** Код направления подготовки */
+  ugs_code: string;
+  /** Наименование направления подготовки */
+  ugs_name: string;
+}
+
 export interface DialogPair {
   enrollee_id: string;
   organization_id: string;
@@ -393,6 +535,11 @@ export interface CreateScene {
 }
 
 /**
+ * Наименование региона
+ */
+export type CreateOrganizationRegionName = string | null;
+
+/**
  * Основная сцена организации
  */
 export type CreateOrganizationMainScene = string | null;
@@ -402,19 +549,142 @@ export type CreateOrganizationMainScene = string | null;
  */
 export type CreateOrganizationLogo = string | null;
 
+/**
+ * Идентификатор организации в реестре
+ */
+export type CreateOrganizationInRegistryId = string | null;
+
+/**
+ * Наименование федерального округа
+ */
+export type CreateOrganizationFederalDistrictName = string | null;
+
+/**
+ * Контактные данные организации
+ */
+export type CreateOrganizationContacts = ContactsSchemaInput | null;
+
 export interface CreateOrganization {
   /** Контактные данные организации */
-  contacts?: unknown;
+  contacts?: CreateOrganizationContacts;
   /** Документы организации */
   documents?: unknown;
+  /** Образовательные программы организации */
+  educational_programs?: EducationalPrograsSchemaInput[];
+  /** Наименование федерального округа */
+  federal_district_name?: CreateOrganizationFederalDistrictName;
+  /** Полное наименование организации */
+  full_name: string;
+  /** Идентификатор организации в реестре */
+  in_registry_id?: CreateOrganizationInRegistryId;
   /** Логотип организации */
   logo?: CreateOrganizationLogo;
   /** Основная сцена организации */
   main_scene?: CreateOrganizationMainScene;
   /** Наименование организации */
   name: string;
+  /** Наименование региона */
+  region_name?: CreateOrganizationRegionName;
   /** Псевдоним организации (уникальный) */
   username: string;
+}
+
+/**
+ * Сайт
+ */
+export type ContactsSchemaOutputWebsite = string | null;
+
+/**
+ * Почтовый адрес
+ */
+export type ContactsSchemaOutputPostAddress = string | null;
+
+/**
+ * Телефон
+ */
+export type ContactsSchemaOutputPhone = string | null;
+
+/**
+ * Факс
+ */
+export type ContactsSchemaOutputFax = string | null;
+
+/**
+ * Электронная почта
+ */
+export type ContactsSchemaOutputEmail = string | null;
+
+export interface ContactsSchemaOutput {
+  /** Электронная почта */
+  email: ContactsSchemaOutputEmail;
+  /** Факс */
+  fax: ContactsSchemaOutputFax;
+  /** Телефон */
+  phone: ContactsSchemaOutputPhone;
+  /** Почтовый адрес */
+  post_address: ContactsSchemaOutputPostAddress;
+  /** Сайт */
+  website: ContactsSchemaOutputWebsite;
+  [key: string]: any;
+ }
+
+/**
+ * Сайт
+ */
+export type ContactsSchemaInputWebsite = string | null;
+
+/**
+ * Почтовый адрес
+ */
+export type ContactsSchemaInputPostAddress = string | null;
+
+/**
+ * Телефон
+ */
+export type ContactsSchemaInputPhone = string | null;
+
+/**
+ * Факс
+ */
+export type ContactsSchemaInputFax = string | null;
+
+/**
+ * Электронная почта
+ */
+export type ContactsSchemaInputEmail = string | null;
+
+export interface ContactsSchemaInput {
+  /** Электронная почта */
+  email?: ContactsSchemaInputEmail;
+  /** Факс */
+  fax?: ContactsSchemaInputFax;
+  /** Телефон */
+  phone?: ContactsSchemaInputPhone;
+  /** Почтовый адрес */
+  post_address?: ContactsSchemaInputPostAddress;
+  /** Сайт */
+  website?: ContactsSchemaInputWebsite;
+  [key: string]: any;
+ }
+
+/**
+ * Логотип организации
+ */
+export type CompactOrganizationLogo = string | null;
+
+export interface CompactOrganization {
+  /** MongoDB document ObjectID */
+  id: string;
+  /** Логотип организации */
+  logo: CompactOrganizationLogo;
+  /** Наименование организации */
+  name: string;
+  /** Псевдоним организации (уникальный) */
+  username: string;
+}
+
+export interface BodyOrganizationsImportOrganizations {
+  upload_file_obj: Blob;
 }
 
 export interface BodyFilesUploadFile {
@@ -1574,7 +1844,7 @@ export const useFilesUpdateFile = <TError = AxiosError<void | HTTPValidationErro
  */
 export const organizationsReadAll = (
      options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Organization[]>> => {
+ ): Promise<AxiosResponse<CompactOrganization[]>> => {
     
     return axios.get(
       `/organizations/`,options
@@ -1912,6 +2182,64 @@ export const useOrganizationsGetByUsername = <TData = Awaited<ReturnType<typeof 
 
 
 
+/**
+ * Импортировать организации из JSON дампа (результат скрипта `parse_organizations.py`)
+ * @summary Import Organizations
+ */
+export const organizationsImportOrganizations = (
+    bodyOrganizationsImportOrganizations: MaybeRef<BodyOrganizationsImportOrganizations>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<string[]>> => {const formData = new FormData();
+formData.append('upload_file_obj', bodyOrganizationsImportOrganizations.upload_file_obj)
+
+    bodyOrganizationsImportOrganizations = unref(bodyOrganizationsImportOrganizations);
+    return axios.post(
+      `/organizations/upload`,
+      formData,options
+    );
+  }
+
+
+
+export const getOrganizationsImportOrganizationsMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError,{data: BodyOrganizationsImportOrganizations}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError,{data: BodyOrganizationsImportOrganizations}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsImportOrganizations>>, {data: BodyOrganizationsImportOrganizations}> = (props) => {
+          const {data} = props ?? {};
+
+          return  organizationsImportOrganizations(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrganizationsImportOrganizationsMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsImportOrganizations>>>
+    export type OrganizationsImportOrganizationsMutationBody = BodyOrganizationsImportOrganizations
+    export type OrganizationsImportOrganizationsMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Import Organizations
+ */
+export const useOrganizationsImportOrganizations = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError,{data: BodyOrganizationsImportOrganizations}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof organizationsImportOrganizations>>,
+        TError,
+        {data: BodyOrganizationsImportOrganizations},
+        TContext
+      > => {
+
+      const mutationOptions = getOrganizationsImportOrganizationsMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
 /**
  * @summary Read All
  */
