@@ -24,6 +24,12 @@ export default defineConfig({
               name: 'customFormData',
             },
           },
+          users_request_approvement: {
+            formData: {
+              path: './api/form-data.ts',
+              name: 'customFormDataDocuments',
+            },
+          },
         },
       },
     },
