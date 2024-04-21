@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useQueryClient } from '@tanstack/vue-query'
-import { getUsersGetMeQueryKey, useOrganizationsRead, useUsersLogout } from '~/api'
+import { useOrganizationsRead, useUsersLogout } from '~/api'
 
 const queryClient = useQueryClient()
 const { me, loggedIn } = useMe()

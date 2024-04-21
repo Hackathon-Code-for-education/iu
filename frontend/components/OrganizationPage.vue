@@ -10,6 +10,11 @@ const props = defineProps<{
   title: string
   bio: string
   logoUrl?: string
+  contacts: {
+    phone?: string
+    email?: string
+    website?: string
+  }
 }>()
 
 defineEmits<{
@@ -112,31 +117,20 @@ function handleSubmit(event: FormSubmitEvent<{ feedback: string, rating: number 
     </Card>
     <div class="grid grid-cols-3 gap-4 mt-4">
       <Card class="p-4">
-        <h3>Социальные сети</h3>
-        <div class="flex flex-col gap-2">
-          <UButton
-            icon="i-mdi-telegram"
-            size="sm"
-            variant="ghost"
-            color="gray"
-            to="https://t.me/@universityinnopolis" target="_blank"
-            label="Telegram"
-          />
-          <UButton
-            icon="i-mdi-vk"
-            size="sm"
-            variant="ghost"
-            color="gray"
-            to="https://vk.com/innopolisu" target="_blank"
-            label="ВКонтакте"
-          />
+        <h3 class="font-medium text-lg mb-2">
+          Контакты
+        </h3>
+        <div class="flex flex-col gap-1">
+          <UButton v-if="contacts.website" icon="i-heroicons-globe-alt" variant="link" :to="contacts.website" target="_blank">
+            {{ contacts.website }}
+          </UButton>
+          <UButton v-if="contacts.email" icon="i-heroicons-envelope" variant="link" :to="`mailto:${contacts.website}`" target="_blank">
+            {{ contacts.email }}
+          </UButton>
+          <UButton v-if="contacts.phone" icon="i-heroicons-phone" variant="link" :to="`tel:${contacts.phone}`" target="_blank">
+            {{ contacts.phone }}
+          </UButton>
         </div>
-      </Card>
-      <Card class="p-4">
-        <h3>FAQ</h3>
-      </Card>
-      <Card class="p-4">
-        <h3>Контакты</h3>
       </Card>
     </div>
     <UModal v-model="reviewModalOpen">

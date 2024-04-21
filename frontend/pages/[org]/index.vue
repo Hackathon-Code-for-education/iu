@@ -74,6 +74,11 @@ watch(chatModalOpen, (isOpen) => {
     :title="org.data.name"
     :bio="org.data.region_name ?? '—'"
     :logo-url="org.data.logo ? getFileUrl(org.data.logo) : undefined"
+    :contacts="{
+      phone: org.data.contacts?.phone ?? undefined,
+      email: org.data.contacts?.email ?? undefined,
+      website: org.data.contacts?.website ?? undefined,
+    }"
     @want-chat-click="handleWantChatClick"
   />
   <UContainer v-else-if="isLoading">
