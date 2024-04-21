@@ -280,6 +280,34 @@ export interface Scene {
 /**
  * Текст отзыва
  */
+export type ReviewWithOrganizationInfoText = string | null;
+
+export interface ReviewWithOrganizationInfo {
+  /** Дата и время создания отзыва */
+  at: string;
+  /** MongoDB document ObjectID */
+  id: string;
+  /** Список пользователей, которым понравился отзыв */
+  liked_by: string[];
+  /** Идентификатор организации, к которой относится отзыв */
+  organization_id: string;
+  organization_name: string;
+  organization_username: string;
+  /**
+   * Оценка
+   * @minimum 1
+   * @maximum 5
+   */
+  rate: number;
+  /** Текст отзыва */
+  text: ReviewWithOrganizationInfoText;
+  /** Идентификатор пользователя, оставившего отзыв */
+  user_id: string;
+}
+
+/**
+ * Текст отзыва
+ */
 export type ReviewText = string | null;
 
 export interface Review {
@@ -1470,7 +1498,7 @@ export const useUsersGetMe = <TData = Awaited<ReturnType<typeof usersGetMe>>, TE
  */
 export const usersGetMyReviews = (
      options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Review[]>> => {
+ ): Promise<AxiosResponse<ReviewWithOrganizationInfo[]>> => {
     
     return axios.get(
       `/users/me/reviews`,options

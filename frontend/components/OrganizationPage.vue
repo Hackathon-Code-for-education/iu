@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query'
-import { getOrganizationsGetByUsernameQueryKey, getOrganizationsReadQueryKey, useOrganizationsPostReview } from '~/api'
+import {
+  getOrganizationsGetByUsernameQueryKey,
+  getOrganizationsReadQueryKey,
+  useOrganizationsGetReviews,
+  useOrganizationsPostReview,
+} from '~/api'
 import type { FormSubmitEvent } from '#ui/types'
 
 const props = defineProps<{
@@ -34,6 +39,8 @@ const canReview = computed(() => !!(
   && me.value.student_approvement?.status === 'approved'
   && me.value.student_approvement.organization_id === props.orgId
 ))
+
+const { data: reviews } = useOrganizationsGetReviews(props.orgId)
 
 const sendReview = useOrganizationsPostReview({
   mutation: {
@@ -130,6 +137,29 @@ function handleSubmit(event: FormSubmitEvent<{ feedback: string, rating: number 
           <UButton v-if="contacts.phone" icon="i-heroicons-phone" variant="link" :to="`tel:${contacts.phone}`" target="_blank">
             {{ contacts.phone }}
           </UButton>
+        </div>
+      </Card>
+      <Card class="p-4 col-span-2">
+        <h3 class="font-medium text-lg mb-2">
+          Отзывы
+        </h3>
+        <div v-if="reviews" class="flex flex-col gap-2">
+          <Card v-for="review in reviews.data" :key="review.id" class="p-4 flex flex-col gap-2">
+            <div class="flex justify-between">
+              <Rating disabled :model-value="review.rate" />
+              <p v-if="!review.mine">
+                {{ review.anonymous_name }}
+              </p>
+              <p v-else>
+                {{ review.anonymous_name }} (это вы)
+              </p>
+            </div>
+            <p>{{ review.text }}</p>
+            <div class="flex justify-between">
+              <UButton :icon="review.liked_by_me ? 'i-mdi-heart' : 'i-mdi-heart-outline'" color="red" variant="ghost" :label="review.likes.toString()" class="w-fit" />
+              <p>{{ new Date(review.at).toLocaleString("ru-RU") }}</p>
+            </div>
+          </Card>
         </div>
       </Card>
     </div>
