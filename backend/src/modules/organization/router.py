@@ -7,11 +7,14 @@ from scripts.parse_organizations import Certificates, CertificateOut
 from src.api.crud_routes_factory import setup_based_on_methods
 
 from src.api.dependencies import get_moderator, UserDep
-from src.exceptions import ObjectNotFound, NotEnoughPermissionsException
+from src.exceptions import ObjectNotFound, NotEnoughPermissionsException, UnauthorizedException
 from src.modules.organization.repository import organization_repository
 from src.modules.organization.schemas import CreateOrganization, UpdateOrganization
+from src.modules.review.repository import review_repository
+from src.modules.review.schemas import CreateReview
 from src.storages.mongo import Organization
 from src.storages.mongo.models.organization import ContactsSchema, EducationalProgramSchema
+from src.storages.mongo.models.review import ReviewRateEnum, Review
 from src.storages.mongo.schemas import UserRole
 
 router = APIRouter(prefix="/organizations", tags=["Organizations"])
@@ -37,6 +40,47 @@ async def get_by_username(username: str) -> Organization:
     if organization is None:
         raise ObjectNotFound(f"Организация с username={username} не найдена")
     return organization
+
+
+@router.post(
+    "/{organization_id}/reviews/",
+    responses={
+        200: {"description": "Success"},
+        **NotEnoughPermissionsException.responses,
+        **ObjectNotFound.responses,
+        **UnauthorizedException.responses,
+    },
+)
+async def post_review(organization_id: PydanticObjectId, user: UserDep, text: str, rate: ReviewRateEnum) -> Review:
+    """
+    Оставить отзыв организации
+    """
+    organization = await organization_repository.read(organization_id)
+    if organization is None:
+        raise ObjectNotFound(f"Организация с id={organization_id} не найдена")
+    # check approvement
+    if not user.is_approved(organization_id):
+        raise NotEnoughPermissionsException(
+            "У вас недостаточно прав для оставления отзыва на эту организацию (не студент)"
+        )
+
+    return await review_repository.create(
+        CreateReview(organization_id=organization_id, user_id=user.id, text=text, rate=rate)
+    )
+
+
+@router.get(
+    "/{organization_id}/reviews/",
+    responses={200: {"description": "Success"}, **ObjectNotFound.responses},
+)
+async def get_reviews(organization_id: PydanticObjectId) -> list[Review]:
+    """
+    Получить отзывы об организации
+    """
+    organization = await organization_repository.read(organization_id)
+    if organization is None:
+        raise ObjectNotFound(f"Организация с id={organization_id} не найдена")
+    return await review_repository.read_for_organization(organization_id)
 
 
 @router.post(

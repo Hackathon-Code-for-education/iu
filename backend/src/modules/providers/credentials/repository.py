@@ -4,7 +4,6 @@ from beanie import PydanticObjectId
 from passlib.context import CryptContext
 
 from src.exceptions import UnauthorizedException
-from src.logging_ import logger
 from src.modules.providers.credentials.schemas import UserCredentialsFromDB
 
 
@@ -26,7 +25,7 @@ class CredentialsRepository:
         return user_credentials.user_id
 
     async def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        logger.info(f"verifying password {self.PWD_CONTEXT.hash(plain_password)} hashed={hashed_password}")
+        # logger.info(f"verifying password {self.PWD_CONTEXT.hash(plain_password)} hashed={hashed_password}")
         return self.PWD_CONTEXT.verify(plain_password, hashed_password)
 
     async def _get_user(self, login: str) -> UserCredentialsFromDB | None:

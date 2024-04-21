@@ -9,9 +9,12 @@ from beanie import PydanticObjectId
 from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
 from src.api.dependencies import UserDep, ModeratorDep
 from src.exceptions import NotEnoughPermissionsException
+from src.modules.review.repository import review_repository
 from src.modules.user.repository import user_repository
 from src.modules.user.schemas import ViewUser
 from fastapi import Request
+
+from src.storages.mongo import Review
 
 router = EnsureAuthenticatedAPIRouter(prefix="/users", tags=["Users"])
 
@@ -25,6 +28,17 @@ async def get_me(user: UserDep) -> ViewUser:
     Получить данные текущего пользователя
     """
     return ViewUser.model_validate(user.model_dump())
+
+
+@router.get(
+    "/me/reviews",
+    responses={200: {"description": "Отзывы пользователя"}},
+)
+async def get_my_reviews(user: UserDep) -> list[Review]:
+    """
+    Получить отзывы пользователя
+    """
+    return await review_repository.read_for_me(user.id)
 
 
 @router.put("/me/set-documents", responses={200: {"description": "Документы успешно загружены"}})
