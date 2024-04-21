@@ -26,7 +26,7 @@ function handleStarClick(v: number) {
       v-for="(_, i) in new Array(5).fill(null)"
       :key="i"
       :name="modelValue >= (i + 1) ? 'i-octicon-star-fill-24' : 'i-octicon-star-24'"
-      class="text-yellow-400 text-[32px]"
+      class="text-yellow-400"
       :class="[
         (!readonly && !disabled && 'cursor-pointer'),
         size === 'sm' ? 'text-[24px]' : 'text-[32px]',
