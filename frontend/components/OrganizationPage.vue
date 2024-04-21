@@ -2,9 +2,11 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import {
   getOrganizationsGetByUsernameQueryKey,
+  getOrganizationsGetReviewsQueryKey,
   getOrganizationsReadQueryKey,
   useOrganizationsGetReviews,
   useOrganizationsPostReview,
+  useReviewsLikeReview,
   useUsersRequestApprovement,
 } from '~/api'
 import type { FormSubmitEvent } from '#ui/types'
@@ -41,8 +43,22 @@ const canReview = computed(() => !!(
   && me.value.student_approvement?.status === 'approved'
   && me.value.student_approvement.organization_id === props.orgId
 ))
-
-const { data: reviews } = useOrganizationsGetReviews(props.orgId)
+const likeReview = useReviewsLikeReview({
+  mutation: {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: getOrganizationsGetReviewsQueryKey(props.orgId),
+      })
+    },
+    onError: () => {
+      toast.add({ id: 'like_failed', title: 'Не удалось поставить лайк', color: 'red' })
+    },
+  },
+})
+const { data: reviews, isLoading: reviewsLoading } = useOrganizationsGetReviews(props.orgId)
+function handleReviewLikeToggle(reviewId: string) {
+  likeReview.mutate({ reviewId })
+}
 
 const sendReview = useOrganizationsPostReview({
   mutation: {
@@ -193,7 +209,14 @@ function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
             </div>
             <p>{{ review.text }}</p>
             <div class="flex justify-between">
-              <UButton :icon="review.liked_by_me ? 'i-mdi-heart' : 'i-mdi-heart-outline'" color="red" variant="ghost" :label="review.likes.toString()" />
+              <UButton
+                :icon="review.liked_by_me ? 'i-mdi-heart' : 'i-mdi-heart-outline'"
+                color="red"
+                variant="ghost"
+                :label="review.likes.toString()"
+                :disabled="likeReview.isPending.value || reviewsLoading"
+                @click="handleReviewLikeToggle(review.id)"
+              />
               <date class="text-sm opacity-60">
                 {{ new Date(review.at).toLocaleDateString("ru-RU") }}
               </date>
