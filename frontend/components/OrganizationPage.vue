@@ -29,7 +29,6 @@ const canReview = computed(() => !!(
   && me.value.student_approvement?.status === 'approved'
   && me.value.student_approvement.organization_id === props.orgId
 ))
-const reviewFormDisabled = computed(() => sendReview.isPending.value)
 
 const sendReview = useOrganizationsPostReview({
   mutation: {
@@ -52,6 +51,7 @@ const sendReview = useOrganizationsPostReview({
     },
   },
 })
+const reviewFormDisabled = computed(() => sendReview.isPending.value)
 
 function handleSubmit(event: FormSubmitEvent<{ feedback: string, rating: number }>) {
   sendReview.mutate({
