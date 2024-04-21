@@ -20,6 +20,9 @@ services:
     volumes:
       - "./backend/settings.yaml:/code/settings.yaml:ro" # Configuration file, mount as read-only
       - "./static:/code/static:rw" # Directory for storing static files
+      # Upload examples for preview
+      - "./backend/organizations.json:/code/organizations.json:ro"
+      - "./backend/static-shared:/code/static-shared:rw"
     env_file: backend/.env # Set some settings for Uvicorn in backend/.env file
 
   # MongoDB database service
