@@ -3,7 +3,7 @@ import process from 'node:process'
 export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
-  modules: ['@nuxt/ui', '@nuxt/image', '@nuxt/eslint'],
+  modules: ['@nuxt/ui', '@nuxt/image', '@nuxt/eslint', '@nuxtjs/tailwindcss'],
   ui: {
     global: true,
     icons: ['mdi', 'heroicons', 'octicon'],
