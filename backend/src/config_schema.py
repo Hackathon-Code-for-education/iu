@@ -65,6 +65,8 @@ class PredefinedScene(SettingsEntityModel):
     "File ID"
     meta: Any | None = None
     "Meta information for panorama view"
+    is_main: bool = False
+    "Is main scene"
 
 
 class Predefined(SettingsEntityModel):

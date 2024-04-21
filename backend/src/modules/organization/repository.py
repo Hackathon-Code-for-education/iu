@@ -45,6 +45,11 @@ class OrganizationRepository:
     async def create_many(self, data: list[CreateOrganization]) -> list[PydanticObjectId]:
         return await crud.create_many(data)
 
+    async def set_main_scene(self, organization_id: PydanticObjectId, scene_id: PydanticObjectId) -> None:
+        await Organization.find({"_id": organization_id}).update(
+            {"$set": {"main_scene": scene_id}},
+        )
+
 
 organization_repository: OrganizationRepository = OrganizationRepository()
 

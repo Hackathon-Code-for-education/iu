@@ -47,13 +47,16 @@ class SceneRepository:
                 logger.error(f"Organization with username={organization_username} not found")
                 continue
 
-            await Scene(
+            created = await Scene(
                 id=scene.id,  # type: ignore[call-arg]
                 organization=organization_id,
                 title=scene.title,
                 meta=scene.meta,
                 file=scene.file,
             ).insert()
+
+            if scene.is_main:
+                await organization_repository.set_main_scene(organization_id, created.id)
 
             logger.info(f"Scene {scene.title} <{scene.id}> created")
 
