@@ -36,8 +36,8 @@ const messagesGrouped = computed(() => {
 </script>
 
 <template>
-  <div class="h-full w-full min-h-[500px] flex flex-col items-stretch">
-    <div class="flex-auto relative">
+  <div class="flex flex-col w-full">
+    <div class="w-full relative flex-auto flex flex-col items-stretch">
       <div class="overflow-y-auto flex flex-col-reverse w-full absolute max-h-full px-4 bg-fixed bg-repeat bg-[url('/img/chat-pattern-white.svg')] dark:bg-[url('/img/chat-pattern-black.svg')]">
         <div v-for="messageGroup in messagesGrouped" :key="messageGroup[0].date.getTime()" class="relative pt-2 max-h-full">
           <h3

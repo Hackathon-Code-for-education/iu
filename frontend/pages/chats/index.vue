@@ -91,8 +91,13 @@ function handleSendMessage() {
         Произошла ошибка при загрузке чатов
       </h2>
     </div>
-    <Card v-else class="flex">
-      <div class="flex flex-col basis-[300px] grow-0 shrink-0 border-r dark:border-gray-700 border-gray-200">
+    <Card v-else-if="!(chats?.data.length)" class="py-8 flex items-center justify-center">
+      <span class="text-lg text-center opacity-65">
+        Здесь появятся ваши чаты
+      </span>
+    </Card>
+    <Card v-else class="flex min-h-[calc(100vh-110px)] justify-stretch">
+      <div class="flex flex-col min-h-full basis-[300px] grow-0 shrink-0 border-r dark:border-gray-700 border-gray-200">
         <template v-if="isLoading">
           <USkeleton
             v-for="i in new Array(5).fill(null)"
