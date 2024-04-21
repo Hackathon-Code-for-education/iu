@@ -16,9 +16,14 @@ watch(() => route.fullPath, () => {
   chatId.value = route.query.chatId as string | null ?? null
 }, { immediate: true })
 
-const { me } = useMe()
+const { me, loggedIn } = useMe()
 const sendMessage = useChattingPushMessage()
 const draftMessages = ref<Record<string, string | undefined>>({})
+
+watch(loggedIn, (newLoggedIn) => {
+  if (newLoggedIn === false)
+    return navigateTo({ path: '/login' })
+}, { immediate: true })
 
 const selectedChat = computed<{ id: string, title: string, messages: Message[] } | null>(() => {
   const selected = chats.value?.data.find(({ id }) => id === chatId.value) ?? null
