@@ -9,6 +9,7 @@ const logout = useUsersLogout({
     onSuccess: () => {
       queryClient.clear()
       queryClient.invalidateQueries()
+      location.reload()
     },
   },
 })
