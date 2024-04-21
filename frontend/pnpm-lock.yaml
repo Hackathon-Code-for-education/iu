@@ -26,6 +26,9 @@ dependencies:
   '@tanstack/vue-query':
     specifier: ^5.29.0
     version: 5.29.0(vue@3.4.23)
+  '@vueuse/core':
+    specifier: ^10.9.0
+    version: 10.9.0(vue@3.4.23)
   axios:
     specifier: ^1.6.8
     version: 1.6.8
