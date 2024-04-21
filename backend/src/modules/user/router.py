@@ -10,11 +10,10 @@ from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
 from src.api.dependencies import UserDep, ModeratorDep
 from src.exceptions import NotEnoughPermissionsException
 from src.modules.review.repository import review_repository
+from src.modules.review.schemas import ReviewWithOrganizationInfo
 from src.modules.user.repository import user_repository
 from src.modules.user.schemas import ViewUser
 from fastapi import Request
-
-from src.storages.mongo import Review
 
 router = EnsureAuthenticatedAPIRouter(prefix="/users", tags=["Users"])
 
@@ -34,7 +33,7 @@ async def get_me(user: UserDep) -> ViewUser:
     "/me/reviews",
     responses={200: {"description": "Отзывы пользователя"}},
 )
-async def get_my_reviews(user: UserDep) -> list[Review]:
+async def get_my_reviews(user: UserDep) -> list[ReviewWithOrganizationInfo]:
     """
     Получить отзывы пользователя
     """

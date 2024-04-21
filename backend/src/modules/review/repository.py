@@ -3,7 +3,8 @@ __all__ = ["ReviewRepository", "review_repository"]
 import pymongo
 from beanie import PydanticObjectId
 
-from src.modules.review.schemas import CreateReview
+from src.modules.review.schemas import CreateReview, ReviewWithOrganizationInfo
+from src.storages.mongo import Organization
 from src.storages.mongo.models.review import Review
 from src.utils import aware_utcnow
 
@@ -25,8 +26,20 @@ class ReviewRepository:
     async def read_for_organization(self, organization_id: PydanticObjectId) -> list[Review]:
         return await Review.find({"organization_id": organization_id}, sort=[("at", pymongo.DESCENDING)]).to_list()
 
-    async def read_for_me(self, user_id: PydanticObjectId) -> list[Review]:
-        return await Review.find({"user_id": user_id}, sort=[("at", pymongo.DESCENDING)]).to_list()
+    async def read_for_me(self, user_id: PydanticObjectId) -> list[ReviewWithOrganizationInfo]:
+        reviews = await Review.find({"user_id": user_id}, sort=[("at", pymongo.DESCENDING)]).to_list()
+        ids = set(review.organization_id for review in reviews)
+        organizations = await Organization.find_many({"_id": {"$in": list(ids)}}).to_list()
+        org_dict = {org.id: org for org in organizations}
+
+        return [
+            ReviewWithOrganizationInfo(
+                **review.model_dump(),
+                organization_name=org_dict[review.organization_id].name,
+                organization_username=org_dict[review.organization_id].username,
+            )
+            for review in reviews
+        ]
 
     # async def update(self, id: PydanticObjectId, data: UpdateReview) -> Review | None:
     #     return await crud.update(id, data)

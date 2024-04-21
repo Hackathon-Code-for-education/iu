@@ -4,6 +4,7 @@ from beanie import PydanticObjectId
 from pydantic import Field
 
 from src.custom_pydantic import CustomModel
+from src.storages.mongo import Review
 
 
 class CreateReview(CustomModel):
@@ -34,3 +35,8 @@ class AnonymousReview(CustomModel):
     "Поставлен ли лайк мной"
     at: datetime.datetime
     "Дата и время создания отзыва"
+
+
+class ReviewWithOrganizationInfo(Review):
+    organization_name: str
+    organization_username: str
