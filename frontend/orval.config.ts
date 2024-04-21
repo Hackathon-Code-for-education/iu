@@ -3,7 +3,7 @@ import { defineConfig } from 'orval'
 export default defineConfig({
   api: {
     input: {
-      target: 'http://10.91.13.230:8000/openapi.json',
+      target: 'http://localhost/api/openapi.json',
       validation: false,
     },
     output: {
