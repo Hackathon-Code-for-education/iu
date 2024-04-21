@@ -8,7 +8,7 @@ WORKDIR /app
 FROM base as build
 
 COPY --link package.json pnpm-lock.yaml ./
-RUN yarn global add pnpm && pnpm i --frozen-lockfile --prod
+RUN yarn global add pnpm && pnpm i --frozen-lockfile
 
 COPY --link . .
 

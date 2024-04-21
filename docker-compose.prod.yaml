@@ -1,7 +1,6 @@
-# Это конфигурация для тестового запуска приложения на локальной машине.
-# Для запуска приложения на production сервере, используйте другой файл конфигурации.
+# Это файл docker-compose для запуска приложения в production среде.
 
-# docker compose up --build
+# Используйте основной docker-compose.yaml для запуска приложения на локальной машине.
 
 services:
   # Nginx proxy forwards requests to the appropriate service
@@ -12,7 +11,6 @@ services:
     volumes:
       # Add configuration file for Nginx, read-only
       - "./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
-    #network_mode: host
 
   # FastAPI backend service
   api:
@@ -22,12 +20,9 @@ services:
       dockerfile: deploy/Dockerfile
     restart: always # Restart the service if it fails
     volumes:
-      - "./backend/settings.example.yaml:/code/settings.yaml:ro" # Configuration file, mount as read-only
+      - "./backend/settings.yaml:/code/settings.yaml:ro" # Configuration file, mount as read-only
       - "./static:/code/static:rw" # Directory for storing static files
-      # Upload examples for preview
-      - "./backend/organizations.json:/code/organizations.json:ro"
-      - "./backend/static-shared:/code/static-shared:rw"
-    env_file: backend/.example.env # Set some settings for Uvicorn in backend/.env file
+    env_file: backend/.env # Set some settings for Uvicorn in backend/.env file
 
   # MongoDB database service
   db:
@@ -35,7 +30,7 @@ services:
     restart: always # Restart the service if it fails
     volumes:
       - "mongodb:/data/db" # Persist data in a volume
-    env_file: backend/.example.env # Set password for MongoDB in backend/.env file
+    env_file: backend/.env # Set password for MongoDB in backend/.env file
 
   # Nuxt frontend service
   frontend:

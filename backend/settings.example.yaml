@@ -1,6 +1,8 @@
 $schema: "./settings.schema.yaml"
 # ---------- Параметры приложения ----- #
 environment: production
+static_files:
+  directory: static-shared
 
 # Настройки безопасности запросов от браузера
 https_only_cookie: false
@@ -9,23 +11,154 @@ wildcard_allow_origin_regex: false
 
 # Параметры подключения к базе данных MongoDB
 database:
-  uri: mongodb://mongoadmin:secret@localhost:27017/db?authSource=admin
+  uri: mongodb://mongoadmin:secret@db:27017/db?authSource=admin
 
 # Предопределенные пользователи для первого запуска
 predefined:
+    organizations_file: organizations.json
     users:
     - login: admin
       password: admin
       role: admin
-      name: Admin
-    - login: moderator
-      password: moderator
-      role: moderator
-      name: Moderator
+      name: Артём Булгаков
     - login: user
       password: user
-      role: default
-      name: User
+      name: Владислав Дерябкин
+    - login: student
+      password: student
+      student_at_organization_username: innopolis
+      name: Бельков Руслан
+    scenes:
+    - id: 6623e0cf4f5a9a64a37cedf3
+      title: Холл университета
+      organization_username: innopolis
+      file: 6623f6e34f5a9a64a37cedf8
+      meta:
+        yaw: -104.56834101376364
+        pitch: -8.307153086153253
+        hotSpots:
+        - yaw: -124.67246072318446
+          pitch: 0.9109259231379979
+          title: Наружу
+          scene: 66239fe39dc170d185166952
+          text: Наружу
+          sceneId: 6624e6f8adfd3394927891b8
+        - yaw: -122.92940259744802
+          pitch: 25.575364462576882
+          text: Вид на зеленые ступеньки
+          sceneId: 66251b21b585e66c0cfc28de
+          type: scene
+        - yaw: 61.31061506092476
+          pitch: 28.59372202253133
+          text: 4 этаж
+          sceneId: 6624eabaadfd3394927891be
+          type: scene
+        - yaw: -108.83487538093291
+          pitch: -2.4362839702882204
+          text: В парк
+          sceneId: 66251ad9b585e66c0cfc28da
+          type: scene
+    - id: 6624e6f8adfd3394927891b8
+      title: Вид на Университет
+      organization_username: innopolis
+      file: 6624e6f8adfd3394927891b7
+      meta:
+        yaw: -60.62961801566286
+        pitch: -1.0815539839272732
+        hotSpots:
+        - yaw: 8.041858158356785
+          pitch: 11.495785376302688
+          text: Внутрь
+          sceneId: 6623e0cf4f5a9a64a37cedf3
+          type: scene
+        - yaw: -82.81672778584763
+          pitch: -0.43780991240089556
+          text: В парк
+          sceneId: 66251ad9b585e66c0cfc28da
+          type: scene
+    - id: 6624eabaadfd3394927891be
+      title: 4 этаж
+      organization_username: innopolis
+      file: 6624eabaadfd3394927891bd
+      meta:
+        yaw: 12.523709297057849
+        pitch: -5.601454288845822
+        hotSpots:
+        - yaw: 0.2246354685323218
+          pitch: -23.424783655128575
+          text: Холл университета
+          sceneId: 6623e0cf4f5a9a64a37cedf3
+          type: scene
+        - yaw: 2.678572133576809
+          pitch: -0.9306768383446969
+          text: Вид на зеленые ступеньки
+          sceneId: 66251b21b585e66c0cfc28de
+          type: scene
+    - id: 66251ad9b585e66c0cfc28da
+      title: Парк
+      is_main: true
+      organization_username: innopolis
+      file: 66251ad9b585e66c0cfc28d9
+      meta:
+        yaw: 4.582534232068497
+        pitch: 10.32661936642971
+        hotSpots:
+        - yaw: 29.76590184525664
+          pitch: 6.3266798087234655
+          text: Вид на Университет
+          sceneId: 6624e6f8adfd3394927891b8
+          type: scene
+        - yaw: -10.456095886793067
+          pitch: 15.504068475602393
+          text: Внутрь
+          sceneId: 6623e0cf4f5a9a64a37cedf3
+          type: scene
+        - yaw: -58.708765746160545
+          pitch: 81.91688580282108
+          text: Секретный уровень
+          sceneId: 66251b00b585e66c0cfc28dc
+          type: scene
+    - id: 66251b00b585e66c0cfc28dc
+      title: Секретный уровень
+      organization_username: innopolis
+      file: 66251b00b585e66c0cfc28db
+      meta:
+        yaw: -126.52369091378472
+        pitch: 1.3240000826052771
+        hotSpots:
+        - yaw: 166.09069822067914
+          pitch: -18.185067355885394
+          text: Обратно
+          sceneId: 66251ad9b585e66c0cfc28da
+          type: scene
+        - yaw: -172.93657304724184
+          pitch: 12.658637103043084
+          text: Внутрь
+          sceneId: 6623e0cf4f5a9a64a37cedf3
+          type: scene
+        - yaw: -102.46974951657626
+          pitch: 3.9871743913814544
+          text: Вид на Университет
+          sceneId: 6624e6f8adfd3394927891b8
+          type: scene
+    - id: 66251b21b585e66c0cfc28de
+      title: Вид на зеленые ступеньки
+      organization_username: innopolis
+      file: 66251b21b585e66c0cfc28dd
+      meta:
+        yaw: 4.2040050313872825
+        pitch: -10.24701424562106
+        hotSpots:
+        - yaw: 178.8391951969865
+          pitch: -1.2533233077559562
+          text: На другую сторону
+          sceneId: 6624eabaadfd3394927891be
+          type: scene
+        - yaw: 176.44933118887096
+          pitch: -36.54359968876855
+          text: В холл
+          sceneId: 6623e0cf4f5a9a64a37cedf3
+          type: scene
 
 # Параметры аутентификации
 auth:
@@ -35,5 +168,6 @@ auth:
 # Подключение Telegram как метода входа в систему
 telegram:
     # Создайте бота через @BotFather
-    bot_username: YourBotName
-    bot_token: YourBotToken
+    # Значения для тестового бота
+    bot_username: AbiTouraBot
+    bot_token: 7190792446:AAELuvcH6WhF_jRstM1c4f67mx58DLZtcu4
