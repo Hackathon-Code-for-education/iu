@@ -26,5 +26,12 @@ export function composeSceneData(scene: SceneExtended) {
     title: scene.title,
     type: 'equirectangular',
     ...(scene.meta || {}),
+    hotSpots: scene.meta?.hotSpots?.map(hotSpot => ({
+      text: hotSpot.text || undefined,
+      yaw: hotSpot.yaw || 0,
+      pitch: hotSpot.pitch || 0,
+      type: hotSpot.type || 'scene',
+      scene: hotSpot.scene,
+    })) || [],
   }
 }
