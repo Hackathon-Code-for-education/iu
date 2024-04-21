@@ -32,7 +32,7 @@ class OrganizationRepository:
 
     async def read_id_by_username(self, username: str) -> PydanticObjectId | None:
         org = await Organization.find({"username": username}).aggregate([{"$project": {"_id": 1}}]).to_list()
-        return org["_id"] if org else None
+        return org[0]["_id"] if org else None
 
     async def get_id_registry_mapping(self) -> dict[PydanticObjectId, str]:
         organizations = await Organization.find().aggregate([{"$project": {"_id": 1, "in_registry_id": 1}}]).to_list()
