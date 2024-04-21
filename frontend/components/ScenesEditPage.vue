@@ -53,7 +53,7 @@ const sceneId = ref(org.value?.data.main_scene)
       </Card>
       <Card class="p-4 col-span-2">
         <ScenesEditLocation
-          v-if="sceneId"
+          v-if="sceneId && scenes"
           :org-username="props.orgUsername"
           :org-id="props.orgId"
           :scene-id="sceneId"

@@ -23,7 +23,7 @@ const { data: scenes } = useScenesGetScenesForOrganization(props.orgId, { query:
 
 const { mutate: updateScene } = useScenesUpdate({
   mutation: {
-    onSuccess(data, variables, context) {
+    onSuccess(data) {
       queryClient.setQueryData(getScenesGetScenesForOrganizationQueryKey(props.orgId), (oldData: any) => {
         if (!oldData)
           return oldData
@@ -63,16 +63,21 @@ const scene = computed(() => scenes.value?.data.find(scene => scene.id === props
 const isMainOrgScene = computed(() => org.value?.data.main_scene === props.sceneId)
 const scenesData = ref(scene.value ? { current: composeSceneData(scene.value) } : {})
 const scenesDataId = ref<string>(scene.value?.id || '')
-watch(scene, () => {
-  if (!scene.value || scenesDataId.value === scene.value?.id)
+
+const pannellum = ref(null)
+const sceneInfo = reactive({ title: scene.value?.title || '', yaw: scene.value?.meta?.yaw || 0, pitch: scene.value?.meta?.pitch || 0 })
+
+watch(() => scene.value?.id, () => {
+  if (!scene.value)
     return
+
+  sceneInfo.title = scene.value?.title || ''
+  sceneInfo.yaw = scene.value?.meta?.yaw || 0
+  sceneInfo.pitch = scene.value?.meta?.pitch || 0
 
   scenesData.value = { current: composeSceneData(scene.value) }
   scenesDataId.value = scene.value.id
 })
-
-const pannellum = ref(null)
-const sceneInfo = reactive({ title: scene.value?.title || '', yaw: scene.value?.meta?.yaw || 0, pitch: scene.value?.meta?.pitch || 0 })
 
 function savePosition() {
   if (!scene.value || !pannellum.value)
@@ -91,6 +96,7 @@ function savePosition() {
 }
 
 function restorePosition() {
+  pannellum.value?.viewer.stopMovement()
   sceneInfo.yaw = scene.value?.meta?.yaw || 0
   sceneInfo.pitch = scene.value?.meta?.pitch || 0
 }
@@ -99,6 +105,7 @@ function save() {
   if (!scene.value)
     return
 
+  pannellum.value?.viewer.stopMovement()
   updateScene({ id: scene.value.id, data: { title: sceneInfo.title } })
 }
 
@@ -131,29 +138,34 @@ function setAsMain() {
         Сохранить
       </UButton>
     </div>
-    <ClientOnly>
-      <VuePannellum
-        ref="pannellum"
-        v-model:yaw="sceneInfo.yaw"
-        v-model:pitch="sceneInfo.pitch"
-        :default="{
-          firstScene: 'current',
-          sceneFadeDuration: 1000,
-        }"
-        :scenes="scenesData"
-        auto-load
-        show-fullscreen
-        style="width: 100%; height: 300px;"
-      >
-        <div v-if="sceneInfo.yaw !== scene?.meta?.yaw" class="flex flex-col gap-2 justify-end right-0">
-          <UButton @click="savePosition">
+    <div class="relative">
+      <ClientOnly>
+        <VuePannellum
+          ref="pannellum"
+          v-model:yaw="sceneInfo.yaw"
+          v-model:pitch="sceneInfo.pitch"
+          :default="{
+            firstScene: 'current',
+            sceneFadeDuration: 1000,
+          }"
+          :scenes="scenesData"
+          auto-load
+          show-fullscreen
+          style="width: 100%; height: 300px;"
+        />
+
+        <div
+          v-if="sceneInfo.yaw !== scene?.meta?.yaw"
+          class="absolute flex flex-col gap-2 justify-end right-0 bottom-0"
+        >
+          <UButton class="justify-center" @click="savePosition">
             Сохранить позицию
           </UButton>
-          <UButton @click="restorePosition">
+          <UButton class="justify-center" @click="restorePosition">
             Восстановить позицию
           </UButton>
         </div>
-      </VuePannellum>
-    </ClientOnly>
+      </ClientOnly>
+    </div>
   </div>
 </template>
