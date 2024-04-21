@@ -5,6 +5,7 @@ import {
   getOrganizationsReadQueryKey,
   useOrganizationsGetReviews,
   useOrganizationsPostReview,
+  useUsersRequestApprovement,
 } from '~/api'
 import type { FormSubmitEvent } from '#ui/types'
 
@@ -74,6 +75,28 @@ function handleSubmit(event: FormSubmitEvent<{ feedback: string, rating: number 
     },
   })
 }
+
+const approveStudentOpen = ref(false)
+const approveState = reactive({
+  files: FileList,
+})
+
+const requestApprovement = useUsersRequestApprovement()
+
+const approveFormDisabled = computed(() => requestApprovement.isPending.value)
+
+function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
+  requestApprovement.mutate({
+    organizationId: props.orgId,
+    data: {
+      upload_file_obj: event.data.files.length > 0 ? event.data.files[0] : undefined,
+    },
+  }, {
+    onSuccess() {
+      approveStudentOpen.value = false
+    },
+  })
+}
 </script>
 
 <template>
@@ -118,6 +141,14 @@ function handleSubmit(event: FormSubmitEvent<{ feedback: string, rating: number 
             @click="reviewModalOpen = true"
           >
             Оставить отзыв
+          </UButton>
+          <UButton
+            v-if="me?.student_approvement?.status !== 'approved'"
+            variant="outline"
+            color="yellow"
+            @click="approveStudentOpen = true"
+          >
+            Я студент
           </UButton>
         </div>
       </div>
@@ -193,6 +224,36 @@ function handleSubmit(event: FormSubmitEvent<{ feedback: string, rating: number 
               Отправить отзыв
             </UButton>
             <UButton variant="outline" class="self-start" @click="reviewModalOpen = false">
+              Отменить
+            </UButton>
+          </div>
+        </UForm>
+      </UCard>
+    </UModal>
+    <UModal v-model="approveStudentOpen">
+      <UCard>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+              {{ title }}
+            </h3>
+            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="approveStudentOpen = false" />
+          </div>
+        </template>
+        <UForm :state="approveState" class="flex flex-col gap-2" @submit="handleApproveSubmit">
+          <p>Приложите подтверждающие документы, чтобы получить доступ к возможностям студента вуза.</p>
+          <UFormGroup label="Загрузить документы">
+            <UInput
+              name="files"
+              type="file"
+              @change="file => approveState.files = file"
+            />
+          </UFormGroup>
+          <div class="flex gap-2">
+            <UButton class="self-start" type="submit" :disabled="approveFormDisabled">
+              Отправить на проверку
+            </UButton>
+            <UButton variant="outline" class="self-start" @click="approveStudentOpen = false">
               Отменить
             </UButton>
           </div>

@@ -6,7 +6,7 @@
  */
 import {
   useMutation,
-  useQuery
+  useQuery,
 } from '@tanstack/vue-query'
 import type {
   MutationFunction,
@@ -15,340 +15,336 @@ import type {
   UseMutationOptions,
   UseMutationReturnType,
   UseQueryOptions,
-  UseQueryReturnType
+  UseQueryReturnType,
 } from '@tanstack/vue-query'
 import axios from 'axios'
 import type {
   AxiosError,
   AxiosRequestConfig,
-  AxiosResponse
+  AxiosResponse,
 } from 'axios'
 import {
   computed,
-  unref
+  unref,
 } from 'vue'
 import type {
-  MaybeRef
+  MaybeRef,
 } from 'vue'
-import { customFormData } from './form-data';
-export type ReviewsLikeReviewParams = {
-like?: boolean;
-};
+import { customFormData, customFormDataDocuments } from './form-data'
 
-export type ChattingGetDialogParams = {
-dialog_id: string;
-};
+export interface ReviewsLikeReviewParams {
+  like?: boolean
+}
 
-export type ChattingPushMessageParams = {
-dialog_id: string;
-message: string;
-};
+export interface ChattingGetDialogParams {
+  dialog_id: string
+}
 
-export type ChattingLeaveDialogParams = {
-dialog_id: string;
-};
+export interface ChattingPushMessageParams {
+  dialog_id: string
+  message: string
+}
 
-export type ChattingUpdateStudentsQueue200 = OnlineOfQueue | JoinDialog;
+export interface ChattingLeaveDialogParams {
+  dialog_id: string
+}
 
-export type ChattingUpdateStudentsQueueParams = {
-organization_id: string;
-};
+export type ChattingUpdateStudentsQueue200 = OnlineOfQueue | JoinDialog
 
-export type ChattingUpdateQueue200 = OnlineOfQueue | JoinDialog;
+export type ChattingUpdateQueue200 = OnlineOfQueue | JoinDialog
 
-export type OrganizationsImportSpecificOrganization201 = Organization | null;
+export type OrganizationsImportSpecificOrganization201 = Organization | null
 
-export type UsersApproveUserParams = {
-is_approve: boolean;
-comment?: string | null;
-};
+export interface UsersApproveUserParams {
+  is_approve: boolean
+  comment?: string | null
+}
 
-export type UsersRequestApprovementParams = {
-organization_id: string;
-};
+export interface ProvidersTelegramLoginParams {
+  hash: string
+  id: number
+  auth_date: number
+  first_name: string
+  last_name?: string | null
+  username?: string | null
+  photo_url?: string | null
+}
 
-export type ProvidersTelegramLoginParams = {
-hash: string;
-id: number;
-auth_date: number;
-first_name: string;
-last_name?: string | null;
-username?: string | null;
-photo_url?: string | null;
-};
+export interface ProvidersTelegramConnectParams {
+  hash: string
+  id: number
+  auth_date: number
+  first_name: string
+  last_name?: string | null
+  username?: string | null
+  photo_url?: string | null
+}
 
-export type ProvidersTelegramConnectParams = {
-hash: string;
-id: number;
-auth_date: number;
-first_name: string;
-last_name?: string | null;
-username?: string | null;
-photo_url?: string | null;
-};
-
-export type ProvidersTelegramRegisterParams = {
-hash: string;
-id: number;
-auth_date: number;
-first_name: string;
-last_name?: string | null;
-username?: string | null;
-photo_url?: string | null;
-};
+export interface ProvidersTelegramRegisterParams {
+  hash: string
+  id: number
+  auth_date: number
+  first_name: string
+  last_name?: string | null
+  username?: string | null
+  photo_url?: string | null
+}
 
 /**
  * Данные Telegram-аккаунта
  */
-export type ViewUserTelegram = TelegramWidgetData | null;
+export type ViewUserTelegram = TelegramWidgetData | null
 
-export type ViewUserStudentApprovementAnyOf = PendingApprovement | ApprovedApprovement | RejectedApprovement;
+export type ViewUserStudentApprovementAnyOf = PendingApprovement | ApprovedApprovement | RejectedApprovement
 
 /**
  * Подтверждения статуса студента
  */
-export type ViewUserStudentApprovement = ViewUserStudentApprovementAnyOf | null;
+export type ViewUserStudentApprovement = ViewUserStudentApprovementAnyOf | null
 
 /**
  * Логин пользователя (уникальный)
  */
-export type ViewUserLogin = string | null;
+export type ViewUserLogin = string | null
 
-export type ValidationErrorLocItem = string | number;
-
-export interface ValidationError {
-  loc: ValidationErrorLocItem[];
-  msg: string;
-  type: string;
+export interface ViewUser {
+  /** Список документов пользователя */
+  documents: string[]
+  /** MongoDB document ObjectID */
+  id: string
+  /** Логин пользователя (уникальный) */
+  login: ViewUserLogin
+  /** Имя пользователя */
+  name: string
+  /** Роль пользователя */
+  role: UserRole
+  /** Подтверждения статуса студента */
+  student_approvement: ViewUserStudentApprovement
+  /** Данные Telegram-аккаунта */
+  telegram: ViewUserTelegram
 }
 
-export type UserRole = typeof UserRole[keyof typeof UserRole];
+export type ValidationErrorLocItem = string | number
 
+export interface ValidationError {
+  loc: ValidationErrorLocItem[]
+  msg: string
+  type: string
+}
+
+export type UserRole = typeof UserRole[keyof typeof UserRole]
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UserRole = {
   admin: 'admin',
   moderator: 'moderator',
   default: 'default',
-} as const;
+} as const
 
-export interface ViewUser {
-  /** Список документов пользователя */
-  documents: string[];
-  /** MongoDB document ObjectID */
-  id: string;
-  /** Логин пользователя (уникальный) */
-  login: ViewUserLogin;
-  /** Имя пользователя */
-  name: string;
-  /** Роль пользователя */
-  role: UserRole;
-  /** Подтверждения статуса студента */
-  student_approvement: ViewUserStudentApprovement;
-  /** Данные Telegram-аккаунта */
-  telegram: ViewUserTelegram;
-}
+export type UpdateSceneTitle = string | null
 
-export type UpdateSceneTitle = string | null;
+export type UpdateSceneOrganization = string | null
 
-export type UpdateSceneOrganization = string | null;
-
-export type UpdateSceneFile = string | null;
+export type UpdateSceneFile = string | null
 
 export interface UpdateScene {
-  file?: UpdateSceneFile;
-  meta?: unknown;
-  organization?: UpdateSceneOrganization;
-  title?: UpdateSceneTitle;
+  file?: UpdateSceneFile
+  meta?: unknown
+  organization?: UpdateSceneOrganization
+  title?: UpdateSceneTitle
 }
 
 /**
  * Псевдоним организации (уникальный)
  */
-export type UpdateOrganizationUsername = string | null;
+export type UpdateOrganizationUsername = string | null
 
 /**
  * Наименование региона
  */
-export type UpdateOrganizationRegionName = string | null;
+export type UpdateOrganizationRegionName = string | null
 
 /**
  * Наименование организации
  */
-export type UpdateOrganizationName = string | null;
+export type UpdateOrganizationName = string | null
 
 /**
  * Основная сцена организации
  */
-export type UpdateOrganizationMainScene = string | null;
+export type UpdateOrganizationMainScene = string | null
 
 /**
  * Логотип организации
  */
-export type UpdateOrganizationLogo = string | null;
+export type UpdateOrganizationLogo = string | null
 
 /**
  * Идентификатор организации в реестре
  */
-export type UpdateOrganizationInRegistryId = string | null;
+export type UpdateOrganizationInRegistryId = string | null
 
 /**
  * Полное наименование организации
  */
-export type UpdateOrganizationFullName = string | null;
+export type UpdateOrganizationFullName = string | null
 
 /**
  * Наименование федерального округа
  */
-export type UpdateOrganizationFederalDistrictName = string | null;
+export type UpdateOrganizationFederalDistrictName = string | null
 
 /**
  * Образовательные программы организации
  */
-export type UpdateOrganizationEducationalPrograms = EducationalProgramSchemaInput[] | null;
+export type UpdateOrganizationEducationalPrograms = EducationalProgramSchemaInput[] | null
 
 /**
  * Контактные данные организации
  */
-export type UpdateOrganizationContacts = ContactsSchemaInput | null;
+export type UpdateOrganizationContacts = ContactsSchemaInput | null
 
 export interface UpdateOrganization {
   /** Контактные данные организации */
-  contacts?: UpdateOrganizationContacts;
+  contacts?: UpdateOrganizationContacts
   /** Документы организации */
-  documents?: unknown;
+  documents?: unknown
   /** Образовательные программы организации */
-  educational_programs?: UpdateOrganizationEducationalPrograms;
+  educational_programs?: UpdateOrganizationEducationalPrograms
   /** Наименование федерального округа */
-  federal_district_name?: UpdateOrganizationFederalDistrictName;
+  federal_district_name?: UpdateOrganizationFederalDistrictName
   /** Полное наименование организации */
-  full_name?: UpdateOrganizationFullName;
+  full_name?: UpdateOrganizationFullName
   /** Идентификатор организации в реестре */
-  in_registry_id?: UpdateOrganizationInRegistryId;
+  in_registry_id?: UpdateOrganizationInRegistryId
   /** Логотип организации */
-  logo?: UpdateOrganizationLogo;
+  logo?: UpdateOrganizationLogo
   /** Основная сцена организации */
-  main_scene?: UpdateOrganizationMainScene;
+  main_scene?: UpdateOrganizationMainScene
   /** Наименование организации */
-  name?: UpdateOrganizationName;
+  name?: UpdateOrganizationName
   /** Наименование региона */
-  region_name?: UpdateOrganizationRegionName;
+  region_name?: UpdateOrganizationRegionName
   /** Псевдоним организации (уникальный) */
-  username?: UpdateOrganizationUsername;
+  username?: UpdateOrganizationUsername
 }
 
-export type UpdateFileMustBeUploaded = boolean | null;
+export type UpdateFileMustBeUploaded = boolean | null
 
-export type UpdateFileFriendlyName = string | null;
+export type UpdateFileFriendlyName = string | null
 
 export interface UpdateFile {
-  friendly_name?: UpdateFileFriendlyName;
-  must_be_uploaded?: UpdateFileMustBeUploaded;
+  friendly_name?: UpdateFileFriendlyName
+  must_be_uploaded?: UpdateFileMustBeUploaded
 }
 
-export type TelegramWidgetDataUsername = string | null;
+export type TelegramWidgetDataUsername = string | null
 
-export type TelegramWidgetDataPhotoUrl = string | null;
+export type TelegramWidgetDataPhotoUrl = string | null
 
-export type TelegramWidgetDataLastName = string | null;
+export type TelegramWidgetDataLastName = string | null
 
 export interface TelegramWidgetData {
-  auth_date: number;
-  first_name: string;
-  hash: string;
-  id: number;
-  last_name?: TelegramWidgetDataLastName;
-  photo_url?: TelegramWidgetDataPhotoUrl;
-  username?: TelegramWidgetDataUsername;
+  auth_date: number
+  first_name: string
+  hash: string
+  id: number
+  last_name?: TelegramWidgetDataLastName
+  photo_url?: TelegramWidgetDataPhotoUrl
+  username?: TelegramWidgetDataUsername
 }
 
 export interface TelegramLoginResponse {
-  need_to_connect: boolean;
+  need_to_connect: boolean
 }
 
-export type SceneMeta = unknown | null;
+export type SceneMeta = unknown | null
 
 export interface Scene {
-  file: string;
+  file: string
   /** MongoDB document ObjectID */
-  id: string;
-  meta: SceneMeta;
-  organization: string;
-  title: string;
+  id: string
+  meta: SceneMeta
+  organization: string
+  title: string
 }
 
 /**
  * Текст отзыва
  */
-export type ReviewWithOrganizationInfoText = string | null;
+export type ReviewWithOrganizationInfoText = string | null
 
 export interface ReviewWithOrganizationInfo {
   /** Дата и время создания отзыва */
-  at: string;
+  at: string
   /** MongoDB document ObjectID */
-  id: string;
+  id: string
   /** Список пользователей, которым понравился отзыв */
-  liked_by: string[];
+  liked_by: string[]
   /** Идентификатор организации, к которой относится отзыв */
-  organization_id: string;
-  organization_name: string;
-  organization_username: string;
+  organization_id: string
+  organization_name: string
+  organization_username: string
   /**
    * Оценка
    * @minimum 1
    * @maximum 5
    */
-  rate: number;
+  rate: number
   /** Текст отзыва */
-  text: ReviewWithOrganizationInfoText;
+  text: ReviewWithOrganizationInfoText
   /** Идентификатор пользователя, оставившего отзыв */
-  user_id: string;
+  user_id: string
 }
 
 /**
  * Текст отзыва
  */
-export type ReviewText = string | null;
+export type ReviewText = string | null
 
 export interface Review {
   /** Дата и время создания отзыва */
-  at: string;
+  at: string
   /** MongoDB document ObjectID */
-  id: string;
+  id: string
   /** Список пользователей, которым понравился отзыв */
-  liked_by: string[];
+  liked_by: string[]
   /** Идентификатор организации, к которой относится отзыв */
-  organization_id: string;
+  organization_id: string
   /**
    * Оценка
    * @minimum 1
    * @maximum 5
    */
-  rate: number;
+  rate: number
   /** Текст отзыва */
-  text: ReviewText;
+  text: ReviewText
   /** Идентификатор пользователя, оставившего отзыв */
-  user_id: string;
+  user_id: string
 }
 
-export type RejectedApprovementStatus = typeof RejectedApprovementStatus[keyof typeof RejectedApprovementStatus];
-
+export type RejectedApprovementStatus = typeof RejectedApprovementStatus[keyof typeof RejectedApprovementStatus]
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RejectedApprovementStatus = {
   rejected: 'rejected',
-} as const;
+} as const
+
+/**
+ * ID модератора, отклонившего студента
+ */
+export type RejectedApprovementModeratorId = string | null
 
 export interface RejectedApprovement {
   /** Дата отклонения студента */
-  at: string;
+  at: string
   /** Комментарий по какой причине отклонен студент */
-  comment: string;
+  comment: string
   /** ID модератора, отклонившего студента */
-  moderator_id: string;
+  moderator_id: RejectedApprovementModeratorId
   /** ID организации к которой будет привязан студент */
-  organization_id: string;
-  status: RejectedApprovementStatus;
+  organization_id: string
+  status: RejectedApprovementStatus
 }
 
 export interface PostReview {
@@ -356,758 +352,735 @@ export interface PostReview {
    * @minimum 1
    * @maximum 5
    */
-  rate: number;
-  text: string;
+  rate: number
+  text: string
 }
 
-export type PendingApprovementStatus = typeof PendingApprovementStatus[keyof typeof PendingApprovementStatus];
-
+export type PendingApprovementStatus = typeof PendingApprovementStatus[keyof typeof PendingApprovementStatus]
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PendingApprovementStatus = {
   pending: 'pending',
-} as const;
+} as const
+
+/**
+ * ID документа, подтверждающего статус студента
+ */
+export type PendingApprovementAttachment = string | null
 
 export interface PendingApprovement {
+  /** ID документа, подтверждающего статус студента */
+  attachment: PendingApprovementAttachment
   /** ID организации к которой будет привязан студент */
-  organization_id: string;
-  status: PendingApprovementStatus;
+  organization_id: string
+  status: PendingApprovementStatus
 }
 
 /**
  * Наименование региона
  */
-export type OrganizationRegionName = string | null;
+export type OrganizationRegionName = string | null
 
 /**
  * Основная сцена организации
  */
-export type OrganizationMainScene = string | null;
+export type OrganizationMainScene = string | null
 
 /**
  * Логотип организации
  */
-export type OrganizationLogo = string | null;
+export type OrganizationLogo = string | null
 
 /**
  * Идентификатор организации в реестре
  */
-export type OrganizationInRegistryId = string | null;
+export type OrganizationInRegistryId = string | null
 
 /**
  * Наименование федерального округа
  */
-export type OrganizationFederalDistrictName = string | null;
+export type OrganizationFederalDistrictName = string | null
 
 /**
  * Контактные данные организации
  */
-export type OrganizationContacts = ContactsSchemaOutput | null;
+export type OrganizationContacts = ContactsSchemaOutput | null
 
 export interface Organization {
   /** Контактные данные организации */
-  contacts: OrganizationContacts;
+  contacts: OrganizationContacts
   /** Документы организации */
-  documents: unknown;
+  documents: unknown
   /** Образовательные программы организации */
-  educational_programs: EducationalProgramSchemaOutput[];
+  educational_programs: EducationalProgramSchemaOutput[]
   /** Наименование федерального округа */
-  federal_district_name: OrganizationFederalDistrictName;
+  federal_district_name: OrganizationFederalDistrictName
   /** Полное наименование организации */
-  full_name: string;
+  full_name: string
   /** MongoDB document ObjectID */
-  id: string;
+  id: string
   /** Идентификатор организации в реестре */
-  in_registry_id: OrganizationInRegistryId;
+  in_registry_id: OrganizationInRegistryId
   /** Логотип организации */
-  logo: OrganizationLogo;
+  logo: OrganizationLogo
   /** Основная сцена организации */
-  main_scene: OrganizationMainScene;
+  main_scene: OrganizationMainScene
   /** Наименование организации */
-  name: string;
+  name: string
   /** Наименование региона */
-  region_name: OrganizationRegionName;
+  region_name: OrganizationRegionName
   /** Псевдоним организации (уникальный) */
-  username: string;
+  username: string
 }
 
-export type OnlineOfQueueType = typeof OnlineOfQueueType[keyof typeof OnlineOfQueueType];
-
+export type OnlineOfQueueType = typeof OnlineOfQueueType[keyof typeof OnlineOfQueueType]
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const OnlineOfQueueType = {
   online: 'online',
-} as const;
+} as const
 
 export interface OnlineOfQueue {
-  queue_enrollees_online: number;
-  queue_students_online: number;
-  type: OnlineOfQueueType;
+  queue_enrollees_online: number
+  queue_students_online: number
+  type: OnlineOfQueueType
 }
 
 export interface MessageSchema {
   /** Дата отправки сообщения */
-  at: string;
+  at: string
   /** ID сообщения */
-  id: string;
+  id: string
   /** Текст сообщения */
-  text: string;
+  text: string
   /** ID пользователя, отправившего сообщение */
-  user_id: string;
+  user_id: string
 }
 
-export type JoinDialogType = typeof JoinDialogType[keyof typeof JoinDialogType];
-
+export type JoinDialogType = typeof JoinDialogType[keyof typeof JoinDialogType]
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const JoinDialogType = {
   join_dialog: 'join_dialog',
-} as const;
+} as const
 
 export interface JoinDialog {
-  dialog: DialogPair;
-  type: JoinDialogType;
+  dialog_id: string
+  type: JoinDialogType
 }
 
 export interface HTTPValidationError {
-  detail?: ValidationError[];
+  detail?: ValidationError[]
 }
 
 /**
  * Тип файла (например, image/png)
  */
-export type FileType = string | null;
+export type FileType = string | null
 
 /**
  * Размер файла в байтах
  */
-export type FileSize = number | null;
+export type FileSize = number | null
 
 /**
  * Название файла (для отображения пользователю)
  */
-export type FileFriendlyName = string | null;
+export type FileFriendlyName = string | null
 
 /**
  * Дата последнего обновления файла
  */
-export type FileFileUpdatedAt = string | null;
+export type FileFileUpdatedAt = string | null
 
 export interface File {
   /** Дата последнего обновления файла */
-  file_updated_at: FileFileUpdatedAt;
+  file_updated_at: FileFileUpdatedAt
   /** Название файла (для отображения пользователю) */
-  friendly_name: FileFriendlyName;
+  friendly_name: FileFriendlyName
   /** MongoDB document ObjectID */
-  id: string;
+  id: string
   /** Должен ли файл быть загружен на гольф-кар (по умолчанию - нет) */
-  must_be_uploaded: boolean;
+  must_be_uploaded: boolean
   /** Размер файла в байтах */
-  size: FileSize;
+  size: FileSize
   /** Тип файла (например, image/png) */
-  type: FileType;
+  type: FileType
 }
 
 /**
  * Наименование направления подготовки
  */
-export type EducationalProgramSchemaOutputUgsName = string | null;
+export type EducationalProgramSchemaOutputUgsName = string | null
 
 /**
  * Код направления подготовки
  */
-export type EducationalProgramSchemaOutputUgsCode = string | null;
+export type EducationalProgramSchemaOutputUgsCode = string | null
 
 /**
  * Квалификация выпускника
  */
-export type EducationalProgramSchemaOutputQualification = string | null;
+export type EducationalProgramSchemaOutputQualification = string | null
 
 /**
  * Код образовательной программы
  */
-export type EducationalProgramSchemaOutputProgramCode = string | null;
+export type EducationalProgramSchemaOutputProgramCode = string | null
 
 /**
  * Нормативный срок обучения
  */
-export type EducationalProgramSchemaOutputEduNormativePeriod = string | null;
+export type EducationalProgramSchemaOutputEduNormativePeriod = string | null
 
 export interface EducationalProgramSchemaOutput {
   /** Наименование уровня образования */
-  edu_level_name: string;
+  edu_level_name: string
   /** Нормативный срок обучения */
-  edu_normative_period: EducationalProgramSchemaOutputEduNormativePeriod;
+  edu_normative_period: EducationalProgramSchemaOutputEduNormativePeriod
   /** Идентификатор образовательной программы в реестре */
-  in_registry_id: string;
+  in_registry_id: string
   /** Код образовательной программы */
-  program_code: EducationalProgramSchemaOutputProgramCode;
+  program_code: EducationalProgramSchemaOutputProgramCode
   /** Наименование образовательной программы */
-  program_name: string;
+  program_name: string
   /** Квалификация выпускника */
-  qualification: EducationalProgramSchemaOutputQualification;
+  qualification: EducationalProgramSchemaOutputQualification
   /** Код направления подготовки */
-  ugs_code: EducationalProgramSchemaOutputUgsCode;
+  ugs_code: EducationalProgramSchemaOutputUgsCode
   /** Наименование направления подготовки */
-  ugs_name: EducationalProgramSchemaOutputUgsName;
+  ugs_name: EducationalProgramSchemaOutputUgsName
 }
 
 /**
  * Наименование направления подготовки
  */
-export type EducationalProgramSchemaInputUgsName = string | null;
+export type EducationalProgramSchemaInputUgsName = string | null
 
 /**
  * Код направления подготовки
  */
-export type EducationalProgramSchemaInputUgsCode = string | null;
+export type EducationalProgramSchemaInputUgsCode = string | null
 
 /**
  * Квалификация выпускника
  */
-export type EducationalProgramSchemaInputQualification = string | null;
+export type EducationalProgramSchemaInputQualification = string | null
 
 /**
  * Код образовательной программы
  */
-export type EducationalProgramSchemaInputProgramCode = string | null;
+export type EducationalProgramSchemaInputProgramCode = string | null
 
 /**
  * Нормативный срок обучения
  */
-export type EducationalProgramSchemaInputEduNormativePeriod = string | null;
+export type EducationalProgramSchemaInputEduNormativePeriod = string | null
 
 export interface EducationalProgramSchemaInput {
   /** Наименование уровня образования */
-  edu_level_name: string;
+  edu_level_name: string
   /** Нормативный срок обучения */
-  edu_normative_period?: EducationalProgramSchemaInputEduNormativePeriod;
+  edu_normative_period?: EducationalProgramSchemaInputEduNormativePeriod
   /** Идентификатор образовательной программы в реестре */
-  in_registry_id: string;
+  in_registry_id: string
   /** Код образовательной программы */
-  program_code?: EducationalProgramSchemaInputProgramCode;
+  program_code?: EducationalProgramSchemaInputProgramCode
   /** Наименование образовательной программы */
-  program_name: string;
+  program_name: string
   /** Квалификация выпускника */
-  qualification?: EducationalProgramSchemaInputQualification;
+  qualification?: EducationalProgramSchemaInputQualification
   /** Код направления подготовки */
-  ugs_code?: EducationalProgramSchemaInputUgsCode;
+  ugs_code?: EducationalProgramSchemaInputUgsCode
   /** Наименование направления подготовки */
-  ugs_name?: EducationalProgramSchemaInputUgsName;
+  ugs_name?: EducationalProgramSchemaInputUgsName
 }
 
-export type EducationalProgramOutUgsName = string | null;
+export type EducationalProgramOutUgsName = string | null
 
-export type EducationalProgramOutUgsCode = string | null;
+export type EducationalProgramOutUgsCode = string | null
 
-export type EducationalProgramOutQualification = string | null;
+export type EducationalProgramOutQualification = string | null
 
-export type EducationalProgramOutProgramName = string | null;
+export type EducationalProgramOutProgramName = string | null
 
-export type EducationalProgramOutProgramCode = string | null;
+export type EducationalProgramOutProgramCode = string | null
 
-export type EducationalProgramOutEduNormativePeriod = string | null;
+export type EducationalProgramOutEduNormativePeriod = string | null
 
-export type EducationalProgramOutEduLevelName = string | null;
+export type EducationalProgramOutEduLevelName = string | null
 
 export interface EducationalProgramOut {
-  edu_level_name: EducationalProgramOutEduLevelName;
-  edu_normative_period: EducationalProgramOutEduNormativePeriod;
-  in_registry_id: string;
-  program_code: EducationalProgramOutProgramCode;
-  program_name: EducationalProgramOutProgramName;
-  qualification: EducationalProgramOutQualification;
-  ugs_code: EducationalProgramOutUgsCode;
-  ugs_name: EducationalProgramOutUgsName;
-}
-
-export interface DialogPair {
-  enrollee_id: string;
-  organization_id: string;
-  student_id: string;
+  edu_level_name: EducationalProgramOutEduLevelName
+  edu_normative_period: EducationalProgramOutEduNormativePeriod
+  in_registry_id: string
+  program_code: EducationalProgramOutProgramCode
+  program_name: EducationalProgramOutProgramName
+  qualification: EducationalProgramOutQualification
+  ugs_code: EducationalProgramOutUgsCode
+  ugs_name: EducationalProgramOutUgsName
 }
 
 /**
  * Название диалога
  */
-export type DialogTitle = string | null;
+export type DialogTitle = string | null
 
 export interface Dialog {
   /** Закрыт ли диалог */
-  closed: boolean;
+  closed: boolean
   /** ID абитуриента */
-  enrollee_id: string;
+  enrollee_id: string
   /** MongoDB document ObjectID */
-  id: string;
+  id: string
   /** Сообщения в диалоге */
-  messages: MessageSchema[];
+  messages: MessageSchema[]
   /** ID организации */
-  organization_id: string;
+  organization_id: string
   /** ID студента */
-  student_id: string;
+  student_id: string
   /** Название диалога */
-  title: DialogTitle;
+  title: DialogTitle
 }
 
-export type CreateSceneMeta = unknown | null;
+export type CreateSceneMeta = unknown | null
 
 export interface CreateScene {
-  file: string;
-  meta?: CreateSceneMeta;
-  organization: string;
-  title: string;
+  file: string
+  meta?: CreateSceneMeta
+  organization: string
+  title: string
 }
 
 /**
  * Наименование региона
  */
-export type CreateOrganizationRegionName = string | null;
+export type CreateOrganizationRegionName = string | null
 
 /**
  * Основная сцена организации
  */
-export type CreateOrganizationMainScene = string | null;
+export type CreateOrganizationMainScene = string | null
 
 /**
  * Логотип организации
  */
-export type CreateOrganizationLogo = string | null;
+export type CreateOrganizationLogo = string | null
 
 /**
  * Идентификатор организации в реестре
  */
-export type CreateOrganizationInRegistryId = string | null;
+export type CreateOrganizationInRegistryId = string | null
 
 /**
  * Наименование федерального округа
  */
-export type CreateOrganizationFederalDistrictName = string | null;
+export type CreateOrganizationFederalDistrictName = string | null
 
 /**
  * Контактные данные организации
  */
-export type CreateOrganizationContacts = ContactsSchemaInput | null;
+export type CreateOrganizationContacts = ContactsSchemaInput | null
 
 export interface CreateOrganization {
   /** Контактные данные организации */
-  contacts?: CreateOrganizationContacts;
+  contacts?: CreateOrganizationContacts
   /** Документы организации */
-  documents?: unknown;
+  documents?: unknown
   /** Образовательные программы организации */
-  educational_programs?: EducationalProgramSchemaInput[];
+  educational_programs?: EducationalProgramSchemaInput[]
   /** Наименование федерального округа */
-  federal_district_name?: CreateOrganizationFederalDistrictName;
+  federal_district_name?: CreateOrganizationFederalDistrictName
   /** Полное наименование организации */
-  full_name: string;
+  full_name: string
   /** Идентификатор организации в реестре */
-  in_registry_id?: CreateOrganizationInRegistryId;
+  in_registry_id?: CreateOrganizationInRegistryId
   /** Логотип организации */
-  logo?: CreateOrganizationLogo;
+  logo?: CreateOrganizationLogo
   /** Основная сцена организации */
-  main_scene?: CreateOrganizationMainScene;
+  main_scene?: CreateOrganizationMainScene
   /** Наименование организации */
-  name: string;
+  name: string
   /** Наименование региона */
-  region_name?: CreateOrganizationRegionName;
+  region_name?: CreateOrganizationRegionName
   /** Псевдоним организации (уникальный) */
-  username: string;
+  username: string
 }
 
 /**
  * Сайт
  */
-export type ContactsSchemaOutputWebsite = string | null;
+export type ContactsSchemaOutputWebsite = string | null
 
 /**
  * Почтовый адрес
  */
-export type ContactsSchemaOutputPostAddress = string | null;
+export type ContactsSchemaOutputPostAddress = string | null
 
 /**
  * Телефон
  */
-export type ContactsSchemaOutputPhone = string | null;
+export type ContactsSchemaOutputPhone = string | null
 
 /**
  * ОГРН
  */
-export type ContactsSchemaOutputOgrn = string | null;
+export type ContactsSchemaOutputOgrn = string | null
 
 /**
  * КПП
  */
-export type ContactsSchemaOutputKpp = string | null;
+export type ContactsSchemaOutputKpp = string | null
 
 /**
  * ИНН
  */
-export type ContactsSchemaOutputInn = string | null;
+export type ContactsSchemaOutputInn = string | null
 
 /**
  * Факс
  */
-export type ContactsSchemaOutputFax = string | null;
+export type ContactsSchemaOutputFax = string | null
 
 /**
  * Электронная почта
  */
-export type ContactsSchemaOutputEmail = string | null;
+export type ContactsSchemaOutputEmail = string | null
 
 export interface ContactsSchemaOutput {
   /** Электронная почта */
-  email: ContactsSchemaOutputEmail;
+  email: ContactsSchemaOutputEmail
   /** Факс */
-  fax: ContactsSchemaOutputFax;
+  fax: ContactsSchemaOutputFax
   /** ИНН */
-  inn: ContactsSchemaOutputInn;
+  inn: ContactsSchemaOutputInn
   /** КПП */
-  kpp: ContactsSchemaOutputKpp;
+  kpp: ContactsSchemaOutputKpp
   /** ОГРН */
-  ogrn: ContactsSchemaOutputOgrn;
+  ogrn: ContactsSchemaOutputOgrn
   /** Телефон */
-  phone: ContactsSchemaOutputPhone;
+  phone: ContactsSchemaOutputPhone
   /** Почтовый адрес */
-  post_address: ContactsSchemaOutputPostAddress;
+  post_address: ContactsSchemaOutputPostAddress
   /** Сайт */
-  website: ContactsSchemaOutputWebsite;
-  [key: string]: any;
- }
+  website: ContactsSchemaOutputWebsite
+  [key: string]: any
+}
 
 /**
  * Сайт
  */
-export type ContactsSchemaInputWebsite = string | null;
+export type ContactsSchemaInputWebsite = string | null
 
 /**
  * Почтовый адрес
  */
-export type ContactsSchemaInputPostAddress = string | null;
+export type ContactsSchemaInputPostAddress = string | null
 
 /**
  * Телефон
  */
-export type ContactsSchemaInputPhone = string | null;
+export type ContactsSchemaInputPhone = string | null
 
 /**
  * ОГРН
  */
-export type ContactsSchemaInputOgrn = string | null;
+export type ContactsSchemaInputOgrn = string | null
 
 /**
  * КПП
  */
-export type ContactsSchemaInputKpp = string | null;
+export type ContactsSchemaInputKpp = string | null
 
 /**
  * ИНН
  */
-export type ContactsSchemaInputInn = string | null;
+export type ContactsSchemaInputInn = string | null
 
 /**
  * Факс
  */
-export type ContactsSchemaInputFax = string | null;
+export type ContactsSchemaInputFax = string | null
 
 /**
  * Электронная почта
  */
-export type ContactsSchemaInputEmail = string | null;
+export type ContactsSchemaInputEmail = string | null
 
 export interface ContactsSchemaInput {
   /** Электронная почта */
-  email?: ContactsSchemaInputEmail;
+  email?: ContactsSchemaInputEmail
   /** Факс */
-  fax?: ContactsSchemaInputFax;
+  fax?: ContactsSchemaInputFax
   /** ИНН */
-  inn?: ContactsSchemaInputInn;
+  inn?: ContactsSchemaInputInn
   /** КПП */
-  kpp?: ContactsSchemaInputKpp;
+  kpp?: ContactsSchemaInputKpp
   /** ОГРН */
-  ogrn?: ContactsSchemaInputOgrn;
+  ogrn?: ContactsSchemaInputOgrn
   /** Телефон */
-  phone?: ContactsSchemaInputPhone;
+  phone?: ContactsSchemaInputPhone
   /** Почтовый адрес */
-  post_address?: ContactsSchemaInputPostAddress;
+  post_address?: ContactsSchemaInputPostAddress
   /** Сайт */
-  website?: ContactsSchemaInputWebsite;
-  [key: string]: any;
- }
+  website?: ContactsSchemaInputWebsite
+  [key: string]: any
+}
 
 /**
  * Логотип организации
  */
-export type CompactOrganizationLogo = string | null;
+export type CompactOrganizationLogo = string | null
 
 export interface CompactOrganization {
   /** MongoDB document ObjectID */
-  id: string;
+  id: string
   /** Логотип организации */
-  logo: CompactOrganizationLogo;
+  logo: CompactOrganizationLogo
   /** Наименование организации */
-  name: string;
+  name: string
   /** Псевдоним организации (уникальный) */
-  username: string;
+  username: string
 }
 
-export type CertificateOutTypeName = string | null;
+export type CertificateOutTypeName = string | null
 
-export type CertificateOutStatusName = string | null;
+export type CertificateOutStatusName = string | null
 
-export type CertificateOutRegionName = string | null;
+export type CertificateOutRegionName = string | null
 
-export type CertificateOutIsFederal = boolean | null;
+export type CertificateOutIsFederal = boolean | null
 
-export type CertificateOutFederalDistrictName = string | null;
+export type CertificateOutFederalDistrictName = string | null
 
-export type CertificateOutActualEducationOrganization = ActualEducationOrganizationOut | null;
+export type CertificateOutActualEducationOrganization = ActualEducationOrganizationOut | null
 
 export interface CertificateOut {
-  actual_education_organization: CertificateOutActualEducationOrganization;
-  educational_programs?: EducationalProgramOut[];
-  federal_district_name: CertificateOutFederalDistrictName;
-  in_registry_id: string;
-  is_federal: CertificateOutIsFederal;
-  region_name: CertificateOutRegionName;
-  status_name: CertificateOutStatusName;
-  type_name: CertificateOutTypeName;
+  actual_education_organization: CertificateOutActualEducationOrganization
+  educational_programs?: EducationalProgramOut[]
+  federal_district_name: CertificateOutFederalDistrictName
+  in_registry_id: string
+  is_federal: CertificateOutIsFederal
+  region_name: CertificateOutRegionName
+  status_name: CertificateOutStatusName
+  type_name: CertificateOutTypeName
+}
+
+export type BodyUsersRequestApprovementUploadFileObj = Blob | null
+
+export interface BodyUsersRequestApprovement {
+  upload_file_obj?: BodyUsersRequestApprovementUploadFileObj
 }
 
 export interface BodyOrganizationsImportOrganizations {
-  upload_file_obj: Blob;
+  upload_file_obj: Blob
 }
 
 export interface BodyFilesUploadFile {
-  upload_file_obj: Blob;
-}
-
-export interface BodyChattingJoinDialog {
-  dialog_pair: DialogPair;
+  upload_file_obj: Blob
 }
 
 export interface AuthCredentials {
   /** User login */
-  login?: string;
+  login?: string
   /** User password */
-  password?: string;
+  password?: string
 }
 
-export type ApprovedApprovementStatus = typeof ApprovedApprovementStatus[keyof typeof ApprovedApprovementStatus];
-
+export type ApprovedApprovementStatus = typeof ApprovedApprovementStatus[keyof typeof ApprovedApprovementStatus]
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ApprovedApprovementStatus = {
   approved: 'approved',
-} as const;
+} as const
+
+/**
+ * ID модератора, подтвердившего студента
+ */
+export type ApprovedApprovementModeratorId = string | null
 
 export interface ApprovedApprovement {
   /** Дата подтверждения студента */
-  at: string;
+  at: string
   /** ID модератора, подтвердившего студента */
-  moderator_id: string;
+  moderator_id: ApprovedApprovementModeratorId
   /** ID организации к которой будет привязан студент */
-  organization_id: string;
-  status: ApprovedApprovementStatus;
+  organization_id: string
+  status: ApprovedApprovementStatus
 }
 
 /**
  * Текст отзыва
  */
-export type AnonymousReviewText = string | null;
+export type AnonymousReviewText = string | null
 
 /**
  * Поставлен ли лайк мной
  */
-export type AnonymousReviewLikedByMe = boolean | null;
+export type AnonymousReviewLikedByMe = boolean | null
 
 export interface AnonymousReview {
   /** Имя анонимного пользователя */
-  anonymous_name: string;
+  anonymous_name: string
   /** Дата и время создания отзыва */
-  at: string;
+  at: string
   /** Идентификатор отзыва */
-  id: string;
+  id: string
   /** Поставлен ли лайк мной */
-  liked_by_me: AnonymousReviewLikedByMe;
+  liked_by_me: AnonymousReviewLikedByMe
   /** Количество лайков */
-  likes: number;
+  likes: number
   /** Отзыв оставлен мной */
-  mine: boolean;
+  mine: boolean
   /**
    * Оценка
    * @minimum 1
    * @maximum 5
    */
-  rate: number;
+  rate: number
   /** Текст отзыва */
-  text: AnonymousReviewText;
+  text: AnonymousReviewText
 }
 
-export type ActualEducationOrganizationOutWebsite = string | null;
+export type ActualEducationOrganizationOutWebsite = string | null
 
-export type ActualEducationOrganizationOutTypeName = string | null;
+export type ActualEducationOrganizationOutTypeName = string | null
 
-export type ActualEducationOrganizationOutShortName = string | null;
+export type ActualEducationOrganizationOutShortName = string | null
 
-export type ActualEducationOrganizationOutRegionName = string | null;
+export type ActualEducationOrganizationOutRegionName = string | null
 
-export type ActualEducationOrganizationOutPostAddress = string | null;
+export type ActualEducationOrganizationOutPostAddress = string | null
 
-export type ActualEducationOrganizationOutPhone = string | null;
+export type ActualEducationOrganizationOutPhone = string | null
 
-export type ActualEducationOrganizationOutOgrn = string | null;
+export type ActualEducationOrganizationOutOgrn = string | null
 
-export type ActualEducationOrganizationOutKpp = string | null;
+export type ActualEducationOrganizationOutKpp = string | null
 
-export type ActualEducationOrganizationOutKindName = string | null;
+export type ActualEducationOrganizationOutKindName = string | null
 
-export type ActualEducationOrganizationOutIsBranch = boolean | null;
+export type ActualEducationOrganizationOutIsBranch = boolean | null
 
-export type ActualEducationOrganizationOutInn = string | null;
+export type ActualEducationOrganizationOutInn = string | null
 
-export type ActualEducationOrganizationOutInRegistryId = string | null;
+export type ActualEducationOrganizationOutInRegistryId = string | null
 
-export type ActualEducationOrganizationOutHeadPost = string | null;
+export type ActualEducationOrganizationOutHeadPost = string | null
 
-export type ActualEducationOrganizationOutHeadName = string | null;
+export type ActualEducationOrganizationOutHeadName = string | null
 
-export type ActualEducationOrganizationOutHeadEduOrgId = string | null;
+export type ActualEducationOrganizationOutHeadEduOrgId = string | null
 
-export type ActualEducationOrganizationOutFullName = string | null;
+export type ActualEducationOrganizationOutFullName = string | null
 
-export type ActualEducationOrganizationOutFormName = string | null;
+export type ActualEducationOrganizationOutFormName = string | null
 
-export type ActualEducationOrganizationOutFederalDistrictShortName = string | null;
+export type ActualEducationOrganizationOutFederalDistrictShortName = string | null
 
-export type ActualEducationOrganizationOutFederalDistrictName = string | null;
+export type ActualEducationOrganizationOutFederalDistrictName = string | null
 
-export type ActualEducationOrganizationOutFax = string | null;
+export type ActualEducationOrganizationOutFax = string | null
 
-export type ActualEducationOrganizationOutEmail = string | null;
+export type ActualEducationOrganizationOutEmail = string | null
 
 export interface ActualEducationOrganizationOut {
-  email: ActualEducationOrganizationOutEmail;
-  fax: ActualEducationOrganizationOutFax;
-  federal_district_name: ActualEducationOrganizationOutFederalDistrictName;
-  federal_district_short_name: ActualEducationOrganizationOutFederalDistrictShortName;
-  form_name: ActualEducationOrganizationOutFormName;
-  full_name: ActualEducationOrganizationOutFullName;
-  head_edu_org_id: ActualEducationOrganizationOutHeadEduOrgId;
-  head_name: ActualEducationOrganizationOutHeadName;
-  head_post: ActualEducationOrganizationOutHeadPost;
-  in_registry_id: ActualEducationOrganizationOutInRegistryId;
-  inn: ActualEducationOrganizationOutInn;
-  is_branch: ActualEducationOrganizationOutIsBranch;
-  kind_name: ActualEducationOrganizationOutKindName;
-  kpp: ActualEducationOrganizationOutKpp;
-  ogrn: ActualEducationOrganizationOutOgrn;
-  phone: ActualEducationOrganizationOutPhone;
-  post_address: ActualEducationOrganizationOutPostAddress;
-  region_name: ActualEducationOrganizationOutRegionName;
-  short_name: ActualEducationOrganizationOutShortName;
-  type_name: ActualEducationOrganizationOutTypeName;
-  website: ActualEducationOrganizationOutWebsite;
+  email: ActualEducationOrganizationOutEmail
+  fax: ActualEducationOrganizationOutFax
+  federal_district_name: ActualEducationOrganizationOutFederalDistrictName
+  federal_district_short_name: ActualEducationOrganizationOutFederalDistrictShortName
+  form_name: ActualEducationOrganizationOutFormName
+  full_name: ActualEducationOrganizationOutFullName
+  head_edu_org_id: ActualEducationOrganizationOutHeadEduOrgId
+  head_name: ActualEducationOrganizationOutHeadName
+  head_post: ActualEducationOrganizationOutHeadPost
+  in_registry_id: ActualEducationOrganizationOutInRegistryId
+  inn: ActualEducationOrganizationOutInn
+  is_branch: ActualEducationOrganizationOutIsBranch
+  kind_name: ActualEducationOrganizationOutKindName
+  kpp: ActualEducationOrganizationOutKpp
+  ogrn: ActualEducationOrganizationOutOgrn
+  phone: ActualEducationOrganizationOutPhone
+  post_address: ActualEducationOrganizationOutPostAddress
+  region_name: ActualEducationOrganizationOutRegionName
+  short_name: ActualEducationOrganizationOutShortName
+  type_name: ActualEducationOrganizationOutTypeName
+  website: ActualEducationOrganizationOutWebsite
 }
 
+type AwaitedInput<T> = PromiseLike<T> | T
 
-
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
-
+      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never
 
 /**
  * Авторизация пользователя по логину и паролю. Возвращает обёрнутый JWT токен.
  * @summary By Credentials
  */
-export const providersByCredentials = (
-    authCredentials: MaybeRef<AuthCredentials>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    authCredentials = unref(authCredentials);
-    return axios.post(
+export function providersByCredentials(authCredentials: MaybeRef<AuthCredentials>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  authCredentials = unref(authCredentials)
+  return axios.post(
       `/providers/credentials/credentials`,
-      authCredentials,options
-    );
+      authCredentials,
+      options,
+  )
+}
+
+export function getProvidersByCredentialsMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof providersByCredentials>>, TError, { data: AuthCredentials }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof providersByCredentials>>, TError, { data: AuthCredentials }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersByCredentials>>, { data: AuthCredentials }> = (props) => {
+    const { data } = props ?? {}
+
+    return providersByCredentials(data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ProvidersByCredentialsMutationResult = NonNullable<Awaited<ReturnType<typeof providersByCredentials>>>
+export type ProvidersByCredentialsMutationBody = AuthCredentials
+export type ProvidersByCredentialsMutationError = AxiosError<void | HTTPValidationError>
 
-export const getProvidersByCredentialsMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersByCredentials>>, TError,{data: AuthCredentials}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof providersByCredentials>>, TError,{data: AuthCredentials}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersByCredentials>>, {data: AuthCredentials}> = (props) => {
-          const {data} = props ?? {};
-
-          return  providersByCredentials(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProvidersByCredentialsMutationResult = NonNullable<Awaited<ReturnType<typeof providersByCredentials>>>
-    export type ProvidersByCredentialsMutationBody = AuthCredentials
-    export type ProvidersByCredentialsMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary By Credentials
  */
-export const useProvidersByCredentials = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof providersByCredentials>>, TError,{data: AuthCredentials}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useProvidersByCredentials<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof providersByCredentials>>, TError, { data: AuthCredentials }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof providersByCredentials>>,
         TError,
-        {data: AuthCredentials},
+        { data: AuthCredentials },
         TContext
-      > => {
+      > {
+  const mutationOptions = getProvidersByCredentialsMutationOptions(options)
 
-      const mutationOptions = getProvidersByCredentialsMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary Telegram Register
  */
-export const providersTelegramRegister = (
-    params: MaybeRef<ProvidersTelegramRegisterParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    params = unref(params);
-    return axios.get(
-      `/providers/telegram/register`,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
-  }
+export function providersTelegramRegister(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  params = unref(params)
+  return axios.get(
+      `/providers/telegram/register`,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
 
+export function getProvidersTelegramRegisterQueryKey(params: MaybeRef<ProvidersTelegramRegisterParams>) {
+  return ['providers', 'telegram', 'register', ...(params ? [params] : [])] as const
+}
 
-export const getProvidersTelegramRegisterQueryKey = (params: MaybeRef<ProvidersTelegramRegisterParams>,) => {
-    return ['providers','telegram','register', ...(params ? [params]: [])] as const;
-    }
+export function getProvidersTelegramRegisterQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getProvidersTelegramRegisterQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getProvidersTelegramRegisterQueryKey(params)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegister>>> = ({ signal }) => providersTelegramRegister(params, { signal, ...axiosOptions })
 
-  const queryKey =  getProvidersTelegramRegisterQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegister>>> = ({ signal }) => providersTelegramRegister(params, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>
 }
 
 export type ProvidersTelegramRegisterQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegister>>>
@@ -1116,59 +1089,42 @@ export type ProvidersTelegramRegisterQueryError = AxiosError<void | HTTPValidati
 /**
  * @summary Telegram Register
  */
-export const useProvidersTelegramRegister = <TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(
- params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useProvidersTelegramRegister<TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getProvidersTelegramRegisterQueryOptions(params, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getProvidersTelegramRegisterQueryOptions(params,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary Telegram Connect
  */
-export const providersTelegramConnect = (
-    params: MaybeRef<ProvidersTelegramConnectParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    params = unref(params);
-    return axios.get(
-      `/providers/telegram/connect`,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
-  }
+export function providersTelegramConnect(params: MaybeRef<ProvidersTelegramConnectParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  params = unref(params)
+  return axios.get(
+      `/providers/telegram/connect`,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
 
+export function getProvidersTelegramConnectQueryKey(params: MaybeRef<ProvidersTelegramConnectParams>) {
+  return ['providers', 'telegram', 'connect', ...(params ? [params] : [])] as const
+}
 
-export const getProvidersTelegramConnectQueryKey = (params: MaybeRef<ProvidersTelegramConnectParams>,) => {
-    return ['providers','telegram','connect', ...(params ? [params]: [])] as const;
-    }
+export function getProvidersTelegramConnectQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getProvidersTelegramConnectQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getProvidersTelegramConnectQueryKey(params)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnect>>> = ({ signal }) => providersTelegramConnect(params, { signal, ...axiosOptions })
 
-  const queryKey =  getProvidersTelegramConnectQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnect>>> = ({ signal }) => providersTelegramConnect(params, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>
 }
 
 export type ProvidersTelegramConnectQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnect>>>
@@ -1177,59 +1133,42 @@ export type ProvidersTelegramConnectQueryError = AxiosError<void | HTTPValidatio
 /**
  * @summary Telegram Connect
  */
-export const useProvidersTelegramConnect = <TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(
- params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useProvidersTelegramConnect<TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getProvidersTelegramConnectQueryOptions(params, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getProvidersTelegramConnectQueryOptions(params,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary Telegram Login
  */
-export const providersTelegramLogin = (
-    params: MaybeRef<ProvidersTelegramLoginParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TelegramLoginResponse>> => {
-    params = unref(params);
-    return axios.get(
-      `/providers/telegram/login`,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
-  }
+export function providersTelegramLogin(params: MaybeRef<ProvidersTelegramLoginParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<TelegramLoginResponse>> {
+  params = unref(params)
+  return axios.get(
+      `/providers/telegram/login`,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
 
+export function getProvidersTelegramLoginQueryKey(params: MaybeRef<ProvidersTelegramLoginParams>) {
+  return ['providers', 'telegram', 'login', ...(params ? [params] : [])] as const
+}
 
-export const getProvidersTelegramLoginQueryKey = (params: MaybeRef<ProvidersTelegramLoginParams>,) => {
-    return ['providers','telegram','login', ...(params ? [params]: [])] as const;
-    }
+export function getProvidersTelegramLoginQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getProvidersTelegramLoginQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getProvidersTelegramLoginQueryKey(params)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLogin>>> = ({ signal }) => providersTelegramLogin(params, { signal, ...axiosOptions })
 
-  const queryKey =  getProvidersTelegramLoginQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLogin>>> = ({ signal }) => providersTelegramLogin(params, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>
 }
 
 export type ProvidersTelegramLoginQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLogin>>>
@@ -1238,57 +1177,38 @@ export type ProvidersTelegramLoginQueryError = AxiosError<void | HTTPValidationE
 /**
  * @summary Telegram Login
  */
-export const useProvidersTelegramLogin = <TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(
- params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useProvidersTelegramLogin<TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getProvidersTelegramLoginQueryOptions(params, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getProvidersTelegramLoginQueryOptions(params,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary Telegram Register Html
  */
-export const providersTelegramRegisterHtml = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<string>> => {
-    
-    return axios.get(
-      `/providers/telegram/register.html`,options
-    );
-  }
+export function providersTelegramRegisterHtml(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
+  return axios.get(
+      `/providers/telegram/register.html`,
+      options,
+  )
+}
 
+export function getProvidersTelegramRegisterHtmlQueryKey() {
+  return ['providers', 'telegram', 'register.html'] as const
+}
 
-export const getProvidersTelegramRegisterHtmlQueryKey = () => {
-    return ['providers','telegram','register.html'] as const;
-    }
+export function getProvidersTelegramRegisterHtmlQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getProvidersTelegramRegisterHtmlQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getProvidersTelegramRegisterHtmlQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>> = ({ signal }) => providersTelegramRegisterHtml({ signal, ...axiosOptions })
 
-  const queryKey =  getProvidersTelegramRegisterHtmlQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>> = ({ signal }) => providersTelegramRegisterHtml({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>
 }
 
 export type ProvidersTelegramRegisterHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>>
@@ -1297,57 +1217,38 @@ export type ProvidersTelegramRegisterHtmlQueryError = AxiosError<unknown>
 /**
  * @summary Telegram Register Html
  */
-export const useProvidersTelegramRegisterHtml = <TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useProvidersTelegramRegisterHtml<TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getProvidersTelegramRegisterHtmlQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary Telegram Connect Html
  */
-export const providersTelegramConnectHtml = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<string>> => {
-    
-    return axios.get(
-      `/providers/telegram/connect.html`,options
-    );
-  }
+export function providersTelegramConnectHtml(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
+  return axios.get(
+      `/providers/telegram/connect.html`,
+      options,
+  )
+}
 
+export function getProvidersTelegramConnectHtmlQueryKey() {
+  return ['providers', 'telegram', 'connect.html'] as const
+}
 
-export const getProvidersTelegramConnectHtmlQueryKey = () => {
-    return ['providers','telegram','connect.html'] as const;
-    }
+export function getProvidersTelegramConnectHtmlQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getProvidersTelegramConnectHtmlQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getProvidersTelegramConnectHtmlQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnectHtml>>> = ({ signal }) => providersTelegramConnectHtml({ signal, ...axiosOptions })
 
-  const queryKey =  getProvidersTelegramConnectHtmlQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnectHtml>>> = ({ signal }) => providersTelegramConnectHtml({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>
 }
 
 export type ProvidersTelegramConnectHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnectHtml>>>
@@ -1356,57 +1257,38 @@ export type ProvidersTelegramConnectHtmlQueryError = AxiosError<unknown>
 /**
  * @summary Telegram Connect Html
  */
-export const useProvidersTelegramConnectHtml = <TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useProvidersTelegramConnectHtml<TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getProvidersTelegramConnectHtmlQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary Telegram Login Html
  */
-export const providersTelegramLoginHtml = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<string>> => {
-    
-    return axios.get(
-      `/providers/telegram/login.html`,options
-    );
-  }
+export function providersTelegramLoginHtml(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
+  return axios.get(
+      `/providers/telegram/login.html`,
+      options,
+  )
+}
 
+export function getProvidersTelegramLoginHtmlQueryKey() {
+  return ['providers', 'telegram', 'login.html'] as const
+}
 
-export const getProvidersTelegramLoginHtmlQueryKey = () => {
-    return ['providers','telegram','login.html'] as const;
-    }
+export function getProvidersTelegramLoginHtmlQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getProvidersTelegramLoginHtmlQueryOptions = <TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getProvidersTelegramLoginHtmlQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLoginHtml>>> = ({ signal }) => providersTelegramLoginHtml({ signal, ...axiosOptions })
 
-  const queryKey =  getProvidersTelegramLoginHtmlQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLoginHtml>>> = ({ signal }) => providersTelegramLoginHtml({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>
 }
 
 export type ProvidersTelegramLoginHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLoginHtml>>>
@@ -1415,58 +1297,39 @@ export type ProvidersTelegramLoginHtmlQueryError = AxiosError<unknown>
 /**
  * @summary Telegram Login Html
  */
-export const useProvidersTelegramLoginHtml = <TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useProvidersTelegramLoginHtml<TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getProvidersTelegramLoginHtmlQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Получить данные текущего пользователя
  * @summary Get Me
  */
-export const usersGetMe = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ViewUser>> => {
-    
-    return axios.get(
-      `/users/me`,options
-    );
-  }
+export function usersGetMe(options?: AxiosRequestConfig): Promise<AxiosResponse<ViewUser>> {
+  return axios.get(
+      `/users/me`,
+      options,
+  )
+}
 
+export function getUsersGetMeQueryKey() {
+  return ['users', 'me'] as const
+}
 
-export const getUsersGetMeQueryKey = () => {
-    return ['users','me'] as const;
-    }
+export function getUsersGetMeQueryOptions<TData = Awaited<ReturnType<typeof usersGetMe>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMe>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getUsersGetMeQueryOptions = <TData = Awaited<ReturnType<typeof usersGetMe>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMe>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getUsersGetMeQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetMe>>> = ({ signal }) => usersGetMe({ signal, ...axiosOptions })
 
-  const queryKey =  getUsersGetMeQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetMe>>> = ({ signal }) => usersGetMe({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersGetMe>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof usersGetMe>>, TError, TData>
 }
 
 export type UsersGetMeQueryResult = NonNullable<Awaited<ReturnType<typeof usersGetMe>>>
@@ -1475,58 +1338,39 @@ export type UsersGetMeQueryError = AxiosError<void>
 /**
  * @summary Get Me
  */
-export const useUsersGetMe = <TData = Awaited<ReturnType<typeof usersGetMe>>, TError = AxiosError<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMe>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useUsersGetMe<TData = Awaited<ReturnType<typeof usersGetMe>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMe>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getUsersGetMeQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Получить отзывы пользователя
  * @summary Get My Reviews
  */
-export const usersGetMyReviews = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ReviewWithOrganizationInfo[]>> => {
-    
-    return axios.get(
-      `/users/me/reviews`,options
-    );
-  }
+export function usersGetMyReviews(options?: AxiosRequestConfig): Promise<AxiosResponse<ReviewWithOrganizationInfo[]>> {
+  return axios.get(
+      `/users/me/reviews`,
+      options,
+  )
+}
 
+export function getUsersGetMyReviewsQueryKey() {
+  return ['users', 'me', 'reviews'] as const
+}
 
-export const getUsersGetMyReviewsQueryKey = () => {
-    return ['users','me','reviews'] as const;
-    }
+export function getUsersGetMyReviewsQueryOptions<TData = Awaited<ReturnType<typeof usersGetMyReviews>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getUsersGetMyReviewsQueryOptions = <TData = Awaited<ReturnType<typeof usersGetMyReviews>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getUsersGetMyReviewsQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetMyReviews>>> = ({ signal }) => usersGetMyReviews({ signal, ...axiosOptions })
 
-  const queryKey =  getUsersGetMyReviewsQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetMyReviews>>> = ({ signal }) => usersGetMyReviews({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData>
 }
 
 export type UsersGetMyReviewsQueryResult = NonNullable<Awaited<ReturnType<typeof usersGetMyReviews>>>
@@ -1535,226 +1379,167 @@ export type UsersGetMyReviewsQueryError = AxiosError<void>
 /**
  * @summary Get My Reviews
  */
-export const useUsersGetMyReviews = <TData = Awaited<ReturnType<typeof usersGetMyReviews>>, TError = AxiosError<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useUsersGetMyReviews<TData = Awaited<ReturnType<typeof usersGetMyReviews>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getUsersGetMyReviewsQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Установить документы пользователя
  * @summary Set Documents
  */
-export const usersSetDocuments = (
-    usersSetDocumentsBody: MaybeRef<string[]>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    usersSetDocumentsBody = unref(usersSetDocumentsBody);
-    return axios.put(
+export function usersSetDocuments(usersSetDocumentsBody: MaybeRef<string[]>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  usersSetDocumentsBody = unref(usersSetDocumentsBody)
+  return axios.put(
       `/users/me/set-documents`,
-      usersSetDocumentsBody,options
-    );
+      usersSetDocumentsBody,
+      options,
+  )
+}
+
+export function getUsersSetDocumentsMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError, { data: string[] }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError, { data: string[] }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersSetDocuments>>, { data: string[] }> = (props) => {
+    const { data } = props ?? {}
+
+    return usersSetDocuments(data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type UsersSetDocumentsMutationResult = NonNullable<Awaited<ReturnType<typeof usersSetDocuments>>>
+export type UsersSetDocumentsMutationBody = string[]
+export type UsersSetDocumentsMutationError = AxiosError<void | HTTPValidationError>
 
-export const getUsersSetDocumentsMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError,{data: string[]}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError,{data: string[]}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersSetDocuments>>, {data: string[]}> = (props) => {
-          const {data} = props ?? {};
-
-          return  usersSetDocuments(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UsersSetDocumentsMutationResult = NonNullable<Awaited<ReturnType<typeof usersSetDocuments>>>
-    export type UsersSetDocumentsMutationBody = string[]
-    export type UsersSetDocumentsMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Set Documents
  */
-export const useUsersSetDocuments = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError,{data: string[]}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useUsersSetDocuments<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersSetDocuments>>, TError, { data: string[] }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof usersSetDocuments>>,
         TError,
-        {data: string[]},
+        { data: string[] },
         TContext
-      > => {
+      > {
+  const mutationOptions = getUsersSetDocumentsMutationOptions(options)
 
-      const mutationOptions = getUsersSetDocumentsMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Отправить запрос на подтверждение
  * @summary Request Approvement
  */
-export const usersRequestApprovement = (
-    params: MaybeRef<UsersRequestApprovementParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    params = unref(params);
-    return axios.put(
-      `/users/me/request-approvement`,undefined,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
+export function usersRequestApprovement(organizationId: MaybeRef<string>, bodyUsersRequestApprovement: MaybeRef<BodyUsersRequestApprovement>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  const formData = customFormDataDocuments(bodyUsersRequestApprovement)
+  organizationId = unref(organizationId)
+  bodyUsersRequestApprovement = unref(bodyUsersRequestApprovement)
+  return axios.put(
+      `/users/me/request-approvement/${organizationId}`,
+      formData,
+      options,
+  )
+}
+
+export function getUsersRequestApprovementMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError, { organizationId: string, data: BodyUsersRequestApprovement }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError, { organizationId: string, data: BodyUsersRequestApprovement }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersRequestApprovement>>, { organizationId: string, data: BodyUsersRequestApprovement }> = (props) => {
+    const { organizationId, data } = props ?? {}
+
+    return usersRequestApprovement(organizationId, data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type UsersRequestApprovementMutationResult = NonNullable<Awaited<ReturnType<typeof usersRequestApprovement>>>
+export type UsersRequestApprovementMutationBody = BodyUsersRequestApprovement
+export type UsersRequestApprovementMutationError = AxiosError<void | HTTPValidationError>
 
-export const getUsersRequestApprovementMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError,{params: UsersRequestApprovementParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError,{params: UsersRequestApprovementParams}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersRequestApprovement>>, {params: UsersRequestApprovementParams}> = (props) => {
-          const {params} = props ?? {};
-
-          return  usersRequestApprovement(params,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UsersRequestApprovementMutationResult = NonNullable<Awaited<ReturnType<typeof usersRequestApprovement>>>
-    
-    export type UsersRequestApprovementMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Request Approvement
  */
-export const useUsersRequestApprovement = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError,{params: UsersRequestApprovementParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useUsersRequestApprovement<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersRequestApprovement>>, TError, { organizationId: string, data: BodyUsersRequestApprovement }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof usersRequestApprovement>>,
         TError,
-        {params: UsersRequestApprovementParams},
+        { organizationId: string, data: BodyUsersRequestApprovement },
         TContext
-      > => {
+      > {
+  const mutationOptions = getUsersRequestApprovementMutationOptions(options)
 
-      const mutationOptions = getUsersRequestApprovementMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Выход из аккаунта
  * @summary Logout
  */
-export const usersLogout = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    
-    return axios.post(
-      `/users/logout`,undefined,options
-    );
+export function usersLogout(options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  return axios.post(
+      `/users/logout`,
+      undefined,
+      options,
+  )
+}
+
+export function getUsersLogoutMutationOptions<TError = AxiosError<void>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError, void, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError, void, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersLogout>>, void> = () => {
+    return usersLogout(axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type UsersLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof usersLogout>>>
 
-export const getUsersLogoutMutationOptions = <TError = AxiosError<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError,void, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type UsersLogoutMutationError = AxiosError<void>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersLogout>>, void> = () => {
-          
-
-          return  usersLogout(axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UsersLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof usersLogout>>>
-    
-    export type UsersLogoutMutationError = AxiosError<void>
-
-    /**
+/**
  * @summary Logout
  */
-export const useUsersLogout = <TError = AxiosError<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useUsersLogout<TError = AxiosError<void>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersLogout>>, TError, void, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof usersLogout>>,
         TError,
         void,
         TContext
-      > => {
+      > {
+  const mutationOptions = getUsersLogoutMutationOptions(options)
 
-      const mutationOptions = getUsersLogoutMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Получить пользователей с ожидающим подтверждением
  * @summary Get Users With Pending Approvement
  */
-export const usersGetUsersWithPendingApprovement = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ViewUser[]>> => {
-    
-    return axios.get(
-      `/users/with-pending-approvement`,options
-    );
-  }
+export function usersGetUsersWithPendingApprovement(options?: AxiosRequestConfig): Promise<AxiosResponse<ViewUser[]>> {
+  return axios.get(
+      `/users/with-pending-approvement`,
+      options,
+  )
+}
 
+export function getUsersGetUsersWithPendingApprovementQueryKey() {
+  return ['users', 'with-pending-approvement'] as const
+}
 
-export const getUsersGetUsersWithPendingApprovementQueryKey = () => {
-    return ['users','with-pending-approvement'] as const;
-    }
+export function getUsersGetUsersWithPendingApprovementQueryOptions<TData = Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getUsersGetUsersWithPendingApprovementQueryOptions = <TData = Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getUsersGetUsersWithPendingApprovementQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>> = ({ signal }) => usersGetUsersWithPendingApprovement({ signal, ...axiosOptions })
 
-  const queryKey =  getUsersGetUsersWithPendingApprovementQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>> = ({ signal }) => usersGetUsersWithPendingApprovement({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData>
 }
 
 export type UsersGetUsersWithPendingApprovementQueryResult = NonNullable<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>>
@@ -1763,58 +1548,40 @@ export type UsersGetUsersWithPendingApprovementQueryError = AxiosError<void>
 /**
  * @summary Get Users With Pending Approvement
  */
-export const useUsersGetUsersWithPendingApprovement = <TData = Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError = AxiosError<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useUsersGetUsersWithPendingApprovement<TData = Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUsersWithPendingApprovement>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getUsersGetUsersWithPendingApprovementQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Получить пользователя по идентификатору
  * @summary Get User By Id
  */
-export const usersGetUserById = (
-    userId: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ViewUser>> => {
-    userId = unref(userId);
-    return axios.get(
-      `/users/by-id/${userId}`,options
-    );
-  }
+export function usersGetUserById(userId: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<ViewUser>> {
+  userId = unref(userId)
+  return axios.get(
+      `/users/by-id/${userId}`,
+      options,
+  )
+}
 
+export function getUsersGetUserByIdQueryKey(userId: MaybeRef<string>) {
+  return ['users', 'by-id', userId] as const
+}
 
-export const getUsersGetUserByIdQueryKey = (userId: MaybeRef<string>,) => {
-    return ['users','by-id',userId] as const;
-    }
+export function getUsersGetUserByIdQueryOptions<TData = Awaited<ReturnType<typeof usersGetUserById>>, TError = AxiosError<void | HTTPValidationError>>(userId: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getUsersGetUserByIdQueryOptions = <TData = Awaited<ReturnType<typeof usersGetUserById>>, TError = AxiosError<void | HTTPValidationError>>(userId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getUsersGetUserByIdQueryKey(userId)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetUserById>>> = ({ signal }) => usersGetUserById(userId, { signal, ...axiosOptions })
 
-  const queryKey =  getUsersGetUserByIdQueryKey(userId);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetUserById>>> = ({ signal }) => usersGetUserById(userId, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: computed(() => !!(unref(userId))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData> 
+  return { queryKey, queryFn, enabled: computed(() => !!(unref(userId))), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData>
 }
 
 export type UsersGetUserByIdQueryResult = NonNullable<Awaited<ReturnType<typeof usersGetUserById>>>
@@ -1823,173 +1590,130 @@ export type UsersGetUserByIdQueryError = AxiosError<void | HTTPValidationError>
 /**
  * @summary Get User By Id
  */
-export const useUsersGetUserById = <TData = Awaited<ReturnType<typeof usersGetUserById>>, TError = AxiosError<void | HTTPValidationError>>(
- userId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useUsersGetUserById<TData = Awaited<ReturnType<typeof usersGetUserById>>, TError = AxiosError<void | HTTPValidationError>>(userId: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetUserById>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getUsersGetUserByIdQueryOptions(userId, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getUsersGetUserByIdQueryOptions(userId,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Одобрить или отклонить пользователя
  * @summary Approve User
  */
-export const usersApproveUser = (
-    userId: MaybeRef<string>,
-    params: MaybeRef<UsersApproveUserParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ViewUser>> => {
-    userId = unref(userId);
-params = unref(params);
-    return axios.post(
-      `/users/by-id/${userId}/approve`,undefined,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
+export function usersApproveUser(userId: MaybeRef<string>, params: MaybeRef<UsersApproveUserParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<ViewUser>> {
+  userId = unref(userId)
+  params = unref(params)
+  return axios.post(
+      `/users/by-id/${userId}/approve`,
+      undefined,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
+
+export function getUsersApproveUserMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError, { userId: string, params: UsersApproveUserParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError, { userId: string, params: UsersApproveUserParams }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersApproveUser>>, { userId: string, params: UsersApproveUserParams }> = (props) => {
+    const { userId, params } = props ?? {}
+
+    return usersApproveUser(userId, params, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type UsersApproveUserMutationResult = NonNullable<Awaited<ReturnType<typeof usersApproveUser>>>
 
-export const getUsersApproveUserMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError,{userId: string;params: UsersApproveUserParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError,{userId: string;params: UsersApproveUserParams}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type UsersApproveUserMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersApproveUser>>, {userId: string;params: UsersApproveUserParams}> = (props) => {
-          const {userId,params} = props ?? {};
-
-          return  usersApproveUser(userId,params,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UsersApproveUserMutationResult = NonNullable<Awaited<ReturnType<typeof usersApproveUser>>>
-    
-    export type UsersApproveUserMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Approve User
  */
-export const useUsersApproveUser = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError,{userId: string;params: UsersApproveUserParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useUsersApproveUser<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof usersApproveUser>>, TError, { userId: string, params: UsersApproveUserParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof usersApproveUser>>,
         TError,
-        {userId: string;params: UsersApproveUserParams},
+        { userId: string, params: UsersApproveUserParams },
         TContext
-      > => {
+      > {
+  const mutationOptions = getUsersApproveUserMutationOptions(options)
 
-      const mutationOptions = getUsersApproveUserMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Загрузить файл в static.
  * @summary Upload File
  */
-export const filesUploadFile = (
-    bodyFilesUploadFile: MaybeRef<BodyFilesUploadFile>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<File>> => {const formData = customFormData(bodyFilesUploadFile)
-    bodyFilesUploadFile = unref(bodyFilesUploadFile);
-    return axios.post(
+export function filesUploadFile(bodyFilesUploadFile: MaybeRef<BodyFilesUploadFile>, options?: AxiosRequestConfig): Promise<AxiosResponse<File>> {
+  const formData = customFormData(bodyFilesUploadFile)
+  bodyFilesUploadFile = unref(bodyFilesUploadFile)
+  return axios.post(
       `/files/upload`,
-      formData,options
-    );
+      formData,
+      options,
+  )
+}
+
+export function getFilesUploadFileMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof filesUploadFile>>, TError, { data: BodyFilesUploadFile }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof filesUploadFile>>, TError, { data: BodyFilesUploadFile }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof filesUploadFile>>, { data: BodyFilesUploadFile }> = (props) => {
+    const { data } = props ?? {}
+
+    return filesUploadFile(data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type FilesUploadFileMutationResult = NonNullable<Awaited<ReturnType<typeof filesUploadFile>>>
+export type FilesUploadFileMutationBody = BodyFilesUploadFile
+export type FilesUploadFileMutationError = AxiosError<void | HTTPValidationError>
 
-export const getFilesUploadFileMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof filesUploadFile>>, TError,{data: BodyFilesUploadFile}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof filesUploadFile>>, TError,{data: BodyFilesUploadFile}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof filesUploadFile>>, {data: BodyFilesUploadFile}> = (props) => {
-          const {data} = props ?? {};
-
-          return  filesUploadFile(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type FilesUploadFileMutationResult = NonNullable<Awaited<ReturnType<typeof filesUploadFile>>>
-    export type FilesUploadFileMutationBody = BodyFilesUploadFile
-    export type FilesUploadFileMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Upload File
  */
-export const useFilesUploadFile = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof filesUploadFile>>, TError,{data: BodyFilesUploadFile}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useFilesUploadFile<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof filesUploadFile>>, TError, { data: BodyFilesUploadFile }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof filesUploadFile>>,
         TError,
-        {data: BodyFilesUploadFile},
+        { data: BodyFilesUploadFile },
         TContext
-      > => {
+      > {
+  const mutationOptions = getFilesUploadFileMutationOptions(options)
 
-      const mutationOptions = getFilesUploadFileMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Получить список всех файлов.
  * @summary Get All Files
  */
-export const filesGetAllFiles = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<File[]>> => {
-    
-    return axios.get(
-      `/files/`,options
-    );
-  }
+export function filesGetAllFiles(options?: AxiosRequestConfig): Promise<AxiosResponse<File[]>> {
+  return axios.get(
+      `/files/`,
+      options,
+  )
+}
 
+export function getFilesGetAllFilesQueryKey() {
+  return ['files'] as const
+}
 
-export const getFilesGetAllFilesQueryKey = () => {
-    return ['files'] as const;
-    }
+export function getFilesGetAllFilesQueryOptions<TData = Awaited<ReturnType<typeof filesGetAllFiles>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetAllFiles>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getFilesGetAllFilesQueryOptions = <TData = Awaited<ReturnType<typeof filesGetAllFiles>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetAllFiles>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getFilesGetAllFilesQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof filesGetAllFiles>>> = ({ signal }) => filesGetAllFiles({ signal, ...axiosOptions })
 
-  const queryKey =  getFilesGetAllFilesQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof filesGetAllFiles>>> = ({ signal }) => filesGetAllFiles({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof filesGetAllFiles>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof filesGetAllFiles>>, TError, TData>
 }
 
 export type FilesGetAllFilesQueryResult = NonNullable<Awaited<ReturnType<typeof filesGetAllFiles>>>
@@ -1998,58 +1722,40 @@ export type FilesGetAllFilesQueryError = AxiosError<void>
 /**
  * @summary Get All Files
  */
-export const useFilesGetAllFiles = <TData = Awaited<ReturnType<typeof filesGetAllFiles>>, TError = AxiosError<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetAllFiles>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useFilesGetAllFiles<TData = Awaited<ReturnType<typeof filesGetAllFiles>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetAllFiles>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getFilesGetAllFilesQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Получить файл по его id.
  * @summary Get File
  */
-export const filesGetFile = (
-    objId: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<File>> => {
-    objId = unref(objId);
-    return axios.get(
-      `/files/${objId}`,options
-    );
-  }
+export function filesGetFile(objId: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<File>> {
+  objId = unref(objId)
+  return axios.get(
+      `/files/${objId}`,
+      options,
+  )
+}
 
+export function getFilesGetFileQueryKey(objId: MaybeRef<string>) {
+  return ['files', objId] as const
+}
 
-export const getFilesGetFileQueryKey = (objId: MaybeRef<string>,) => {
-    return ['files',objId] as const;
-    }
+export function getFilesGetFileQueryOptions<TData = Awaited<ReturnType<typeof filesGetFile>>, TError = AxiosError<void | HTTPValidationError>>(objId: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetFile>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getFilesGetFileQueryOptions = <TData = Awaited<ReturnType<typeof filesGetFile>>, TError = AxiosError<void | HTTPValidationError>>(objId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetFile>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getFilesGetFileQueryKey(objId)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof filesGetFile>>> = ({ signal }) => filesGetFile(objId, { signal, ...axiosOptions })
 
-  const queryKey =  getFilesGetFileQueryKey(objId);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof filesGetFile>>> = ({ signal }) => filesGetFile(objId, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: computed(() => !!(unref(objId))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof filesGetFile>>, TError, TData> 
+  return { queryKey, queryFn, enabled: computed(() => !!(unref(objId))), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof filesGetFile>>, TError, TData>
 }
 
 export type FilesGetFileQueryResult = NonNullable<Awaited<ReturnType<typeof filesGetFile>>>
@@ -2058,169 +1764,123 @@ export type FilesGetFileQueryError = AxiosError<void | HTTPValidationError>
 /**
  * @summary Get File
  */
-export const useFilesGetFile = <TData = Awaited<ReturnType<typeof filesGetFile>>, TError = AxiosError<void | HTTPValidationError>>(
- objId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetFile>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useFilesGetFile<TData = Awaited<ReturnType<typeof filesGetFile>>, TError = AxiosError<void | HTTPValidationError>>(objId: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof filesGetFile>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getFilesGetFileQueryOptions(objId, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getFilesGetFileQueryOptions(objId,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary Delete File
  */
-export const filesDeleteFile = (
-    objId: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<boolean>> => {
-    objId = unref(objId);
-    return axios.delete(
-      `/files/${objId}`,options
-    );
+export function filesDeleteFile(objId: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<boolean>> {
+  objId = unref(objId)
+  return axios.delete(
+      `/files/${objId}`,
+      options,
+  )
+}
+
+export function getFilesDeleteFileMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof filesDeleteFile>>, TError, { objId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof filesDeleteFile>>, TError, { objId: string }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof filesDeleteFile>>, { objId: string }> = (props) => {
+    const { objId } = props ?? {}
+
+    return filesDeleteFile(objId, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type FilesDeleteFileMutationResult = NonNullable<Awaited<ReturnType<typeof filesDeleteFile>>>
 
-export const getFilesDeleteFileMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof filesDeleteFile>>, TError,{objId: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof filesDeleteFile>>, TError,{objId: string}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type FilesDeleteFileMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof filesDeleteFile>>, {objId: string}> = (props) => {
-          const {objId} = props ?? {};
-
-          return  filesDeleteFile(objId,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type FilesDeleteFileMutationResult = NonNullable<Awaited<ReturnType<typeof filesDeleteFile>>>
-    
-    export type FilesDeleteFileMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Delete File
  */
-export const useFilesDeleteFile = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof filesDeleteFile>>, TError,{objId: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useFilesDeleteFile<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof filesDeleteFile>>, TError, { objId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof filesDeleteFile>>,
         TError,
-        {objId: string},
+        { objId: string },
         TContext
-      > => {
+      > {
+  const mutationOptions = getFilesDeleteFileMutationOptions(options)
 
-      const mutationOptions = getFilesDeleteFileMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Обновить файл. В том числе, переместить его в другую директорию или переименовать.
  * @summary Update File
  */
-export const filesUpdateFile = (
-    objId: MaybeRef<string>,
-    updateFile: MaybeRef<UpdateFile>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<File>> => {
-    objId = unref(objId);
-updateFile = unref(updateFile);
-    return axios.patch(
+export function filesUpdateFile(objId: MaybeRef<string>, updateFile: MaybeRef<UpdateFile>, options?: AxiosRequestConfig): Promise<AxiosResponse<File>> {
+  objId = unref(objId)
+  updateFile = unref(updateFile)
+  return axios.patch(
       `/files/${objId}`,
-      updateFile,options
-    );
+      updateFile,
+      options,
+  )
+}
+
+export function getFilesUpdateFileMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof filesUpdateFile>>, TError, { objId: string, data: UpdateFile }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof filesUpdateFile>>, TError, { objId: string, data: UpdateFile }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof filesUpdateFile>>, { objId: string, data: UpdateFile }> = (props) => {
+    const { objId, data } = props ?? {}
+
+    return filesUpdateFile(objId, data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type FilesUpdateFileMutationResult = NonNullable<Awaited<ReturnType<typeof filesUpdateFile>>>
+export type FilesUpdateFileMutationBody = UpdateFile
+export type FilesUpdateFileMutationError = AxiosError<void | HTTPValidationError>
 
-export const getFilesUpdateFileMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof filesUpdateFile>>, TError,{objId: string;data: UpdateFile}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof filesUpdateFile>>, TError,{objId: string;data: UpdateFile}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof filesUpdateFile>>, {objId: string;data: UpdateFile}> = (props) => {
-          const {objId,data} = props ?? {};
-
-          return  filesUpdateFile(objId,data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type FilesUpdateFileMutationResult = NonNullable<Awaited<ReturnType<typeof filesUpdateFile>>>
-    export type FilesUpdateFileMutationBody = UpdateFile
-    export type FilesUpdateFileMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Update File
  */
-export const useFilesUpdateFile = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof filesUpdateFile>>, TError,{objId: string;data: UpdateFile}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useFilesUpdateFile<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof filesUpdateFile>>, TError, { objId: string, data: UpdateFile }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof filesUpdateFile>>,
         TError,
-        {objId: string;data: UpdateFile},
+        { objId: string, data: UpdateFile },
         TContext
-      > => {
+      > {
+  const mutationOptions = getFilesUpdateFileMutationOptions(options)
 
-      const mutationOptions = getFilesUpdateFileMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary Read All
  */
-export const organizationsReadAll = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CompactOrganization[]>> => {
-    
-    return axios.get(
-      `/organizations/`,options
-    );
-  }
+export function organizationsReadAll(options?: AxiosRequestConfig): Promise<AxiosResponse<CompactOrganization[]>> {
+  return axios.get(
+      `/organizations/`,
+      options,
+  )
+}
 
+export function getOrganizationsReadAllQueryKey() {
+  return ['organizations'] as const
+}
 
-export const getOrganizationsReadAllQueryKey = () => {
-    return ['organizations'] as const;
-    }
+export function getOrganizationsReadAllQueryOptions<TData = Awaited<ReturnType<typeof organizationsReadAll>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsReadAll>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getOrganizationsReadAllQueryOptions = <TData = Awaited<ReturnType<typeof organizationsReadAll>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsReadAll>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getOrganizationsReadAllQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsReadAll>>> = ({ signal }) => organizationsReadAll({ signal, ...axiosOptions })
 
-  const queryKey =  getOrganizationsReadAllQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsReadAll>>> = ({ signal }) => organizationsReadAll({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof organizationsReadAll>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof organizationsReadAll>>, TError, TData>
 }
 
 export type OrganizationsReadAllQueryResult = NonNullable<Awaited<ReturnType<typeof organizationsReadAll>>>
@@ -2229,112 +1889,81 @@ export type OrganizationsReadAllQueryError = AxiosError<unknown>
 /**
  * @summary Read All
  */
-export const useOrganizationsReadAll = <TData = Awaited<ReturnType<typeof organizationsReadAll>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsReadAll>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useOrganizationsReadAll<TData = Awaited<ReturnType<typeof organizationsReadAll>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsReadAll>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getOrganizationsReadAllQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary  Create
  */
-export const organizationsCreate = (
-    createOrganization: MaybeRef<CreateOrganization>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Organization>> => {
-    createOrganization = unref(createOrganization);
-    return axios.post(
+export function organizationsCreate(createOrganization: MaybeRef<CreateOrganization>, options?: AxiosRequestConfig): Promise<AxiosResponse<Organization>> {
+  createOrganization = unref(createOrganization)
+  return axios.post(
       `/organizations/`,
-      createOrganization,options
-    );
+      createOrganization,
+      options,
+  )
+}
+
+export function getOrganizationsCreateMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsCreate>>, TError, { data: CreateOrganization }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof organizationsCreate>>, TError, { data: CreateOrganization }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsCreate>>, { data: CreateOrganization }> = (props) => {
+    const { data } = props ?? {}
+
+    return organizationsCreate(data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type OrganizationsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsCreate>>>
+export type OrganizationsCreateMutationBody = CreateOrganization
+export type OrganizationsCreateMutationError = AxiosError<void | HTTPValidationError>
 
-export const getOrganizationsCreateMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsCreate>>, TError,{data: CreateOrganization}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof organizationsCreate>>, TError,{data: CreateOrganization}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsCreate>>, {data: CreateOrganization}> = (props) => {
-          const {data} = props ?? {};
-
-          return  organizationsCreate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type OrganizationsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsCreate>>>
-    export type OrganizationsCreateMutationBody = CreateOrganization
-    export type OrganizationsCreateMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary  Create
  */
-export const useOrganizationsCreate = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsCreate>>, TError,{data: CreateOrganization}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useOrganizationsCreate<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsCreate>>, TError, { data: CreateOrganization }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof organizationsCreate>>,
         TError,
-        {data: CreateOrganization},
+        { data: CreateOrganization },
         TContext
-      > => {
+      > {
+  const mutationOptions = getOrganizationsCreateMutationOptions(options)
 
-      const mutationOptions = getOrganizationsCreateMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary  Read
  */
-export const organizationsRead = (
-    id: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Organization>> => {
-    id = unref(id);
-    return axios.get(
-      `/organizations/${id}`,options
-    );
-  }
+export function organizationsRead(id: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<Organization>> {
+  id = unref(id)
+  return axios.get(
+      `/organizations/${id}`,
+      options,
+  )
+}
 
+export function getOrganizationsReadQueryKey(id: MaybeRef<string>) {
+  return ['organizations', id] as const
+}
 
-export const getOrganizationsReadQueryKey = (id: MaybeRef<string>,) => {
-    return ['organizations',id] as const;
-    }
+export function getOrganizationsReadQueryOptions<TData = Awaited<ReturnType<typeof organizationsRead>>, TError = AxiosError<void | HTTPValidationError>>(id: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsRead>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getOrganizationsReadQueryOptions = <TData = Awaited<ReturnType<typeof organizationsRead>>, TError = AxiosError<void | HTTPValidationError>>(id: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsRead>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getOrganizationsReadQueryKey(id)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsRead>>> = ({ signal }) => organizationsRead(id, { signal, ...axiosOptions })
 
-  const queryKey =  getOrganizationsReadQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsRead>>> = ({ signal }) => organizationsRead(id, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: computed(() => !!(unref(id))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof organizationsRead>>, TError, TData> 
+  return { queryKey, queryFn, enabled: computed(() => !!(unref(id))), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof organizationsRead>>, TError, TData>
 }
 
 export type OrganizationsReadQueryResult = NonNullable<Awaited<ReturnType<typeof organizationsRead>>>
@@ -2343,168 +1972,123 @@ export type OrganizationsReadQueryError = AxiosError<void | HTTPValidationError>
 /**
  * @summary  Read
  */
-export const useOrganizationsRead = <TData = Awaited<ReturnType<typeof organizationsRead>>, TError = AxiosError<void | HTTPValidationError>>(
- id: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsRead>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useOrganizationsRead<TData = Awaited<ReturnType<typeof organizationsRead>>, TError = AxiosError<void | HTTPValidationError>>(id: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsRead>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getOrganizationsReadQueryOptions(id, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getOrganizationsReadQueryOptions(id,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
 
+/**
+ * @summary  Update
+ */
+export function organizationsUpdate(id: MaybeRef<string>, updateOrganization: MaybeRef<UpdateOrganization>, options?: AxiosRequestConfig): Promise<AxiosResponse<Organization>> {
+  id = unref(id)
+  updateOrganization = unref(updateOrganization)
+  return axios.patch(
+      `/organizations/${id}`,
+      updateOrganization,
+      options,
+  )
+}
 
+export function getOrganizationsUpdateMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsUpdate>>, TError, { id: string, data: UpdateOrganization }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof organizationsUpdate>>, TError, { id: string, data: UpdateOrganization }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
 
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsUpdate>>, { id: string, data: UpdateOrganization }> = (props) => {
+    const { id, data } = props ?? {}
+
+    return organizationsUpdate(id, data, axiosOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type OrganizationsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsUpdate>>>
+export type OrganizationsUpdateMutationBody = UpdateOrganization
+export type OrganizationsUpdateMutationError = AxiosError<void | HTTPValidationError>
 
 /**
  * @summary  Update
  */
-export const organizationsUpdate = (
-    id: MaybeRef<string>,
-    updateOrganization: MaybeRef<UpdateOrganization>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Organization>> => {
-    id = unref(id);
-updateOrganization = unref(updateOrganization);
-    return axios.patch(
-      `/organizations/${id}`,
-      updateOrganization,options
-    );
-  }
-
-
-
-export const getOrganizationsUpdateMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsUpdate>>, TError,{id: string;data: UpdateOrganization}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof organizationsUpdate>>, TError,{id: string;data: UpdateOrganization}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsUpdate>>, {id: string;data: UpdateOrganization}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  organizationsUpdate(id,data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type OrganizationsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsUpdate>>>
-    export type OrganizationsUpdateMutationBody = UpdateOrganization
-    export type OrganizationsUpdateMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
- * @summary  Update
- */
-export const useOrganizationsUpdate = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsUpdate>>, TError,{id: string;data: UpdateOrganization}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useOrganizationsUpdate<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsUpdate>>, TError, { id: string, data: UpdateOrganization }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof organizationsUpdate>>,
         TError,
-        {id: string;data: UpdateOrganization},
+        { id: string, data: UpdateOrganization },
         TContext
-      > => {
+      > {
+  const mutationOptions = getOrganizationsUpdateMutationOptions(options)
 
-      const mutationOptions = getOrganizationsUpdateMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary  Delete
  */
-export const organizationsDelete = (
-    id: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<boolean>> => {
-    id = unref(id);
-    return axios.delete(
-      `/organizations/${id}`,options
-    );
+export function organizationsDelete(id: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<boolean>> {
+  id = unref(id)
+  return axios.delete(
+      `/organizations/${id}`,
+      options,
+  )
+}
+
+export function getOrganizationsDeleteMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsDelete>>, TError, { id: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof organizationsDelete>>, TError, { id: string }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsDelete>>, { id: string }> = (props) => {
+    const { id } = props ?? {}
+
+    return organizationsDelete(id, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type OrganizationsDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsDelete>>>
 
-export const getOrganizationsDeleteMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof organizationsDelete>>, TError,{id: string}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type OrganizationsDeleteMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsDelete>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  organizationsDelete(id,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type OrganizationsDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsDelete>>>
-    
-    export type OrganizationsDeleteMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary  Delete
  */
-export const useOrganizationsDelete = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useOrganizationsDelete<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsDelete>>, TError, { id: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof organizationsDelete>>,
         TError,
-        {id: string},
+        { id: string },
         TContext
-      > => {
+      > {
+  const mutationOptions = getOrganizationsDeleteMutationOptions(options)
 
-      const mutationOptions = getOrganizationsDeleteMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary Get By Username
  */
-export const organizationsGetByUsername = (
-    username: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Organization>> => {
-    username = unref(username);
-    return axios.get(
-      `/organizations/by-username/${username}`,options
-    );
-  }
+export function organizationsGetByUsername(username: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<Organization>> {
+  username = unref(username)
+  return axios.get(
+      `/organizations/by-username/${username}`,
+      options,
+  )
+}
 
+export function getOrganizationsGetByUsernameQueryKey(username: MaybeRef<string>) {
+  return ['organizations', 'by-username', username] as const
+}
 
-export const getOrganizationsGetByUsernameQueryKey = (username: MaybeRef<string>,) => {
-    return ['organizations','by-username',username] as const;
-    }
+export function getOrganizationsGetByUsernameQueryOptions<TData = Awaited<ReturnType<typeof organizationsGetByUsername>>, TError = AxiosError<void | HTTPValidationError>>(username: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getOrganizationsGetByUsernameQueryOptions = <TData = Awaited<ReturnType<typeof organizationsGetByUsername>>, TError = AxiosError<void | HTTPValidationError>>(username: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getOrganizationsGetByUsernameQueryKey(username)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsGetByUsername>>> = ({ signal }) => organizationsGetByUsername(username, { signal, ...axiosOptions })
 
-  const queryKey =  getOrganizationsGetByUsernameQueryKey(username);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsGetByUsername>>> = ({ signal }) => organizationsGetByUsername(username, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: computed(() => !!(unref(username))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData> 
+  return { queryKey, queryFn, enabled: computed(() => !!(unref(username))), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData>
 }
 
 export type OrganizationsGetByUsernameQueryResult = NonNullable<Awaited<ReturnType<typeof organizationsGetByUsername>>>
@@ -2513,116 +2097,84 @@ export type OrganizationsGetByUsernameQueryError = AxiosError<void | HTTPValidat
 /**
  * @summary Get By Username
  */
-export const useOrganizationsGetByUsername = <TData = Awaited<ReturnType<typeof organizationsGetByUsername>>, TError = AxiosError<void | HTTPValidationError>>(
- username: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useOrganizationsGetByUsername<TData = Awaited<ReturnType<typeof organizationsGetByUsername>>, TError = AxiosError<void | HTTPValidationError>>(username: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetByUsername>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getOrganizationsGetByUsernameQueryOptions(username, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getOrganizationsGetByUsernameQueryOptions(username,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Оставить отзыв организации
  * @summary Post Review
  */
-export const organizationsPostReview = (
-    organizationId: MaybeRef<string>,
-    postReview: MaybeRef<PostReview>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Review>> => {
-    organizationId = unref(organizationId);
-postReview = unref(postReview);
-    return axios.post(
+export function organizationsPostReview(organizationId: MaybeRef<string>, postReview: MaybeRef<PostReview>, options?: AxiosRequestConfig): Promise<AxiosResponse<Review>> {
+  organizationId = unref(organizationId)
+  postReview = unref(postReview)
+  return axios.post(
       `/organizations/${organizationId}/reviews/`,
-      postReview,options
-    );
+      postReview,
+      options,
+  )
+}
+
+export function getOrganizationsPostReviewMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError, { organizationId: string, data: PostReview }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError, { organizationId: string, data: PostReview }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsPostReview>>, { organizationId: string, data: PostReview }> = (props) => {
+    const { organizationId, data } = props ?? {}
+
+    return organizationsPostReview(organizationId, data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type OrganizationsPostReviewMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsPostReview>>>
+export type OrganizationsPostReviewMutationBody = PostReview
+export type OrganizationsPostReviewMutationError = AxiosError<void | HTTPValidationError>
 
-export const getOrganizationsPostReviewMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError,{organizationId: string;data: PostReview}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError,{organizationId: string;data: PostReview}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsPostReview>>, {organizationId: string;data: PostReview}> = (props) => {
-          const {organizationId,data} = props ?? {};
-
-          return  organizationsPostReview(organizationId,data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type OrganizationsPostReviewMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsPostReview>>>
-    export type OrganizationsPostReviewMutationBody = PostReview
-    export type OrganizationsPostReviewMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Post Review
  */
-export const useOrganizationsPostReview = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError,{organizationId: string;data: PostReview}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useOrganizationsPostReview<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError, { organizationId: string, data: PostReview }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof organizationsPostReview>>,
         TError,
-        {organizationId: string;data: PostReview},
+        { organizationId: string, data: PostReview },
         TContext
-      > => {
+      > {
+  const mutationOptions = getOrganizationsPostReviewMutationOptions(options)
 
-      const mutationOptions = getOrganizationsPostReviewMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Получить отзывы об организации
  * @summary Get Reviews
  */
-export const organizationsGetReviews = (
-    organizationId: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<AnonymousReview[]>> => {
-    organizationId = unref(organizationId);
-    return axios.get(
-      `/organizations/${organizationId}/reviews/`,options
-    );
-  }
+export function organizationsGetReviews(organizationId: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<AnonymousReview[]>> {
+  organizationId = unref(organizationId)
+  return axios.get(
+      `/organizations/${organizationId}/reviews/`,
+      options,
+  )
+}
 
+export function getOrganizationsGetReviewsQueryKey(organizationId: MaybeRef<string>) {
+  return ['organizations', organizationId, 'reviews'] as const
+}
 
-export const getOrganizationsGetReviewsQueryKey = (organizationId: MaybeRef<string>,) => {
-    return ['organizations',organizationId,'reviews'] as const;
-    }
+export function getOrganizationsGetReviewsQueryOptions<TData = Awaited<ReturnType<typeof organizationsGetReviews>>, TError = AxiosError<void | HTTPValidationError>>(organizationId: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getOrganizationsGetReviewsQueryOptions = <TData = Awaited<ReturnType<typeof organizationsGetReviews>>, TError = AxiosError<void | HTTPValidationError>>(organizationId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getOrganizationsGetReviewsQueryKey(organizationId)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsGetReviews>>> = ({ signal }) => organizationsGetReviews(organizationId, { signal, ...axiosOptions })
 
-  const queryKey =  getOrganizationsGetReviewsQueryKey(organizationId);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsGetReviews>>> = ({ signal }) => organizationsGetReviews(organizationId, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: computed(() => !!(unref(organizationId))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData> 
+  return { queryKey, queryFn, enabled: computed(() => !!(unref(organizationId))), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData>
 }
 
 export type OrganizationsGetReviewsQueryResult = NonNullable<Awaited<ReturnType<typeof organizationsGetReviews>>>
@@ -2631,173 +2183,126 @@ export type OrganizationsGetReviewsQueryError = AxiosError<void | HTTPValidation
 /**
  * @summary Get Reviews
  */
-export const useOrganizationsGetReviews = <TData = Awaited<ReturnType<typeof organizationsGetReviews>>, TError = AxiosError<void | HTTPValidationError>>(
- organizationId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useOrganizationsGetReviews<TData = Awaited<ReturnType<typeof organizationsGetReviews>>, TError = AxiosError<void | HTTPValidationError>>(organizationId: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getOrganizationsGetReviewsQueryOptions(organizationId, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getOrganizationsGetReviewsQueryOptions(organizationId,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
 
-
-
-
 /**
  * Импортировать организации из JSON дампа (результат скрипта `parse_organizations.py`)
  * @summary Import Organizations
  */
-export const organizationsImportOrganizations = (
-    bodyOrganizationsImportOrganizations: MaybeRef<BodyOrganizationsImportOrganizations>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<string[]>> => {const formData = new FormData();
-formData.append('upload_file_obj', bodyOrganizationsImportOrganizations.upload_file_obj)
-
-    bodyOrganizationsImportOrganizations = unref(bodyOrganizationsImportOrganizations);
-    return axios.post(
+export function organizationsImportOrganizations(bodyOrganizationsImportOrganizations: MaybeRef<BodyOrganizationsImportOrganizations>, options?: AxiosRequestConfig): Promise<AxiosResponse<string[]>> {
+  const formData = customFormData(bodyOrganizationsImportOrganizations)
+  bodyOrganizationsImportOrganizations = unref(bodyOrganizationsImportOrganizations)
+  return axios.post(
       `/organizations/import`,
-      formData,options
-    );
+      formData,
+      options,
+  )
+}
+
+export function getOrganizationsImportOrganizationsMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError, { data: BodyOrganizationsImportOrganizations }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError, { data: BodyOrganizationsImportOrganizations }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsImportOrganizations>>, { data: BodyOrganizationsImportOrganizations }> = (props) => {
+    const { data } = props ?? {}
+
+    return organizationsImportOrganizations(data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type OrganizationsImportOrganizationsMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsImportOrganizations>>>
+export type OrganizationsImportOrganizationsMutationBody = BodyOrganizationsImportOrganizations
+export type OrganizationsImportOrganizationsMutationError = AxiosError<void | HTTPValidationError>
 
-export const getOrganizationsImportOrganizationsMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError,{data: BodyOrganizationsImportOrganizations}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError,{data: BodyOrganizationsImportOrganizations}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsImportOrganizations>>, {data: BodyOrganizationsImportOrganizations}> = (props) => {
-          const {data} = props ?? {};
-
-          return  organizationsImportOrganizations(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type OrganizationsImportOrganizationsMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsImportOrganizations>>>
-    export type OrganizationsImportOrganizationsMutationBody = BodyOrganizationsImportOrganizations
-    export type OrganizationsImportOrganizationsMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Import Organizations
  */
-export const useOrganizationsImportOrganizations = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError,{data: BodyOrganizationsImportOrganizations}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useOrganizationsImportOrganizations<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsImportOrganizations>>, TError, { data: BodyOrganizationsImportOrganizations }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof organizationsImportOrganizations>>,
         TError,
-        {data: BodyOrganizationsImportOrganizations},
+        { data: BodyOrganizationsImportOrganizations },
         TContext
-      > => {
+      > {
+  const mutationOptions = getOrganizationsImportOrganizationsMutationOptions(options)
 
-      const mutationOptions = getOrganizationsImportOrganizationsMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Импортировать организации из JSON дампа (результат скрипта `parse_organizations.py`)
  * @summary Import Specific Organization
  */
-export const organizationsImportSpecificOrganization = (
-    organizationId: MaybeRef<string>,
-    certificateOut: MaybeRef<CertificateOut>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<OrganizationsImportSpecificOrganization201>> => {
-    organizationId = unref(organizationId);
-certificateOut = unref(certificateOut);
-    return axios.post(
+export function organizationsImportSpecificOrganization(organizationId: MaybeRef<string>, certificateOut: MaybeRef<CertificateOut>, options?: AxiosRequestConfig): Promise<AxiosResponse<OrganizationsImportSpecificOrganization201>> {
+  organizationId = unref(organizationId)
+  certificateOut = unref(certificateOut)
+  return axios.post(
       `/organizations/import/${organizationId}`,
-      certificateOut,options
-    );
+      certificateOut,
+      options,
+  )
+}
+
+export function getOrganizationsImportSpecificOrganizationMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError, { organizationId: string, data: CertificateOut }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError, { organizationId: string, data: CertificateOut }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, { organizationId: string, data: CertificateOut }> = (props) => {
+    const { organizationId, data } = props ?? {}
+
+    return organizationsImportSpecificOrganization(organizationId, data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type OrganizationsImportSpecificOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>>
+export type OrganizationsImportSpecificOrganizationMutationBody = CertificateOut
+export type OrganizationsImportSpecificOrganizationMutationError = AxiosError<void | HTTPValidationError>
 
-export const getOrganizationsImportSpecificOrganizationMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError,{organizationId: string;data: CertificateOut}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError,{organizationId: string;data: CertificateOut}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, {organizationId: string;data: CertificateOut}> = (props) => {
-          const {organizationId,data} = props ?? {};
-
-          return  organizationsImportSpecificOrganization(organizationId,data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type OrganizationsImportSpecificOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>>
-    export type OrganizationsImportSpecificOrganizationMutationBody = CertificateOut
-    export type OrganizationsImportSpecificOrganizationMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Import Specific Organization
  */
-export const useOrganizationsImportSpecificOrganization = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError,{organizationId: string;data: CertificateOut}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useOrganizationsImportSpecificOrganization<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError, { organizationId: string, data: CertificateOut }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>,
         TError,
-        {organizationId: string;data: CertificateOut},
+        { organizationId: string, data: CertificateOut },
         TContext
-      > => {
+      > {
+  const mutationOptions = getOrganizationsImportSpecificOrganizationMutationOptions(options)
 
-      const mutationOptions = getOrganizationsImportSpecificOrganizationMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary Read All
  */
-export const scenesReadAll = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Scene[]>> => {
-    
-    return axios.get(
-      `/scenes/`,options
-    );
-  }
+export function scenesReadAll(options?: AxiosRequestConfig): Promise<AxiosResponse<Scene[]>> {
+  return axios.get(
+      `/scenes/`,
+      options,
+  )
+}
 
+export function getScenesReadAllQueryKey() {
+  return ['scenes'] as const
+}
 
-export const getScenesReadAllQueryKey = () => {
-    return ['scenes'] as const;
-    }
+export function getScenesReadAllQueryOptions<TData = Awaited<ReturnType<typeof scenesReadAll>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesReadAll>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getScenesReadAllQueryOptions = <TData = Awaited<ReturnType<typeof scenesReadAll>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesReadAll>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getScenesReadAllQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof scenesReadAll>>> = ({ signal }) => scenesReadAll({ signal, ...axiosOptions })
 
-  const queryKey =  getScenesReadAllQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof scenesReadAll>>> = ({ signal }) => scenesReadAll({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scenesReadAll>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof scenesReadAll>>, TError, TData>
 }
 
 export type ScenesReadAllQueryResult = NonNullable<Awaited<ReturnType<typeof scenesReadAll>>>
@@ -2806,112 +2311,81 @@ export type ScenesReadAllQueryError = AxiosError<unknown>
 /**
  * @summary Read All
  */
-export const useScenesReadAll = <TData = Awaited<ReturnType<typeof scenesReadAll>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesReadAll>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useScenesReadAll<TData = Awaited<ReturnType<typeof scenesReadAll>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesReadAll>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getScenesReadAllQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * @summary  Create
  */
-export const scenesCreate = (
-    createScene: MaybeRef<CreateScene>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Scene>> => {
-    createScene = unref(createScene);
-    return axios.post(
+export function scenesCreate(createScene: MaybeRef<CreateScene>, options?: AxiosRequestConfig): Promise<AxiosResponse<Scene>> {
+  createScene = unref(createScene)
+  return axios.post(
       `/scenes/`,
-      createScene,options
-    );
+      createScene,
+      options,
+  )
+}
+
+export function getScenesCreateMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof scenesCreate>>, TError, { data: CreateScene }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof scenesCreate>>, TError, { data: CreateScene }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof scenesCreate>>, { data: CreateScene }> = (props) => {
+    const { data } = props ?? {}
+
+    return scenesCreate(data, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ScenesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof scenesCreate>>>
+export type ScenesCreateMutationBody = CreateScene
+export type ScenesCreateMutationError = AxiosError<void | HTTPValidationError>
 
-export const getScenesCreateMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scenesCreate>>, TError,{data: CreateScene}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof scenesCreate>>, TError,{data: CreateScene}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scenesCreate>>, {data: CreateScene}> = (props) => {
-          const {data} = props ?? {};
-
-          return  scenesCreate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ScenesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof scenesCreate>>>
-    export type ScenesCreateMutationBody = CreateScene
-    export type ScenesCreateMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary  Create
  */
-export const useScenesCreate = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scenesCreate>>, TError,{data: CreateScene}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useScenesCreate<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof scenesCreate>>, TError, { data: CreateScene }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof scenesCreate>>,
         TError,
-        {data: CreateScene},
+        { data: CreateScene },
         TContext
-      > => {
+      > {
+  const mutationOptions = getScenesCreateMutationOptions(options)
 
-      const mutationOptions = getScenesCreateMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary  Read
  */
-export const scenesRead = (
-    id: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Scene>> => {
-    id = unref(id);
-    return axios.get(
-      `/scenes/${id}`,options
-    );
-  }
+export function scenesRead(id: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<Scene>> {
+  id = unref(id)
+  return axios.get(
+      `/scenes/${id}`,
+      options,
+  )
+}
 
+export function getScenesReadQueryKey(id: MaybeRef<string>) {
+  return ['scenes', id] as const
+}
 
-export const getScenesReadQueryKey = (id: MaybeRef<string>,) => {
-    return ['scenes',id] as const;
-    }
+export function getScenesReadQueryOptions<TData = Awaited<ReturnType<typeof scenesRead>>, TError = AxiosError<void | HTTPValidationError>>(id: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesRead>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getScenesReadQueryOptions = <TData = Awaited<ReturnType<typeof scenesRead>>, TError = AxiosError<void | HTTPValidationError>>(id: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesRead>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getScenesReadQueryKey(id)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof scenesRead>>> = ({ signal }) => scenesRead(id, { signal, ...axiosOptions })
 
-  const queryKey =  getScenesReadQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof scenesRead>>> = ({ signal }) => scenesRead(id, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: computed(() => !!(unref(id))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scenesRead>>, TError, TData> 
+  return { queryKey, queryFn, enabled: computed(() => !!(unref(id))), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof scenesRead>>, TError, TData>
 }
 
 export type ScenesReadQueryResult = NonNullable<Awaited<ReturnType<typeof scenesRead>>>
@@ -2920,169 +2394,124 @@ export type ScenesReadQueryError = AxiosError<void | HTTPValidationError>
 /**
  * @summary  Read
  */
-export const useScenesRead = <TData = Awaited<ReturnType<typeof scenesRead>>, TError = AxiosError<void | HTTPValidationError>>(
- id: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesRead>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useScenesRead<TData = Awaited<ReturnType<typeof scenesRead>>, TError = AxiosError<void | HTTPValidationError>>(id: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesRead>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getScenesReadQueryOptions(id, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getScenesReadQueryOptions(id,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
 
+/**
+ * @summary  Update
+ */
+export function scenesUpdate(id: MaybeRef<string>, updateScene: MaybeRef<UpdateScene>, options?: AxiosRequestConfig): Promise<AxiosResponse<Scene>> {
+  id = unref(id)
+  updateScene = unref(updateScene)
+  return axios.patch(
+      `/scenes/${id}`,
+      updateScene,
+      options,
+  )
+}
 
+export function getScenesUpdateMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof scenesUpdate>>, TError, { id: string, data: UpdateScene }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof scenesUpdate>>, TError, { id: string, data: UpdateScene }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
 
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof scenesUpdate>>, { id: string, data: UpdateScene }> = (props) => {
+    const { id, data } = props ?? {}
+
+    return scenesUpdate(id, data, axiosOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type ScenesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof scenesUpdate>>>
+export type ScenesUpdateMutationBody = UpdateScene
+export type ScenesUpdateMutationError = AxiosError<void | HTTPValidationError>
 
 /**
  * @summary  Update
  */
-export const scenesUpdate = (
-    id: MaybeRef<string>,
-    updateScene: MaybeRef<UpdateScene>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Scene>> => {
-    id = unref(id);
-updateScene = unref(updateScene);
-    return axios.patch(
-      `/scenes/${id}`,
-      updateScene,options
-    );
-  }
-
-
-
-export const getScenesUpdateMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scenesUpdate>>, TError,{id: string;data: UpdateScene}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof scenesUpdate>>, TError,{id: string;data: UpdateScene}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scenesUpdate>>, {id: string;data: UpdateScene}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  scenesUpdate(id,data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ScenesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof scenesUpdate>>>
-    export type ScenesUpdateMutationBody = UpdateScene
-    export type ScenesUpdateMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
- * @summary  Update
- */
-export const useScenesUpdate = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scenesUpdate>>, TError,{id: string;data: UpdateScene}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useScenesUpdate<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof scenesUpdate>>, TError, { id: string, data: UpdateScene }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof scenesUpdate>>,
         TError,
-        {id: string;data: UpdateScene},
+        { id: string, data: UpdateScene },
         TContext
-      > => {
+      > {
+  const mutationOptions = getScenesUpdateMutationOptions(options)
 
-      const mutationOptions = getScenesUpdateMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * @summary  Delete
  */
-export const scenesDelete = (
-    id: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<boolean>> => {
-    id = unref(id);
-    return axios.delete(
-      `/scenes/${id}`,options
-    );
+export function scenesDelete(id: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<boolean>> {
+  id = unref(id)
+  return axios.delete(
+      `/scenes/${id}`,
+      options,
+  )
+}
+
+export function getScenesDeleteMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof scenesDelete>>, TError, { id: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof scenesDelete>>, TError, { id: string }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof scenesDelete>>, { id: string }> = (props) => {
+    const { id } = props ?? {}
+
+    return scenesDelete(id, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ScenesDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof scenesDelete>>>
 
-export const getScenesDeleteMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scenesDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof scenesDelete>>, TError,{id: string}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type ScenesDeleteMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scenesDelete>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  scenesDelete(id,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ScenesDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof scenesDelete>>>
-    
-    export type ScenesDeleteMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary  Delete
  */
-export const useScenesDelete = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scenesDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useScenesDelete<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof scenesDelete>>, TError, { id: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof scenesDelete>>,
         TError,
-        {id: string},
+        { id: string },
         TContext
-      > => {
+      > {
+  const mutationOptions = getScenesDeleteMutationOptions(options)
 
-      const mutationOptions = getScenesDeleteMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Получить сцены организации
  * @summary Get Scenes For Organization
  */
-export const scenesGetScenesForOrganization = (
-    id: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Scene[]>> => {
-    id = unref(id);
-    return axios.get(
-      `/scenes/for-organization/${id}`,options
-    );
-  }
+export function scenesGetScenesForOrganization(id: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<Scene[]>> {
+  id = unref(id)
+  return axios.get(
+      `/scenes/for-organization/${id}`,
+      options,
+  )
+}
 
+export function getScenesGetScenesForOrganizationQueryKey(id: MaybeRef<string>) {
+  return ['scenes', 'for-organization', id] as const
+}
 
-export const getScenesGetScenesForOrganizationQueryKey = (id: MaybeRef<string>,) => {
-    return ['scenes','for-organization',id] as const;
-    }
+export function getScenesGetScenesForOrganizationQueryOptions<TData = Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError = AxiosError<HTTPValidationError>>(id: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getScenesGetScenesForOrganizationQueryOptions = <TData = Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError = AxiosError<HTTPValidationError>>(id: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getScenesGetScenesForOrganizationQueryKey(id)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>> = ({ signal }) => scenesGetScenesForOrganization(id, { signal, ...axiosOptions })
 
-  const queryKey =  getScenesGetScenesForOrganizationQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>> = ({ signal }) => scenesGetScenesForOrganization(id, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: computed(() => !!(unref(id))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError, TData> 
+  return { queryKey, queryFn, enabled: computed(() => !!(unref(id))), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError, TData>
 }
 
 export type ScenesGetScenesForOrganizationQueryResult = NonNullable<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>>
@@ -3091,342 +2520,264 @@ export type ScenesGetScenesForOrganizationQueryError = AxiosError<HTTPValidation
 /**
  * @summary Get Scenes For Organization
  */
-export const useScenesGetScenesForOrganization = <TData = Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError = AxiosError<HTTPValidationError>>(
- id: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useScenesGetScenesForOrganization<TData = Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError = AxiosError<HTTPValidationError>>(id: MaybeRef<string>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof scenesGetScenesForOrganization>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getScenesGetScenesForOrganizationQueryOptions(id, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getScenesGetScenesForOrganizationQueryOptions(id,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Обновить своё место в очереди абитуриентов
  * @summary Update Queue
  */
-export const chattingUpdateQueue = (
-    organizationId: MaybeRef<string>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ChattingUpdateQueue200>> => {
-    organizationId = unref(organizationId);
-    return axios.post(
-      `/chatting/chat-queue/update-enrollee-queue/${organizationId}`,undefined,options
-    );
+export function chattingUpdateQueue(organizationId: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<ChattingUpdateQueue200>> {
+  organizationId = unref(organizationId)
+  return axios.post(
+      `/chatting/chat-queue/update-enrollee-queue/${organizationId}`,
+      undefined,
+      options,
+  )
+}
+
+export function getChattingUpdateQueueMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError, { organizationId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError, { organizationId: string }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingUpdateQueue>>, { organizationId: string }> = (props) => {
+    const { organizationId } = props ?? {}
+
+    return chattingUpdateQueue(organizationId, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ChattingUpdateQueueMutationResult = NonNullable<Awaited<ReturnType<typeof chattingUpdateQueue>>>
 
-export const getChattingUpdateQueueMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError,{organizationId: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError,{organizationId: string}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type ChattingUpdateQueueMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingUpdateQueue>>, {organizationId: string}> = (props) => {
-          const {organizationId} = props ?? {};
-
-          return  chattingUpdateQueue(organizationId,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChattingUpdateQueueMutationResult = NonNullable<Awaited<ReturnType<typeof chattingUpdateQueue>>>
-    
-    export type ChattingUpdateQueueMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Update Queue
  */
-export const useChattingUpdateQueue = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError,{organizationId: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useChattingUpdateQueue<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateQueue>>, TError, { organizationId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof chattingUpdateQueue>>,
         TError,
-        {organizationId: string},
+        { organizationId: string },
         TContext
-      > => {
+      > {
+  const mutationOptions = getChattingUpdateQueueMutationOptions(options)
 
-      const mutationOptions = getChattingUpdateQueueMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Обновить своё место в очереди студентов
  * @summary Update Students Queue
  */
-export const chattingUpdateStudentsQueue = (
-    params: MaybeRef<ChattingUpdateStudentsQueueParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ChattingUpdateStudentsQueue200>> => {
-    params = unref(params);
-    return axios.post(
-      `/chatting/chat-queue/update-students-queue`,undefined,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
+export function chattingUpdateStudentsQueue(organizationId: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<ChattingUpdateStudentsQueue200>> {
+  organizationId = unref(organizationId)
+  return axios.post(
+      `/chatting/chat-queue/update-students-queue/${organizationId}`,
+      undefined,
+      options,
+  )
+}
+
+export function getChattingUpdateStudentsQueueMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError, { organizationId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError, { organizationId: string }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, { organizationId: string }> = (props) => {
+    const { organizationId } = props ?? {}
+
+    return chattingUpdateStudentsQueue(organizationId, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ChattingUpdateStudentsQueueMutationResult = NonNullable<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>>
 
-export const getChattingUpdateStudentsQueueMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError,{params: ChattingUpdateStudentsQueueParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError,{params: ChattingUpdateStudentsQueueParams}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type ChattingUpdateStudentsQueueMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, {params: ChattingUpdateStudentsQueueParams}> = (props) => {
-          const {params} = props ?? {};
-
-          return  chattingUpdateStudentsQueue(params,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChattingUpdateStudentsQueueMutationResult = NonNullable<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>>
-    
-    export type ChattingUpdateStudentsQueueMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Update Students Queue
  */
-export const useChattingUpdateStudentsQueue = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError,{params: ChattingUpdateStudentsQueueParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useChattingUpdateStudentsQueue<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>, TError, { organizationId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof chattingUpdateStudentsQueue>>,
         TError,
-        {params: ChattingUpdateStudentsQueueParams},
+        { organizationId: string },
         TContext
-      > => {
+      > {
+  const mutationOptions = getChattingUpdateStudentsQueueMutationOptions(options)
 
-      const mutationOptions = getChattingUpdateStudentsQueueMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
- * Присоединиться к диалогу
- * @summary Join Dialog
+ * Покинуть очередь
+ * @summary Leave Queue
  */
-export const chattingJoinDialog = (
-    bodyChattingJoinDialog: MaybeRef<BodyChattingJoinDialog>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Dialog>> => {
-    bodyChattingJoinDialog = unref(bodyChattingJoinDialog);
-    return axios.post(
-      `/chatting/dialogs/join-dialog`,
-      bodyChattingJoinDialog,options
-    );
+export function chattingLeaveQueue(organizationId: MaybeRef<string>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  organizationId = unref(organizationId)
+  return axios.post(
+      `/chatting/chat-queue/leave-queue/${organizationId}`,
+      undefined,
+      options,
+  )
+}
+
+export function getChattingLeaveQueueMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveQueue>>, TError, { organizationId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveQueue>>, TError, { organizationId: string }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingLeaveQueue>>, { organizationId: string }> = (props) => {
+    const { organizationId } = props ?? {}
+
+    return chattingLeaveQueue(organizationId, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ChattingLeaveQueueMutationResult = NonNullable<Awaited<ReturnType<typeof chattingLeaveQueue>>>
 
-export const getChattingJoinDialogMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingJoinDialog>>, TError,{data: BodyChattingJoinDialog}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof chattingJoinDialog>>, TError,{data: BodyChattingJoinDialog}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type ChattingLeaveQueueMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingJoinDialog>>, {data: BodyChattingJoinDialog}> = (props) => {
-          const {data} = props ?? {};
-
-          return  chattingJoinDialog(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChattingJoinDialogMutationResult = NonNullable<Awaited<ReturnType<typeof chattingJoinDialog>>>
-    export type ChattingJoinDialogMutationBody = BodyChattingJoinDialog
-    export type ChattingJoinDialogMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
- * @summary Join Dialog
+/**
+ * @summary Leave Queue
  */
-export const useChattingJoinDialog = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingJoinDialog>>, TError,{data: BodyChattingJoinDialog}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
-        Awaited<ReturnType<typeof chattingJoinDialog>>,
+export function useChattingLeaveQueue<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveQueue>>, TError, { organizationId: string }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
+        Awaited<ReturnType<typeof chattingLeaveQueue>>,
         TError,
-        {data: BodyChattingJoinDialog},
+        { organizationId: string },
         TContext
-      > => {
+      > {
+  const mutationOptions = getChattingLeaveQueueMutationOptions(options)
 
-      const mutationOptions = getChattingJoinDialogMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Покинуть диалог
  * @summary Leave Dialog
  */
-export const chattingLeaveDialog = (
-    params: MaybeRef<ChattingLeaveDialogParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    params = unref(params);
-    return axios.post(
-      `/chatting/dialogs/leave-dialog`,undefined,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
+export function chattingLeaveDialog(params: MaybeRef<ChattingLeaveDialogParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  params = unref(params)
+  return axios.post(
+      `/chatting/dialogs/leave-dialog`,
+      undefined,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
+
+export function getChattingLeaveDialogMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError, { params: ChattingLeaveDialogParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError, { params: ChattingLeaveDialogParams }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingLeaveDialog>>, { params: ChattingLeaveDialogParams }> = (props) => {
+    const { params } = props ?? {}
+
+    return chattingLeaveDialog(params, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ChattingLeaveDialogMutationResult = NonNullable<Awaited<ReturnType<typeof chattingLeaveDialog>>>
 
-export const getChattingLeaveDialogMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError,{params: ChattingLeaveDialogParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError,{params: ChattingLeaveDialogParams}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type ChattingLeaveDialogMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingLeaveDialog>>, {params: ChattingLeaveDialogParams}> = (props) => {
-          const {params} = props ?? {};
-
-          return  chattingLeaveDialog(params,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChattingLeaveDialogMutationResult = NonNullable<Awaited<ReturnType<typeof chattingLeaveDialog>>>
-    
-    export type ChattingLeaveDialogMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Leave Dialog
  */
-export const useChattingLeaveDialog = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError,{params: ChattingLeaveDialogParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useChattingLeaveDialog<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingLeaveDialog>>, TError, { params: ChattingLeaveDialogParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof chattingLeaveDialog>>,
         TError,
-        {params: ChattingLeaveDialogParams},
+        { params: ChattingLeaveDialogParams },
         TContext
-      > => {
+      > {
+  const mutationOptions = getChattingLeaveDialogMutationOptions(options)
 
-      const mutationOptions = getChattingLeaveDialogMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Отправить сообщение в диалог
  * @summary Push Message
  */
-export const chattingPushMessage = (
-    params: MaybeRef<ChattingPushMessageParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<unknown>> => {
-    params = unref(params);
-    return axios.post(
-      `/chatting/dialogs/push-message`,undefined,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
+export function chattingPushMessage(params: MaybeRef<ChattingPushMessageParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
+  params = unref(params)
+  return axios.post(
+      `/chatting/dialogs/push-message`,
+      undefined,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
+
+export function getChattingPushMessageMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError, { params: ChattingPushMessageParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError, { params: ChattingPushMessageParams }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingPushMessage>>, { params: ChattingPushMessageParams }> = (props) => {
+    const { params } = props ?? {}
+
+    return chattingPushMessage(params, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ChattingPushMessageMutationResult = NonNullable<Awaited<ReturnType<typeof chattingPushMessage>>>
 
-export const getChattingPushMessageMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError,{params: ChattingPushMessageParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError,{params: ChattingPushMessageParams}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type ChattingPushMessageMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chattingPushMessage>>, {params: ChattingPushMessageParams}> = (props) => {
-          const {params} = props ?? {};
-
-          return  chattingPushMessage(params,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChattingPushMessageMutationResult = NonNullable<Awaited<ReturnType<typeof chattingPushMessage>>>
-    
-    export type ChattingPushMessageMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Push Message
  */
-export const useChattingPushMessage = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError,{params: ChattingPushMessageParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useChattingPushMessage<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof chattingPushMessage>>, TError, { params: ChattingPushMessageParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof chattingPushMessage>>,
         TError,
-        {params: ChattingPushMessageParams},
+        { params: ChattingPushMessageParams },
         TContext
-      > => {
+      > {
+  const mutationOptions = getChattingPushMessageMutationOptions(options)
 
-      const mutationOptions = getChattingPushMessageMutationOptions(options);
+  return useMutation(mutationOptions)
+}
 
-      return useMutation(mutationOptions);
-    }
-    
 /**
  * Получить диалог
  * @summary Get Dialog
  */
-export const chattingGetDialog = (
-    params: MaybeRef<ChattingGetDialogParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Dialog>> => {
-    params = unref(params);
-    return axios.get(
-      `/chatting/dialogs/get-dialog`,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
-  }
+export function chattingGetDialog(params: MaybeRef<ChattingGetDialogParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<Dialog>> {
+  params = unref(params)
+  return axios.get(
+      `/chatting/dialogs/get-dialog`,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
 
+export function getChattingGetDialogQueryKey(params: MaybeRef<ChattingGetDialogParams>) {
+  return ['chatting', 'dialogs', 'get-dialog', ...(params ? [params] : [])] as const
+}
 
-export const getChattingGetDialogQueryKey = (params: MaybeRef<ChattingGetDialogParams>,) => {
-    return ['chatting','dialogs','get-dialog', ...(params ? [params]: [])] as const;
-    }
+export function getChattingGetDialogQueryOptions<TData = Awaited<ReturnType<typeof chattingGetDialog>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ChattingGetDialogParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getChattingGetDialogQueryOptions = <TData = Awaited<ReturnType<typeof chattingGetDialog>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ChattingGetDialogParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getChattingGetDialogQueryKey(params)
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof chattingGetDialog>>> = ({ signal }) => chattingGetDialog(params, { signal, ...axiosOptions })
 
-  const queryKey =  getChattingGetDialogQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chattingGetDialog>>> = ({ signal }) => chattingGetDialog(params, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData>
 }
 
 export type ChattingGetDialogQueryResult = NonNullable<Awaited<ReturnType<typeof chattingGetDialog>>>
@@ -3435,58 +2786,39 @@ export type ChattingGetDialogQueryError = AxiosError<void | HTTPValidationError>
 /**
  * @summary Get Dialog
  */
-export const useChattingGetDialog = <TData = Awaited<ReturnType<typeof chattingGetDialog>>, TError = AxiosError<void | HTTPValidationError>>(
- params: MaybeRef<ChattingGetDialogParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useChattingGetDialog<TData = Awaited<ReturnType<typeof chattingGetDialog>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ChattingGetDialogParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetDialog>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getChattingGetDialogQueryOptions(params, options)
 
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  const queryOptions = getChattingGetDialogQueryOptions(params,options)
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
-
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Получить мои диалоги
  * @summary Get My Dialogs
  */
-export const chattingGetMyDialogs = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<Dialog[]>> => {
-    
-    return axios.get(
-      `/chatting/dialogs/get-my-dialogs`,options
-    );
-  }
+export function chattingGetMyDialogs(options?: AxiosRequestConfig): Promise<AxiosResponse<Dialog[]>> {
+  return axios.get(
+      `/chatting/dialogs/get-my-dialogs`,
+      options,
+  )
+}
 
+export function getChattingGetMyDialogsQueryKey() {
+  return ['chatting', 'dialogs', 'get-my-dialogs'] as const
+}
 
-export const getChattingGetMyDialogsQueryKey = () => {
-    return ['chatting','dialogs','get-my-dialogs'] as const;
-    }
+export function getChattingGetMyDialogsQueryOptions<TData = Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData>>, axios?: AxiosRequestConfig }) {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {}
 
-    
-export const getChattingGetMyDialogsQueryOptions = <TData = Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+  const queryKey = getChattingGetMyDialogsQueryKey()
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof chattingGetMyDialogs>>> = ({ signal }) => chattingGetMyDialogs({ signal, ...axiosOptions })
 
-  const queryKey =  getChattingGetMyDialogsQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chattingGetMyDialogs>>> = ({ signal }) => chattingGetMyDialogs({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData> 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData>
 }
 
 export type ChattingGetMyDialogsQueryResult = NonNullable<Awaited<ReturnType<typeof chattingGetMyDialogs>>>
@@ -3495,79 +2827,59 @@ export type ChattingGetMyDialogsQueryError = AxiosError<void>
 /**
  * @summary Get My Dialogs
  */
-export const useChattingGetMyDialogs = <TData = Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError = AxiosError<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData>>, axios?: AxiosRequestConfig}
-
-  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
-
+export function useChattingGetMyDialogs<TData = Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError = AxiosError<void>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof chattingGetMyDialogs>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getChattingGetMyDialogsQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
 
-  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+  query.queryKey = unref(queryOptions).queryKey as QueryKey
 
-  return query;
+  return query
 }
-
-
-
 
 /**
  * Поставить лайк/дизлайк отзыву, возвращает True если лайк поставлен, False если убран или 404 если отзыв не найден
  * @summary Like Review
  */
-export const reviewsLikeReview = (
-    reviewId: MaybeRef<string>,
-    params?: MaybeRef<ReviewsLikeReviewParams>, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<boolean>> => {
-    reviewId = unref(reviewId);
-params = unref(params);
-    return axios.post(
-      `/reviews/${reviewId}/like`,undefined,{
-    ...options,
-        params: {...unref(params), ...options?.params},}
-    );
+export function reviewsLikeReview(reviewId: MaybeRef<string>, params?: MaybeRef<ReviewsLikeReviewParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<boolean>> {
+  reviewId = unref(reviewId)
+  params = unref(params)
+  return axios.post(
+      `/reviews/${reviewId}/like`,
+      undefined,
+      {
+        ...options,
+        params: { ...unref(params), ...options?.params },
+      },
+  )
+}
+
+export function getReviewsLikeReviewMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError, { reviewId: string, params?: ReviewsLikeReviewParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError, { reviewId: string, params?: ReviewsLikeReviewParams }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewsLikeReview>>, { reviewId: string, params?: ReviewsLikeReviewParams }> = (props) => {
+    const { reviewId, params } = props ?? {}
+
+    return reviewsLikeReview(reviewId, params, axiosOptions)
   }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type ReviewsLikeReviewMutationResult = NonNullable<Awaited<ReturnType<typeof reviewsLikeReview>>>
 
-export const getReviewsLikeReviewMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError,{reviewId: string;params?: ReviewsLikeReviewParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError,{reviewId: string;params?: ReviewsLikeReviewParams}, TContext> => {
-const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+export type ReviewsLikeReviewMutationError = AxiosError<void | HTTPValidationError>
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewsLikeReview>>, {reviewId: string;params?: ReviewsLikeReviewParams}> = (props) => {
-          const {reviewId,params} = props ?? {};
-
-          return  reviewsLikeReview(reviewId,params,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ReviewsLikeReviewMutationResult = NonNullable<Awaited<ReturnType<typeof reviewsLikeReview>>>
-    
-    export type ReviewsLikeReviewMutationError = AxiosError<void | HTTPValidationError>
-
-    /**
+/**
  * @summary Like Review
  */
-export const useReviewsLikeReview = <TError = AxiosError<void | HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError,{reviewId: string;params?: ReviewsLikeReviewParams}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationReturnType<
+export function useReviewsLikeReview<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError, { reviewId: string, params?: ReviewsLikeReviewParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
         Awaited<ReturnType<typeof reviewsLikeReview>>,
         TError,
-        {reviewId: string;params?: ReviewsLikeReviewParams},
+        { reviewId: string, params?: ReviewsLikeReviewParams },
         TContext
-      > => {
+      > {
+  const mutationOptions = getReviewsLikeReviewMutationOptions(options)
 
-      const mutationOptions = getReviewsLikeReviewMutationOptions(options);
-
-      return useMutation(mutationOptions);
-    }
-    
+  return useMutation(mutationOptions)
+}
