@@ -122,13 +122,17 @@ function handleApproveSubmit(event: FormSubmitEvent<{ files: FileList }>) {
           </div>
         </div>
         <div class="flex flex-row gap-2 items-end flex-shrink-0">
-          <UButton @click="$emit('wantChatClick')">
+          <UButton
+            v-if="!canReview"
+            icon="i-heroicons-chat-bubble-left-ellipsis"
+            @click="$emit('wantChatClick')"
+          >
             Написать студентам
           </UButton>
           <UButton
             v-if="me?.role === 'admin' || me?.role === 'moderator'"
             variant="outline"
-            :to="`/${orgUsername}/edit/scenes`"
+            :to="`/${orgUsername}/edit`"
             icon="i-mdi-pencil"
           >
             Редактировать

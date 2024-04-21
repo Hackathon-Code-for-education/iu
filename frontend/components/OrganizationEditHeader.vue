@@ -27,7 +27,7 @@ const { data: org } = useOrganizationsGetByUsername(props.orgUsername, { query: 
       <div class="flex items-start">
         <UHorizontalNavigation
           :links="[
-            { icon: 'i-octicon-info', label: 'Основная информация', to: `/${orgUsername}/edit` },
+            { icon: 'i-octicon-info', label: 'Данные', to: `/${orgUsername}/edit` },
             { icon: 'i-octicon-location', label: 'Локации', to: `/${orgUsername}/edit/scenes` },
           ]"
         />
