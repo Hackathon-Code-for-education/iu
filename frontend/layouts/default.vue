@@ -1,5 +1,20 @@
 <script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query'
+import { useUsersLogout } from '~/api'
+
+const queryClient = useQueryClient()
 const { me, meLoading } = useMe()
+const logout = useUsersLogout({
+  mutation: {
+    onSuccess: () => {
+      queryClient.clear()
+      queryClient.invalidateQueries()
+    },
+  },
+})
+function handleLogout() {
+  logout.mutate()
+}
 </script>
 
 <template>
@@ -16,9 +31,16 @@ const { me, meLoading } = useMe()
           />
           <div class="flex items-center">
             <UButton v-if="meLoading" loading variant="outline" label="Профиль" />
-            <NuxtLink v-else-if="me" to="/profile">
-              <UButton icon="i-heroicons-user-circle" variant="outline" label="Профиль" />
-            </NuxtLink>
+            <UDropdown
+              v-else-if="me"
+              mode="hover"
+              :items="[
+                [{ label: 'Профиль', icon: 'i-heroicons-user-circle', href: '/profile' }],
+                [{ label: 'Выйти', icon: 'i-heroicons-arrow-right-start-on-rectangle', click: handleLogout, disabled: logout.isPending.value }],
+              ]"
+            >
+              <UButton color="white" label="Профиль" trailing-icon="i-heroicons-chevron-down-20-solid" />
+            </UDropdown>
             <NuxtLink v-else to="/login">
               <UButton icon="i-octicon-sign-in-16" variant="outline" label="Войти" />
             </NuxtLink>
