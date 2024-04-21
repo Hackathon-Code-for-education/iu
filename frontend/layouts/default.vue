@@ -42,6 +42,7 @@ function handleThemeToggle() {
               { label: 'Главная', to: '/' },
               { label: 'ВУЗы', to: '/orgs' },
               { label: 'Чаты', to: '/chats' },
+              ...(me ? [{ label: 'Модерация', to: '/moderator' }] : []),
             ]"
           />
           <div class="flex items-center">
