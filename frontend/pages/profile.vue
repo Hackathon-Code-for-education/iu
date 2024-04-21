@@ -56,10 +56,48 @@ function handleToggleChatting(newVal: boolean) {
           </template>
           <UInput :model-value="org?.data.name ?? '...'" disabled />
         </UFormGroup>
+        <UFormGroup v-else-if="me.student_approvement.status === 'pending'">
+          <template #label>
+            <UPopover mode="hover">
+              <span class="flex items-center gap-1 mb-1">
+                Образовательное учреждение
+                <UIcon class="text-blue-500" name="i-octicon-clock-24" />
+              </span>
+              <template #panel>
+                <p class="text-sm p-1">
+                  Ожидайте подтверждения вашего статуса студента.
+                </p>
+              </template>
+            </UPopover>
+          </template>
+          <p class="text-sm mb-2">
+            Ваш запрос находится на рассмотрении.
+          </p>
+          <UInput :model-value="org?.data.name ?? '...'" disabled />
+        </UFormGroup>
+        <UFormGroup v-else-if="me.student_approvement.status === 'rejected'">
+          <template #label>
+            <UPopover mode="hover">
+              <span class="flex items-center gap-1 mb-1">
+                Образовательное учреждение
+                <UIcon class="text-red-500" name="i-octicon-blocked-24" />
+              </span>
+              <template #panel>
+                <p class="text-sm p-1">
+                  Статус студента не подтвержден.
+                </p>
+              </template>
+            </UPopover>
+          </template>
+          <p class="text-sm mb-2">
+            Ваш запрос отклонен. Подайте новую заявку на странице вуза.
+          </p>
+          <UInput :model-value="org?.data.name ?? '...'" disabled />
+        </UFormGroup>
 
-        <UDivider />
+        <UDivider v-if="me.student_approvement?.status === 'approved'" />
 
-        <div>
+        <div v-if="me.student_approvement?.status === 'approved'">
           <UFormGroup>
             <template #label>
               <UPopover mode="hover">
