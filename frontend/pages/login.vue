@@ -58,10 +58,18 @@ function handleSubmit(event: FormSubmitEvent<Schema>) {
           <UInput v-model="state.password" :disabled="loginByCreds.isPending.value" type="password" />
         </UFormGroup>
 
-        <UButton :disabled="loginByCreds.isPending.value" type="submit">
-          Войти
-        </UButton>
+        <div class="flex justify-center">
+          <UButton :disabled="loginByCreds.isPending.value" type="submit">
+            Войти
+          </UButton>
+        </div>
       </UForm>
+
+      <p class="text-center my-2">
+        или
+      </p>
+
+      <TelegramLogin />
     </Card>
   </UContainer>
 </template>

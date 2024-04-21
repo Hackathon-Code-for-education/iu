@@ -82,6 +82,18 @@ function handleToggleChatting(newVal: boolean) {
             />
           </UFormGroup>
         </div>
+
+        <UDivider />
+
+        <UFormGroup v-if="!me.telegram" label="Подключить телеграм">
+          <TelegramConnect />
+        </UFormGroup>
+        <UFormGroup v-if="me.telegram" label="Телеграм">
+          <div class="flex flex-col gap-2 text-sm">
+            Вы можете использовать виджет Telegram для входа в аккаунт.
+            <UInput :model-value="me.telegram.username || me.telegram.last_name || me.telegram.id" disabled />
+          </div>
+        </UFormGroup>
       </Card>
       <Card class="p-4 col-span-2">
         <h3 class="mb-2">

@@ -80,16 +80,6 @@ export interface ProvidersTelegramConnectParams {
   photo_url?: string | null
 }
 
-export interface ProvidersTelegramRegisterParams {
-  hash: string
-  id: number
-  auth_date: number
-  first_name: string
-  last_name?: string | null
-  username?: string | null
-  photo_url?: string | null
-}
-
 /**
  * Данные Telegram-аккаунта
  */
@@ -849,6 +839,8 @@ export type CertificateOutStatusName = string | null
 
 export type CertificateOutRegionName = string | null
 
+export type CertificateOutLogo = string | null
+
 export type CertificateOutIsFederal = boolean | null
 
 export type CertificateOutFederalDistrictName = string | null
@@ -861,6 +853,7 @@ export interface CertificateOut {
   federal_district_name: CertificateOutFederalDistrictName
   in_registry_id: string
   is_federal: CertificateOutIsFederal
+  logo?: CertificateOutLogo
   region_name: CertificateOutRegionName
   status_name: CertificateOutStatusName
   type_name: CertificateOutTypeName
@@ -1056,56 +1049,13 @@ export function useProvidersByCredentials<TError = AxiosError<void | HTTPValidat
 }
 
 /**
- * @summary Telegram Register
- */
-export function providersTelegramRegister(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
-  params = unref(params)
-  return axios.get(
-      `/providers/telegram/register`,
-      {
-        ...options,
-        params: { ...unref(params), ...options?.params },
-      },
-  )
-}
-
-export function getProvidersTelegramRegisterQueryKey(params: MaybeRef<ProvidersTelegramRegisterParams>) {
-  return ['providers', 'telegram', 'register', ...(params ? [params] : [])] as const
-}
-
-export function getProvidersTelegramRegisterQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig }) {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
-
-  const queryKey = getProvidersTelegramRegisterQueryKey(params)
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegister>>> = ({ signal }) => providersTelegramRegister(params, { signal, ...axiosOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>
-}
-
-export type ProvidersTelegramRegisterQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegister>>>
-export type ProvidersTelegramRegisterQueryError = AxiosError<void | HTTPValidationError>
-
-/**
- * @summary Telegram Register
- */
-export function useProvidersTelegramRegister<TData = Awaited<ReturnType<typeof providersTelegramRegister>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramRegisterParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegister>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getProvidersTelegramRegisterQueryOptions(params, options)
-
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey
-
-  return query
-}
-
-/**
  * @summary Telegram Connect
  */
 export function providersTelegramConnect(params: MaybeRef<ProvidersTelegramConnectParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<unknown>> {
   params = unref(params)
-  return axios.get(
+  return axios.post(
       `/providers/telegram/connect`,
+      undefined,
       {
         ...options,
         params: { ...unref(params), ...options?.params },
@@ -1113,34 +1063,34 @@ export function providersTelegramConnect(params: MaybeRef<ProvidersTelegramConne
   )
 }
 
-export function getProvidersTelegramConnectQueryKey(params: MaybeRef<ProvidersTelegramConnectParams>) {
-  return ['providers', 'telegram', 'connect', ...(params ? [params] : [])] as const
+export function getProvidersTelegramConnectMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, { params: ProvidersTelegramConnectParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, { params: ProvidersTelegramConnectParams }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramConnect>>, { params: ProvidersTelegramConnectParams }> = (props) => {
+    const { params } = props ?? {}
+
+    return providersTelegramConnect(params, axiosOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
 }
 
-export function getProvidersTelegramConnectQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig }) {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+export type ProvidersTelegramConnectMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnect>>>
 
-  const queryKey = getProvidersTelegramConnectQueryKey(params)
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnect>>> = ({ signal }) => providersTelegramConnect(params, { signal, ...axiosOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>
-}
-
-export type ProvidersTelegramConnectQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnect>>>
-export type ProvidersTelegramConnectQueryError = AxiosError<void | HTTPValidationError>
+export type ProvidersTelegramConnectMutationError = AxiosError<void | HTTPValidationError>
 
 /**
  * @summary Telegram Connect
  */
-export function useProvidersTelegramConnect<TData = Awaited<ReturnType<typeof providersTelegramConnect>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramConnectParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getProvidersTelegramConnectQueryOptions(params, options)
+export function useProvidersTelegramConnect<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof providersTelegramConnect>>, TError, { params: ProvidersTelegramConnectParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
+        Awaited<ReturnType<typeof providersTelegramConnect>>,
+        TError,
+        { params: ProvidersTelegramConnectParams },
+        TContext
+      > {
+  const mutationOptions = getProvidersTelegramConnectMutationOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey
-
-  return query
+  return useMutation(mutationOptions)
 }
 
 /**
@@ -1148,8 +1098,9 @@ export function useProvidersTelegramConnect<TData = Awaited<ReturnType<typeof pr
  */
 export function providersTelegramLogin(params: MaybeRef<ProvidersTelegramLoginParams>, options?: AxiosRequestConfig): Promise<AxiosResponse<TelegramLoginResponse>> {
   params = unref(params)
-  return axios.get(
+  return axios.post(
       `/providers/telegram/login`,
+      undefined,
       {
         ...options,
         params: { ...unref(params), ...options?.params },
@@ -1157,154 +1108,34 @@ export function providersTelegramLogin(params: MaybeRef<ProvidersTelegramLoginPa
   )
 }
 
-export function getProvidersTelegramLoginQueryKey(params: MaybeRef<ProvidersTelegramLoginParams>) {
-  return ['providers', 'telegram', 'login', ...(params ? [params] : [])] as const
+export function getProvidersTelegramLoginMutationOptions<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, { params: ProvidersTelegramLoginParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, { params: ProvidersTelegramLoginParams }, TContext> {
+  const { mutation: mutationOptions, axios: axiosOptions } = options ?? {}
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof providersTelegramLogin>>, { params: ProvidersTelegramLoginParams }> = (props) => {
+    const { params } = props ?? {}
+
+    return providersTelegramLogin(params, axiosOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
 }
 
-export function getProvidersTelegramLoginQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig }) {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+export type ProvidersTelegramLoginMutationResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLogin>>>
 
-  const queryKey = getProvidersTelegramLoginQueryKey(params)
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLogin>>> = ({ signal }) => providersTelegramLogin(params, { signal, ...axiosOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>
-}
-
-export type ProvidersTelegramLoginQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLogin>>>
-export type ProvidersTelegramLoginQueryError = AxiosError<void | HTTPValidationError>
+export type ProvidersTelegramLoginMutationError = AxiosError<void | HTTPValidationError>
 
 /**
  * @summary Telegram Login
  */
-export function useProvidersTelegramLogin<TData = Awaited<ReturnType<typeof providersTelegramLogin>>, TError = AxiosError<void | HTTPValidationError>>(params: MaybeRef<ProvidersTelegramLoginParams>, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getProvidersTelegramLoginQueryOptions(params, options)
+export function useProvidersTelegramLogin<TError = AxiosError<void | HTTPValidationError>, TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof providersTelegramLogin>>, TError, { params: ProvidersTelegramLoginParams }, TContext>, axios?: AxiosRequestConfig }): UseMutationReturnType<
+        Awaited<ReturnType<typeof providersTelegramLogin>>,
+        TError,
+        { params: ProvidersTelegramLoginParams },
+        TContext
+      > {
+  const mutationOptions = getProvidersTelegramLoginMutationOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey
-
-  return query
-}
-
-/**
- * @summary Telegram Register Html
- */
-export function providersTelegramRegisterHtml(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
-  return axios.get(
-      `/providers/telegram/register.html`,
-      options,
-  )
-}
-
-export function getProvidersTelegramRegisterHtmlQueryKey() {
-  return ['providers', 'telegram', 'register.html'] as const
-}
-
-export function getProvidersTelegramRegisterHtmlQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig }) {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
-
-  const queryKey = getProvidersTelegramRegisterHtmlQueryKey()
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>> = ({ signal }) => providersTelegramRegisterHtml({ signal, ...axiosOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>
-}
-
-export type ProvidersTelegramRegisterHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>>
-export type ProvidersTelegramRegisterHtmlQueryError = AxiosError<unknown>
-
-/**
- * @summary Telegram Register Html
- */
-export function useProvidersTelegramRegisterHtml<TData = Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramRegisterHtml>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getProvidersTelegramRegisterHtmlQueryOptions(options)
-
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey
-
-  return query
-}
-
-/**
- * @summary Telegram Connect Html
- */
-export function providersTelegramConnectHtml(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
-  return axios.get(
-      `/providers/telegram/connect.html`,
-      options,
-  )
-}
-
-export function getProvidersTelegramConnectHtmlQueryKey() {
-  return ['providers', 'telegram', 'connect.html'] as const
-}
-
-export function getProvidersTelegramConnectHtmlQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig }) {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
-
-  const queryKey = getProvidersTelegramConnectHtmlQueryKey()
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramConnectHtml>>> = ({ signal }) => providersTelegramConnectHtml({ signal, ...axiosOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>
-}
-
-export type ProvidersTelegramConnectHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramConnectHtml>>>
-export type ProvidersTelegramConnectHtmlQueryError = AxiosError<unknown>
-
-/**
- * @summary Telegram Connect Html
- */
-export function useProvidersTelegramConnectHtml<TData = Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramConnectHtml>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getProvidersTelegramConnectHtmlQueryOptions(options)
-
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey
-
-  return query
-}
-
-/**
- * @summary Telegram Login Html
- */
-export function providersTelegramLoginHtml(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
-  return axios.get(
-      `/providers/telegram/login.html`,
-      options,
-  )
-}
-
-export function getProvidersTelegramLoginHtmlQueryKey() {
-  return ['providers', 'telegram', 'login.html'] as const
-}
-
-export function getProvidersTelegramLoginHtmlQueryOptions<TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig }) {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
-
-  const queryKey = getProvidersTelegramLoginHtmlQueryKey()
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof providersTelegramLoginHtml>>> = ({ signal }) => providersTelegramLoginHtml({ signal, ...axiosOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>
-}
-
-export type ProvidersTelegramLoginHtmlQueryResult = NonNullable<Awaited<ReturnType<typeof providersTelegramLoginHtml>>>
-export type ProvidersTelegramLoginHtmlQueryError = AxiosError<unknown>
-
-/**
- * @summary Telegram Login Html
- */
-export function useProvidersTelegramLoginHtml<TData = Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError = AxiosError<unknown>>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof providersTelegramLoginHtml>>, TError, TData>>, axios?: AxiosRequestConfig }): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getProvidersTelegramLoginHtmlQueryOptions(options)
-
-  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey }
-
-  query.queryKey = unref(queryOptions).queryKey as QueryKey
-
-  return query
+  return useMutation(mutationOptions)
 }
 
 /**

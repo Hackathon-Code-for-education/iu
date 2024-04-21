@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiUrl: process.env.API_URL || '/api',
+      telegramBot: process.env.TELEGRAM_BOT || undefined,
     },
   },
   eslint: {
