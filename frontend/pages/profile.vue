@@ -20,6 +20,10 @@ function handleToggleChatting(newVal: boolean) {
   else
     stopChatting()
 }
+
+onBeforeUnmount(() => {
+  stopChatting()
+})
 </script>
 
 <template>

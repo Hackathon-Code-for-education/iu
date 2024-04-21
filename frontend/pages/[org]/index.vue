@@ -61,6 +61,11 @@ watch(chatModalOpen, (isOpen, _, onCleanup) => {
     clearInterval(keepaliveChatQueueInterval.value)
   })
 }, { immediate: true })
+
+onBeforeUnmount(() => {
+  if (keepaliveChatQueueInterval.value)
+    clearInterval(keepaliveChatQueueInterval.value)
+})
 </script>
 
 <template>
@@ -89,14 +94,19 @@ watch(chatModalOpen, (isOpen, _, onCleanup) => {
       <template #header>
         <div class="flex items-center justify-between">
           <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-            Чат со студентом
+            Чат со случайным студентом
           </h3>
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="chatModalOpen = false" />
         </div>
       </template>
-      <div class="flex gap-2 items-center">
-        <span class="live-circle" />
-        Студентов онлайн: {{ studentsOnline }}
+      <div>
+        <p class="mb-4 text-justify">
+          Вы можете пообщаться со случайным студентом этого ВУЗа. Дождитесь, пока кто-нибудь из студентов будет готов принять ваш запрос.
+        </p>
+        <div class="flex gap-2 items-center">
+          <span class="live-circle" />
+          Студентов онлайн: {{ studentsOnline }}
+        </div>
       </div>
     </UCard>
   </UModal>
