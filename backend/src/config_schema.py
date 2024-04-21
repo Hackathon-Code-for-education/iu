@@ -88,6 +88,13 @@ class Settings(SettingsEntityModel):
     auth: Authentication
     "Authentication settings"
     telegram: Telegram | None = None
+    "Telegram Bot settings for authorization"
+    https_only_cookie: bool = False
+    "Use HTTPS only for SessionMiddleware"
+    secure_prefix_cookie: bool = False
+    "Add `__Secure-` prefix to session cookie"
+    wildcard_allow_origin_regex: bool = True
+    "Allow all origins for CORS"
 
     @classmethod
     def from_yaml(cls, path: Path) -> "Settings":

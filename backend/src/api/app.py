@@ -13,7 +13,6 @@ from src.api.docs import generate_unique_operation_id
 from src.api.lifespan import lifespan
 from src.api.routers import routers
 from src.config import settings
-from src.config_schema import Environment
 
 # App definition
 app = FastAPI(
@@ -39,12 +38,12 @@ if settings.cors_allow_origins:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        allow_origin_regex=".*" if settings.environment == Environment.DEVELOPMENT else None,
+        allow_origin_regex=".*" if settings.wildcard_allow_origin_regex else None,
     )
 
 # Authorization
 same_site = "lax"
-session_cookie = "__Secure-abitura-session" if settings.environment == Environment.PRODUCTION else "abitura-session"
+session_cookie = "__Secure-abitura-session" if settings.secure_prefix_cookie else "abitura-session"
 # noinspection PyTypeChecker
 app.add_middleware(
     SessionMiddleware,
@@ -52,7 +51,7 @@ app.add_middleware(
     session_cookie=session_cookie,
     max_age=14 * 24 * 60 * 60,  # 14 days, in seconds
     same_site=same_site,
-    https_only=settings.environment == Environment.PRODUCTION,
+    https_only=settings.https_only_cookie,
     domain=None,
 )
 
@@ -65,12 +64,6 @@ if settings.static_files is not None:
         StaticFiles(directory=settings.static_files.directory),
         name=settings.static_files.mount_name,
     )
-
-# Mock utilities
-if settings.environment == Environment.DEVELOPMENT:
-    from fastapi_mock import MockUtilities  # type: ignore
-
-    MockUtilities(app, return_example_instead_of_500=True)
 
 
 # Redirect root to docs

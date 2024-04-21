@@ -160,6 +160,22 @@ properties:
     - $ref: '#/$defs/Telegram'
     - type: 'null'
     default: null
+    description: Telegram Bot settings for authorization
+  https_only_cookie:
+    default: false
+    description: Use HTTPS only for SessionMiddleware
+    title: Https Only Cookie
+    type: boolean
+  secure_prefix_cookie:
+    default: false
+    description: Add `__Secure-` prefix to session cookie
+    title: Secure Prefix Cookie
+    type: boolean
+  wildcard_allow_origin_regex:
+    default: true
+    description: Allow all origins for CORS
+    title: Wildcard Allow Origin Regex
+    type: boolean
 required:
 - database
 - auth
