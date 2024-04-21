@@ -1,7 +1,5 @@
 FROM node:20.12-slim as base
 
-ENV NODE_ENV=production
-
 WORKDIR /app
 
 # Build
@@ -17,6 +15,8 @@ RUN pnpm prune
 
 # Run
 FROM base
+
+ENV NODE_ENV=production
 
 COPY --from=build /app/node_modules /app/node_modules
 COPY --from=build /app/.output /app/.output
