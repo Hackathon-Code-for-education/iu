@@ -1,5 +1,6 @@
 import time
 
+from beanie import PydanticObjectId
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import xml.etree.ElementTree as ET
@@ -182,6 +183,7 @@ class Certificate(BaseModel):
 
 class CertificateOut(BaseModel):
     in_registry_id: str
+    logo: PydanticObjectId | None = None
     is_federal: bool | None
     status_name: str | None
     type_name: str | None

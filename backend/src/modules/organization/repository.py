@@ -66,6 +66,7 @@ async def parse_certificates_to_organizations(organizations: Certificates) -> li
     not_existing_organizations = (org for org in organizations.certificates if org.in_registry_id in not_existing_ids)
     create_ = (
         CreateOrganization(
+            logo=org.logo,
             in_registry_id=org.in_registry_id,
             username=org.in_registry_id,
             name=org.actual_education_organization.short_name or org.actual_education_organization.full_name,
