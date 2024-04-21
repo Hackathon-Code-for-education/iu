@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import time
 
 from beanie import PydanticObjectId
@@ -65,7 +66,7 @@ class ActualEducationOrganization(BaseModel):
 
 class ActualEducationOrganizationOut(BaseModel):
     in_registry_id: str | None
-    full_name: str | None
+    full_name: str
     short_name: str | None
     head_edu_org_id: str | None
     is_branch: bool | None

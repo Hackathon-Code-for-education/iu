@@ -1,5 +1,7 @@
 __all__ = ["OrganizationRepository", "organization_repository", "parse_certificates_to_organizations"]
 
+from typing import cast
+
 from beanie import PydanticObjectId
 
 from scripts.parse_organizations import Certificates
@@ -19,7 +21,8 @@ class OrganizationRepository:
         return await crud.read(id)
 
     async def read_all(self) -> list[CompactOrganization]:
-        return await crud.read_all(projection_model=CompactOrganization)
+        compacts = await crud.read_all(projection_model=CompactOrganization)
+        return cast(list[CompactOrganization], compacts)
 
     async def update(self, id: PydanticObjectId, data: UpdateOrganization) -> Organization | None:
         return await crud.update(id, data)

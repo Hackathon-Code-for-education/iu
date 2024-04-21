@@ -8,7 +8,7 @@ from beanie import PydanticObjectId
 
 from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
 from src.api.dependencies import UserDep, ModeratorDep
-from src.exceptions import NotEnoughPermissionsException
+from src.exceptions import NotEnoughPermissionsException, ObjectNotFound
 from src.logging_ import logger
 from src.modules.files.repository import upload_file_from_fastapi
 from src.modules.review.repository import review_repository
@@ -96,7 +96,12 @@ async def get_users_with_pending_approvement(_moder: ModeratorDep) -> list[ViewU
 
 
 @router.get(
-    "/by-id/{user_id}", responses={200: {"description": "Пользователь"}, **NotEnoughPermissionsException.responses}
+    "/by-id/{user_id}",
+    responses={
+        200: {"description": "Пользователь"},
+        **NotEnoughPermissionsException.responses,
+        **ObjectNotFound.responses,
+    },
 )
 async def get_user_by_id(_moder: ModeratorDep, user_id: PydanticObjectId) -> ViewUser:
     """
@@ -104,6 +109,8 @@ async def get_user_by_id(_moder: ModeratorDep, user_id: PydanticObjectId) -> Vie
     """
 
     target_user = await user_repository.read(user_id)
+    if target_user is None:
+        raise ObjectNotFound(f"Пользователь с ID `{user_id}` не найден")
     return ViewUser.model_validate(target_user.model_dump())
 
 

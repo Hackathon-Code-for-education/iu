@@ -126,6 +126,9 @@ async def import_specific_organization(
     if user.role != UserRole.ADMIN:
         raise NotEnoughPermissionsException("У вас недостаточно прав для загрузки организаций")
 
+    if org.actual_education_organization is None:
+        raise ObjectNotFound("Не найдена актуальная организация")
+
     update_ = UpdateOrganization(
         in_registry_id=org.in_registry_id,
         username=org.in_registry_id,

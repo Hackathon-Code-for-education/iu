@@ -24,6 +24,8 @@ class DialogRepository:
             from src.modules.organization.repository import organization_repository
 
             organization = await organization_repository.read(obj.organization_id)
+            if organization is None:
+                raise ValueError("Organization not found")
             anon_student = anonym_repository.anonymize_caption_for_user(obj.student_id)
             title = f"{organization.name} - Студент [{anon_student}]"
             obj.title = title

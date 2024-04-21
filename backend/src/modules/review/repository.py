@@ -1,7 +1,6 @@
 __all__ = ["ReviewRepository", "review_repository"]
 
-import pymongo
-from beanie import PydanticObjectId
+from beanie import PydanticObjectId, SortDirection
 
 from src.modules.review.schemas import CreateReview, ReviewWithOrganizationInfo
 from src.storages.mongo import Organization
@@ -24,10 +23,12 @@ class ReviewRepository:
         return await Review.get(id)
 
     async def read_for_organization(self, organization_id: PydanticObjectId) -> list[Review]:
-        return await Review.find({"organization_id": organization_id}, sort=[("at", pymongo.DESCENDING)]).to_list()
+        return await Review.find(
+            {"organization_id": organization_id}, sort=[("at", SortDirection.DESCENDING)]
+        ).to_list()
 
     async def read_for_me(self, user_id: PydanticObjectId) -> list[ReviewWithOrganizationInfo]:
-        reviews = await Review.find({"user_id": user_id}, sort=[("at", pymongo.DESCENDING)]).to_list()
+        reviews = await Review.find({"user_id": user_id}, sort=[("at", SortDirection.DESCENDING)]).to_list()
         ids = set(review.organization_id for review in reviews)
         organizations = await Organization.find_many({"_id": {"$in": list(ids)}}).to_list()
         org_dict = {org.id: org for org in organizations}
