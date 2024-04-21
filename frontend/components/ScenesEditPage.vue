@@ -16,13 +16,16 @@ const sceneId = ref(org.value?.data.main_scene)
   <UContainer v-if="org && scenes">
     <Card class="bg-neutral-900">
       <div class="px-4 flex py-4 justify-between items-start">
-        <div class="flex justify-between gap-5 items-end">
-          <div>
-            <h1 class="text-2xl font-medium">
-              {{ org.data.name }}
-            </h1>
-          </div>
-        </div>
+        <h1 class="text-2xl font-medium">
+          {{ org.data.name }}
+        </h1>
+        <UButton
+          :to="`/${orgUsername}`"
+          variant="ghost"
+          label="Просмотреть страницу"
+          size="sm"
+          color="gray"
+        />
       </div>
     </Card>
     <div class="grid grid-cols-3 gap-4 mt-4">
