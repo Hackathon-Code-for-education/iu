@@ -1,9 +1,9 @@
 import datetime
 
 from beanie import PydanticObjectId
+from pydantic import Field
 
 from src.custom_pydantic import CustomModel
-from src.storages.mongo.models.review import ReviewRateEnum
 
 
 class CreateReview(CustomModel):
@@ -13,7 +13,7 @@ class CreateReview(CustomModel):
     "Идентификатор пользователя, оставившего отзыв"
     text: str | None = None
     "Текст отзыва"
-    rate: ReviewRateEnum
+    rate: int = Field(..., ge=1, le=5)
     "Оценка"
 
 
@@ -22,7 +22,7 @@ class AnonymousReview(CustomModel):
     "Идентификатор отзыва"
     text: str | None
     "Текст отзыва"
-    rate: ReviewRateEnum
+    rate: int = Field(..., ge=1, le=5)
     "Оценка"
     anonymous_name: str
     "Имя анонимного пользователя"

@@ -10,12 +10,12 @@ from src.api.dependencies import get_moderator, UserDep, OptionalUserIdDep
 from src.exceptions import ObjectNotFound, NotEnoughPermissionsException, UnauthorizedException
 from src.modules.anonymize.repository import anonym_repository
 from src.modules.organization.repository import organization_repository
-from src.modules.organization.schemas import CreateOrganization, UpdateOrganization
+from src.modules.organization.schemas import CreateOrganization, UpdateOrganization, PostReview
 from src.modules.review.repository import review_repository
 from src.modules.review.schemas import CreateReview, AnonymousReview
 from src.storages.mongo import Organization
 from src.storages.mongo.models.organization import ContactsSchema, EducationalProgramSchema
-from src.storages.mongo.models.review import ReviewRateEnum, Review
+from src.storages.mongo.models.review import Review
 from src.storages.mongo.schemas import UserRole
 
 router = APIRouter(prefix="/organizations", tags=["Organizations"])
@@ -52,7 +52,7 @@ async def get_by_username(username: str) -> Organization:
         **UnauthorizedException.responses,
     },
 )
-async def post_review(organization_id: PydanticObjectId, user: UserDep, text: str, rate: ReviewRateEnum) -> Review:
+async def post_review(data: PostReview, user: UserDep, organization_id: PydanticObjectId) -> Review:
     """
     Оставить отзыв организации
     """
@@ -66,7 +66,7 @@ async def post_review(organization_id: PydanticObjectId, user: UserDep, text: st
         )
 
     return await review_repository.create(
-        CreateReview(organization_id=organization_id, user_id=user.id, text=text, rate=rate)
+        CreateReview(organization_id=data.organization_id, user_id=user.id, text=data.text, rate=data.rate)
     )
 
 

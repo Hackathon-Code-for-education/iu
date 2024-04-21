@@ -1,23 +1,10 @@
 import datetime
-from enum import StrEnum
 
 from beanie import PydanticObjectId
+from pydantic import Field
 
 from src.custom_pydantic import CustomModel
 from src.storages.mongo.models.__base__ import CustomDocument
-
-
-class ReviewRateEnum(StrEnum):
-    """Перечисление возможных оценок"""
-
-    BAD = "BAD"
-    "Плохо"
-    NORMAL = "NORMAL"
-    "Нормально"
-    GOOD = "GOOD"
-    "Хорошо"
-    EXCELLENT = "EXCELLENT"
-    "Отлично"
 
 
 class ReviewSchema(CustomModel):
@@ -29,7 +16,7 @@ class ReviewSchema(CustomModel):
     "Список пользователей, которым понравился отзыв"
     text: str | None = None
     "Текст отзыва"
-    rate: ReviewRateEnum
+    rate: int = Field(..., ge=1, le=5)
     "Оценка"
     at: datetime.datetime
     "Дата и время создания отзыва"

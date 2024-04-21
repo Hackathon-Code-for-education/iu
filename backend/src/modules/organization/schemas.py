@@ -48,3 +48,8 @@ class CompactOrganization(CustomModel):
     "Наименование организации"
     logo: PydanticObjectId | None = None
     "Логотип организации"
+
+
+class PostReview(CustomModel):
+    text: str
+    rate: int = Field(..., ge=1, le=5)
