@@ -8,7 +8,7 @@ const {
   data: chats,
   error,
   isLoading,
-} = useChattingGetMyDialogs()
+} = useChattingGetMyDialogs({ query: { refetchInterval: 3000 } })
 
 const { data: me } = useUsersGetMe()
 const sendMessage = useChattingPushMessage()
