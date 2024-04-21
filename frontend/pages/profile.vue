@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { getUsersGetMeQueryKey, useOrganizationsRead, useUsersLogout } from '~/api'
 
 const queryClient = useQueryClient()
@@ -26,11 +26,7 @@ function handleLogout() {
     .mutateAsync()
     .then(() => {
       queryClient.clear()
-    })
-    .finally(() => {
-      queryClient.invalidateQueries({
-        queryKey: getUsersGetMeQueryKey(),
-      })
+      queryClient.invalidateQueries()
     })
 }
 </script>
