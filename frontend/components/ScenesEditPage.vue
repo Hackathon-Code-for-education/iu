@@ -49,9 +49,9 @@ const sceneId = ref(org.value?.data.main_scene)
         />
         <ScenesEditLocation
           v-else-if="sceneId && scenes"
+          v-model:scene-id="sceneId"
           :org-username="props.orgUsername"
           :org-id="props.orgId"
-          :scene-id="sceneId"
         />
         <p v-else>
           Выберите локацию

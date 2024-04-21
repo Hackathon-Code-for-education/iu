@@ -6,6 +6,7 @@ import {
   getScenesGetScenesForOrganizationQueryKey,
   useOrganizationsGetByUsername,
   useOrganizationsUpdate,
+  useScenesDelete,
   useScenesGetScenesForOrganization,
   useScenesUpdate,
 } from '~/api'
@@ -15,6 +16,10 @@ const props = defineProps<{
   orgUsername: string
   orgId: string
   sceneId: string
+}>()
+
+const emit = defineEmits<{
+  'update:sceneId': [sceneId: string]
 }>()
 
 const queryClient = useQueryClient()
@@ -33,6 +38,17 @@ const { mutate: updateScene } = useScenesUpdate({
           data: oldData.data.map((scene: any) => scene.id === data.data.id ? data.data : scene),
         }
       })
+    },
+  },
+})
+
+const { mutate: removeScene } = useScenesDelete({
+  mutation: {
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: getScenesGetScenesForOrganizationQueryKey(props.orgId),
+      })
+      emit('update:sceneId', '')
     },
   },
 })
@@ -101,6 +117,10 @@ function save() {
       hotSpots: sceneInfo.hotSpots,
     } as SceneMeta,
   } })
+}
+
+function remove() {
+  removeScene({ id: props.sceneId })
 }
 
 function setAsMain() {
@@ -212,9 +232,14 @@ function handleHotspotSceneChange(index: number, v: string) {
       >
         {{ isMainOrgScene ? 'Основная локация' : 'Сделать основной локацией' }}
       </UButton>
-      <UButton @click="save">
-        Сохранить
-      </UButton>
+      <div class="flex gap-2">
+        <UButton @click="save">
+          Сохранить
+        </UButton>
+        <UButton color="red" @click="remove">
+          Удалить
+        </UButton>
+      </div>
     </div>
     <UInput v-model="sceneInfo.title" class="w-full" label="Название локации" />
     <div class="relative">
