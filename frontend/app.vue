@@ -9,4 +9,6 @@ axios.defaults.baseURL = config.public.apiUrl
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+
+  <UNotifications />
 </template>

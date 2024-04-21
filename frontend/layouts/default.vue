@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { me, meLoading } = useMe()
+</script>
+
 <template>
   <div class="py-4">
     <header>
@@ -11,10 +15,12 @@
             ]"
           />
           <div class="flex items-center">
-            <NuxtLink to="/login">
-              <UButton icon="i-octicon-sign-in-16" variant="outline">
-                Войти
-              </UButton>
+            <UButton v-if="meLoading" loading variant="outline" label="Профиль" />
+            <NuxtLink v-else-if="me" to="/profile">
+              <UButton icon="i-heroicons-user-circle" variant="outline" label="Профиль" />
+            </NuxtLink>
+            <NuxtLink v-else to="/login">
+              <UButton icon="i-octicon-sign-in-16" variant="outline" label="Войти" />
             </NuxtLink>
           </div>
         </Card>
