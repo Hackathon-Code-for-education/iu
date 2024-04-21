@@ -66,7 +66,7 @@ async def post_review(data: PostReview, user: UserDep, organization_id: Pydantic
         )
 
     return await review_repository.create(
-        CreateReview(organization_id=data.organization_id, user_id=user.id, text=data.text, rate=data.rate)
+        CreateReview(organization_id=organization_id, user_id=user.id, text=data.text, rate=data.rate)
     )
 
 
