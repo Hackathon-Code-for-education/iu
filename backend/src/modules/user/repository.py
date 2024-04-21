@@ -4,6 +4,8 @@ from beanie import PydanticObjectId
 
 from src.config import settings
 from src.exceptions import AlreadyExists, ObjectNotFound
+from src.logging_ import logger
+from src.modules.organization.repository import organization_repository
 from src.modules.providers.telegram.schemas import TelegramWidgetData
 from src.storages.mongo import User
 from src.storages.mongo.models.user import PendingApprovement, ApprovedApprovement, RejectedApprovement
@@ -26,6 +28,15 @@ class UserRepository:
                 "password_hash": credentials_repository.get_password_hash(user.password),
                 "role": user.role,
             }
+            if user.student_at_organization_username:
+                organization = await organization_repository.read_by_username(user.student_at_organization_username)
+                if organization:
+                    user_dict["student_approvement"] = ApprovedApprovement(
+                        organization_id=organization.id, at=aware_utcnow()
+                    )
+                else:
+                    logger.error(f"Organization with username={user.student_at_organization_username} not found")
+
             await User.model_validate(user_dict).insert()
 
     async def create_superuser(self, login: str, password: str) -> User:
@@ -91,12 +102,14 @@ class UserRepository:
             return None
         return await user.update({"$set": {"documents": document_ids}})
 
-    async def request_approvement(self, user_id: PydanticObjectId, organization_id: PydanticObjectId) -> User | None:
+    async def request_approvement(
+        self, user_id: PydanticObjectId, organization_id: PydanticObjectId, file_obj_id: PydanticObjectId | None = None
+    ) -> User | None:
         user = await self.read(user_id)
         if user is None:
             return None
 
-        _approvement = PendingApprovement(organization_id=organization_id)
+        _approvement = PendingApprovement(organization_id=organization_id, attachment=file_obj_id)
         return await user.update({"$set": {"student_approvement": _approvement}})
 
     async def approve_user(

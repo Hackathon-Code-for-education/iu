@@ -15,13 +15,15 @@ class PendingApprovement(CustomModel):
     status: Literal["pending"] = "pending"
     organization_id: PydanticObjectId
     "ID организации к которой будет привязан студент"
+    attachment: PydanticObjectId | None = None
+    "ID документа, подтверждающего статус студента"
 
 
 class ApprovedApprovement(CustomModel):
     status: Literal["approved"] = "approved"
     organization_id: PydanticObjectId
     "ID организации к которой будет привязан студент"
-    moderator_id: PydanticObjectId
+    moderator_id: PydanticObjectId | None = None
     "ID модератора, подтвердившего студента"
     at: datetime.datetime
     "Дата подтверждения студента"
@@ -31,7 +33,7 @@ class RejectedApprovement(CustomModel):
     status: Literal["rejected"] = "rejected"
     organization_id: PydanticObjectId
     "ID организации к которой будет привязан студент"
-    moderator_id: PydanticObjectId
+    moderator_id: PydanticObjectId | None = None
     "ID модератора, отклонившего студента"
     at: datetime.datetime
     "Дата отклонения студента"

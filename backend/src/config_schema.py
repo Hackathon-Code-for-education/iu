@@ -1,7 +1,9 @@
 from enum import StrEnum
 from pathlib import Path
+from typing import Any
 
 import yaml
+from beanie import PydanticObjectId
 from pydantic import Field, SecretStr, ConfigDict, field_validator, BaseModel
 
 from src.storages.mongo.schemas import UserRole
@@ -48,12 +50,32 @@ class PredefinedUser(SettingsEntityModel):
     name: str
     login: str
     password: str
+    student_at_organization_username: str | None = None
+    "ID of the organization where the student is approved"
+
+
+class PredefinedScene(SettingsEntityModel):
+    id: PydanticObjectId
+    "Scene ID"
+    title: str
+    "Scene title"
+    organization_username: str
+    "Organization Username"
+    file: PydanticObjectId
+    "File ID"
+    meta: Any | None = None
+    "Meta information for panorama view"
 
 
 class Predefined(SettingsEntityModel):
     """Predefined settings. Will be used in setup stage."""
 
     users: list[PredefinedUser] = []
+    "Predefined users"
+    scenes: list[PredefinedScene] = []
+    "Predefined scenes"
+    organizations_file: Path | None = None
+    "Path to the organizations file (output of `parse_organizations.py`)"
 
 
 class Telegram(SettingsEntityModel):

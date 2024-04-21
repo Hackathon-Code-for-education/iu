@@ -9,11 +9,13 @@ from beanie import PydanticObjectId
 from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
 from src.api.dependencies import UserDep, ModeratorDep
 from src.exceptions import NotEnoughPermissionsException
+from src.logging_ import logger
+from src.modules.files.repository import upload_file_from_fastapi
 from src.modules.review.repository import review_repository
 from src.modules.review.schemas import ReviewWithOrganizationInfo
 from src.modules.user.repository import user_repository
 from src.modules.user.schemas import ViewUser
-from fastapi import Request
+from fastapi import Request, UploadFile
 
 router = EnsureAuthenticatedAPIRouter(prefix="/users", tags=["Users"])
 
@@ -48,12 +50,23 @@ async def set_documents(user: UserDep, documents: list[PydanticObjectId]) -> Non
     await user_repository.set_documents(user.id, documents)
 
 
-@router.put("/me/request-approvement", responses={200: {"description": "Запрос на подтверждение успешно отправлен"}})
-async def request_approvement(user: UserDep, organization_id: PydanticObjectId) -> None:
+@router.put(
+    "/me/request-approvement/{organization_id}",
+    responses={200: {"description": "Запрос на подтверждение успешно отправлен"}},
+)
+async def request_approvement(
+    user: UserDep, organization_id: PydanticObjectId, upload_file_obj: UploadFile | None = None
+) -> None:
     """
     Отправить запрос на подтверждение
     """
-    await user_repository.request_approvement(user.id, organization_id=organization_id)
+    if upload_file_obj is not None:
+        logger.info(f"Uploading file {upload_file_obj.filename}")
+        file_obj = await upload_file_from_fastapi(upload_file_obj)
+        await user_repository.request_approvement(user.id, organization_id=organization_id, file_obj_id=file_obj.id)
+    else:
+        logger.info("Requesting approvement without file")
+        await user_repository.request_approvement(user.id, organization_id=organization_id)
 
 
 @router.post(

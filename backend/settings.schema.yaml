@@ -50,11 +50,62 @@ $defs:
     properties:
       users:
         default: []
+        description: Predefined users
         items:
           $ref: '#/$defs/PredefinedUser'
         title: Users
         type: array
+      scenes:
+        default: []
+        description: Predefined scenes
+        items:
+          $ref: '#/$defs/PredefinedScene'
+        title: Scenes
+        type: array
+      organizations_file:
+        anyOf:
+        - format: path
+          type: string
+        - type: 'null'
+        default: null
+        description: Path to the organizations file (output of `parse_organizations.py`)
+        title: Organizations File
     title: Predefined
+    type: object
+  PredefinedScene:
+    additionalProperties: false
+    properties:
+      id:
+        description: Scene ID
+        example: 5eb7cf5a86d9755df3a6c593
+        title: Id
+        type: string
+      title:
+        description: Scene title
+        title: Title
+        type: string
+      organization_username:
+        description: Organization Username
+        title: Organization Username
+        type: string
+      file:
+        description: File ID
+        example: 5eb7cf5a86d9755df3a6c593
+        title: File
+        type: string
+      meta:
+        anyOf:
+        - {}
+        - type: 'null'
+        default: null
+        description: Meta information for panorama view
+        title: Meta
+    required:
+    - id
+    - title
+    - organization_username
+    - file
+    title: PredefinedScene
     type: object
   PredefinedUser:
     additionalProperties: false
@@ -72,6 +123,13 @@ $defs:
       password:
         title: Password
         type: string
+      student_at_organization_username:
+        anyOf:
+        - type: string
+        - type: 'null'
+        default: null
+        description: ID of the organization where the student is approved
+        title: Student At Organization Username
     required:
     - name
     - login

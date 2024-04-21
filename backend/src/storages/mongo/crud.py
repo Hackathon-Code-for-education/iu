@@ -32,6 +32,8 @@ class CRUD(Generic[D, Create, Update]):
         return await self.document_class.create(_)
 
     async def create_many(self, data: list[Create]) -> list[PydanticObjectId]:
+        if not data:
+            return []
         _ = [self.document_class.model_validate(item, from_attributes=True) for item in data]
         return (await self.document_class.insert_many(_)).inserted_ids
 

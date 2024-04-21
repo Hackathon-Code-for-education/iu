@@ -6,14 +6,13 @@ __all__ = ["router"]
 
 import os
 
-import pyvips
 from beanie import PydanticObjectId
 from fastapi import UploadFile, BackgroundTasks
 
 from src.api.custom_router_class import EnsureAuthenticatedAPIRouter
 from src.exceptions import ObjectNotFound
 from src.config import settings
-from src.modules.files.repository import files_repository
+from src.modules.files.repository import files_repository, upload_file_from_fastapi
 from src.modules.files.schemas import UpdateFile
 from src.storages.mongo import File
 
@@ -25,22 +24,7 @@ async def upload_file(upload_file_obj: UploadFile) -> File:
     """
     Загрузить файл в static.
     """
-    content_type = upload_file_obj.content_type
-    bytes_ = await upload_file_obj.read()
-    # convert to webp
-    if content_type in ("image/jpeg", "image/png"):
-        image = pyvips.Image.new_from_buffer(bytes_, "")
-        bytes_ = image.write_to_buffer(".webp")
-
-    obj_id = PydanticObjectId()
-    path_to_upload = settings.static_files.directory / str(obj_id)
-    friendly_name = upload_file_obj.filename
-    file_obj = await files_repository.upload(bytes_, path_to_upload, friendly_name=friendly_name)
-
-    if file_obj is None:
-        raise ObjectNotFound(f"Возникла ошибка во время загрузки файла: `{path_to_upload}`")
-
-    return file_obj
+    return await upload_file_from_fastapi(upload_file_obj)
 
 
 @router.get(

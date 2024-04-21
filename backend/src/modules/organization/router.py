@@ -9,8 +9,8 @@ from src.api.crud_routes_factory import setup_based_on_methods
 from src.api.dependencies import get_moderator, UserDep, OptionalUserIdDep
 from src.exceptions import ObjectNotFound, NotEnoughPermissionsException, UnauthorizedException
 from src.modules.anonymize.repository import anonym_repository
-from src.modules.organization.repository import organization_repository
-from src.modules.organization.schemas import CreateOrganization, UpdateOrganization, PostReview
+from src.modules.organization.repository import organization_repository, parse_certificates_to_organizations
+from src.modules.organization.schemas import UpdateOrganization, PostReview
 from src.modules.review.repository import review_repository
 from src.modules.review.schemas import CreateReview, AnonymousReview
 from src.storages.mongo import Organization
@@ -102,48 +102,11 @@ async def import_organizations(upload_file_obj: UploadFile, user: UserDep) -> li
 
     bytes_ = await upload_file_obj.read()
     organizations = Certificates.model_validate_json(bytes_)
-    id_registry_mapping = await organization_repository.get_id_registry_mapping()
 
-    not_existing_ids = set(org.in_registry_id for org in organizations.certificates) - set(id_registry_mapping.values())
-    not_existing_organizations = (org for org in organizations.certificates if org.in_registry_id in not_existing_ids)
-
-    create_ = (
-        CreateOrganization(
-            in_registry_id=org.in_registry_id,
-            username=org.in_registry_id,
-            name=org.actual_education_organization.short_name or org.actual_education_organization.full_name,
-            full_name=org.actual_education_organization.full_name,
-            contacts=ContactsSchema(
-                email=org.actual_education_organization.email,
-                phone=org.actual_education_organization.phone,
-                website=org.actual_education_organization.website,
-                fax=org.actual_education_organization.fax,
-                post_address=org.actual_education_organization.post_address,
-                inn=org.actual_education_organization.inn,
-                kpp=org.actual_education_organization.kpp,
-                ogrn=org.actual_education_organization.ogrn,
-            ),
-            region_name=org.region_name,
-            federal_district_name=org.federal_district_name,
-            educational_programs=[
-                EducationalProgramSchema(
-                    in_registry_id=_.in_registry_id,
-                    edu_level_name=_.edu_level_name,
-                    program_name=_.program_name,
-                    program_code=_.program_code,
-                    ugs_name=_.ugs_name,
-                    ugs_code=_.ugs_code,
-                    edu_normative_period=_.edu_normative_period,
-                    qualification=_.qualification,
-                )
-                for _ in org.educational_programs
-            ],
-        )
-        for org in not_existing_organizations
-        if org.actual_education_organization
-    )
-
-    return await organization_repository.create_many(list(create_))
+    create_ = await parse_certificates_to_organizations(organizations)
+    if create_:
+        return await organization_repository.create_many(create_)
+    return []
 
 
 @router.post(

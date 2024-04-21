@@ -1,14 +1,17 @@
-__all__ = ["FileRepository", "files_repository"]
+__all__ = ["FileRepository", "files_repository", "upload_file_from_fastapi"]
 
 import datetime
 from pathlib import Path
 
 import magic
+import pyvips
 from anyio import open_file
 from beanie import PydanticObjectId
 from beanie.odm.operators.find.comparison import Eq
+from fastapi import UploadFile
 
 from src.config import settings
+from src.exceptions import ObjectNotFound
 from src.logging_ import logger
 from src.modules.files.schemas import UpdateFile
 from src.storages.mongo.models.file import File
@@ -87,3 +90,22 @@ class FileRepository:
 
 
 files_repository: FileRepository = FileRepository()
+
+
+async def upload_file_from_fastapi(upload_file_obj: UploadFile) -> File:
+    content_type = upload_file_obj.content_type
+    bytes_ = await upload_file_obj.read()
+    # convert to webp
+    if content_type in ("image/jpeg", "image/png"):
+        image = pyvips.Image.new_from_buffer(bytes_, "")
+        bytes_ = image.write_to_buffer(".webp")
+
+    obj_id = PydanticObjectId()
+    path_to_upload = settings.static_files.directory / str(obj_id)
+    friendly_name = upload_file_obj.filename
+    file_obj = await files_repository.upload(bytes_, path_to_upload, friendly_name=friendly_name)
+
+    if file_obj is None:
+        raise ObjectNotFound(f"Возникла ошибка во время загрузки файла: `{path_to_upload}`")
+
+    return file_obj

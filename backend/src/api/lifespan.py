@@ -12,6 +12,7 @@ from pymongo import timeout
 from pymongo.errors import ConnectionFailure
 from starlette.datastructures import State
 
+from scripts.parse_organizations import Certificates
 from src.config import settings
 from src.logging_ import logger
 from src.storages.mongo import document_models
@@ -42,10 +43,20 @@ async def setup_database() -> AsyncIOMotorClient:
 async def setup_predefined() -> None:
     from src.modules.user.repository import user_repository
     from src.modules.files.repository import files_repository
+    from src.modules.organization.repository import organization_repository, parse_certificates_to_organizations
+    from src.modules.scene.repository import scene_repository
 
-    await user_repository.create_predefined_users()
     await files_repository.insert_all_existing_files()
     await files_repository.check_existing_files()
+
+    if settings.predefined.organizations_file:
+        with open(settings.predefined.organizations_file) as f:
+            organizations = Certificates.model_validate_json(f.read())
+            _create = await parse_certificates_to_organizations(organizations)
+            if _create:
+                await organization_repository.create_many(_create)
+    await user_repository.create_predefined_users()
+    await scene_repository.create_predefined_scenes()
 
 
 @asynccontextmanager
