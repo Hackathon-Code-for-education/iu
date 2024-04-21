@@ -19,9 +19,9 @@ const { me } = useMe()
   <UContainer>
     <Card class="bg-neutral-900">
       <OrganizationPanorama v-if="mainSceneId" :org-username="orgUsername" :org-id="orgId" :main-scene-id="mainSceneId" />
-      <div class="px-12 flex py-4 justify-between items-start">
+      <div class="px-4 flex py-4 justify-between items-start">
         <div class="flex justify-between gap-5 items-end">
-          <div class="w-40 h-1 relative">
+          <div v-if="logoUrl" class="w-20 h-1 relative">
             <UAvatar
               class="absolute bottom-0 box-content border-4 border-neutral-900"
               size="3xl"

@@ -6,7 +6,7 @@ const { me, meLoading } = useMe()
   <div class="py-4">
     <header>
       <UContainer>
-        <Card class="px-16 py-2 flex mb-4 items-center justify-between">
+        <Card class="px-4 py-2 flex mb-4 items-center justify-between">
           <UHorizontalNavigation
             :links="[
               { label: 'Главная', to: '/' },
