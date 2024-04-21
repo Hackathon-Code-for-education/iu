@@ -1,5 +1,6 @@
 from beanie import PydanticObjectId
 
+from src.modules.anonymize.repository import anonym_repository
 from src.modules.chatting.dialog.schemas import CreateDialog
 from src.storages.mongo.models.dialog import Dialog, MessageSchema
 
@@ -11,7 +12,8 @@ class DialogRepository:
             from src.modules.organization.repository import organization_repository
 
             organization = await organization_repository.read(obj.organization_id)
-            title = f"{organization.name} - Студент X"
+            anon_student = anonym_repository.anonymize_caption_for_user(obj.student_id)
+            title = f"{organization.name} - Студент [{anon_student}]"
             obj.title = title
         return await Dialog.model_validate(obj.model_dump()).insert()
 

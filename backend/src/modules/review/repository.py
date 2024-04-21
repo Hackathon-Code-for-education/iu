@@ -34,5 +34,17 @@ class ReviewRepository:
     # async def delete(self, id: PydanticObjectId) -> bool:
     #     return await crud.delete(id)
 
+    async def like_review(self, review_id: PydanticObjectId, user_id: PydanticObjectId, like: bool) -> None | bool:
+        review = await Review.get(review_id)
+        if review is None:
+            return None
+
+        if like:
+            await review.update({"$addToSet": {"liked_by": user_id}})
+            return True
+        else:
+            await review.update({"$pull": {"liked_by": user_id}})
+            return False
+
 
 review_repository: ReviewRepository = ReviewRepository()

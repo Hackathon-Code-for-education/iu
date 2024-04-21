@@ -6,12 +6,13 @@ from fastapi import Depends, APIRouter, UploadFile
 from scripts.parse_organizations import Certificates, CertificateOut
 from src.api.crud_routes_factory import setup_based_on_methods
 
-from src.api.dependencies import get_moderator, UserDep
+from src.api.dependencies import get_moderator, UserDep, OptionalUserIdDep
 from src.exceptions import ObjectNotFound, NotEnoughPermissionsException, UnauthorizedException
+from src.modules.anonymize.repository import anonym_repository
 from src.modules.organization.repository import organization_repository
 from src.modules.organization.schemas import CreateOrganization, UpdateOrganization
 from src.modules.review.repository import review_repository
-from src.modules.review.schemas import CreateReview
+from src.modules.review.schemas import CreateReview, AnonymousReview
 from src.storages.mongo import Organization
 from src.storages.mongo.models.organization import ContactsSchema, EducationalProgramSchema
 from src.storages.mongo.models.review import ReviewRateEnum, Review
@@ -73,14 +74,15 @@ async def post_review(organization_id: PydanticObjectId, user: UserDep, text: st
     "/{organization_id}/reviews/",
     responses={200: {"description": "Success"}, **ObjectNotFound.responses},
 )
-async def get_reviews(organization_id: PydanticObjectId) -> list[Review]:
+async def get_reviews(organization_id: PydanticObjectId, user_id: OptionalUserIdDep) -> list[AnonymousReview]:
     """
     Получить отзывы об организации
     """
     organization = await organization_repository.read(organization_id)
     if organization is None:
         raise ObjectNotFound(f"Организация с id={organization_id} не найдена")
-    return await review_repository.read_for_organization(organization_id)
+    reviews = await review_repository.read_for_organization(organization_id)
+    return [anonym_repository.anonymize_review(review, user_id) for review in reviews]
 
 
 @router.post(

@@ -5,6 +5,7 @@ from src.modules.organization.router import router as router_organization
 from src.modules.scene.router import router as router_scene
 from src.modules.online.router import router as router_online
 from src.modules.chatting.router import router as router_chatting
+from src.modules.review.router import router as router_reviews
 
 routers = [
     router_providers,
@@ -14,6 +15,7 @@ routers = [
     router_scene,
     router_online,
     router_chatting,
+    router_reviews,
 ]
 
 __all__ = ["routers"]
