@@ -31,6 +31,10 @@ import type {
   MaybeRef
 } from 'vue'
 import { customFormData } from './form-data';
+export type ReviewsLikeReviewParams = {
+like?: boolean;
+};
+
 export type ChattingGetDialogParams = {
 dialog_id: string;
 };
@@ -51,6 +55,8 @@ organization_id: string;
 };
 
 export type ChattingUpdateQueue200 = OnlineOfQueue | JoinDialog;
+
+export type OrganizationsImportSpecificOrganization201 = Organization | null;
 
 export type UsersApproveUserParams = {
 is_approve: boolean;
@@ -108,23 +114,6 @@ export type ViewUserStudentApprovement = ViewUserStudentApprovementAnyOf | null;
  */
 export type ViewUserLogin = string | null;
 
-export interface ViewUser {
-  /** Список документов пользователя */
-  documents: string[];
-  /** MongoDB document ObjectID */
-  id: string;
-  /** Логин пользователя (уникальный) */
-  login: ViewUserLogin;
-  /** Имя пользователя */
-  name: string;
-  /** Роль пользователя */
-  role: UserRole;
-  /** Подтверждения статуса студента */
-  student_approvement: ViewUserStudentApprovement;
-  /** Данные Telegram-аккаунта */
-  telegram: ViewUserTelegram;
-}
-
 export type ValidationErrorLocItem = string | number;
 
 export interface ValidationError {
@@ -142,6 +131,23 @@ export const UserRole = {
   moderator: 'moderator',
   default: 'default',
 } as const;
+
+export interface ViewUser {
+  /** Список документов пользователя */
+  documents: string[];
+  /** MongoDB document ObjectID */
+  id: string;
+  /** Логин пользователя (уникальный) */
+  login: ViewUserLogin;
+  /** Имя пользователя */
+  name: string;
+  /** Роль пользователя */
+  role: UserRole;
+  /** Подтверждения статуса студента */
+  student_approvement: ViewUserStudentApprovement;
+  /** Данные Telegram-аккаунта */
+  telegram: ViewUserTelegram;
+}
 
 export type UpdateSceneTitle = string | null;
 
@@ -199,7 +205,7 @@ export type UpdateOrganizationFederalDistrictName = string | null;
 /**
  * Образовательные программы организации
  */
-export type UpdateOrganizationEducationalPrograms = EducationalPrograsSchemaInput[] | null;
+export type UpdateOrganizationEducationalPrograms = EducationalProgramSchemaInput[] | null;
 
 /**
  * Контактные данные организации
@@ -271,6 +277,32 @@ export interface Scene {
   title: string;
 }
 
+/**
+ * Текст отзыва
+ */
+export type ReviewText = string | null;
+
+export interface Review {
+  /** Дата и время создания отзыва */
+  at: string;
+  /** MongoDB document ObjectID */
+  id: string;
+  /** Список пользователей, которым понравился отзыв */
+  liked_by: string[];
+  /** Идентификатор организации, к которой относится отзыв */
+  organization_id: string;
+  /**
+   * Оценка
+   * @minimum 1
+   * @maximum 5
+   */
+  rate: number;
+  /** Текст отзыва */
+  text: ReviewText;
+  /** Идентификатор пользователя, оставившего отзыв */
+  user_id: string;
+}
+
 export type RejectedApprovementStatus = typeof RejectedApprovementStatus[keyof typeof RejectedApprovementStatus];
 
 
@@ -289,6 +321,15 @@ export interface RejectedApprovement {
   /** ID организации к которой будет привязан студент */
   organization_id: string;
   status: RejectedApprovementStatus;
+}
+
+export interface PostReview {
+  /**
+   * @minimum 1
+   * @maximum 5
+   */
+  rate: number;
+  text: string;
 }
 
 export type PendingApprovementStatus = typeof PendingApprovementStatus[keyof typeof PendingApprovementStatus];
@@ -341,7 +382,7 @@ export interface Organization {
   /** Документы организации */
   documents: unknown;
   /** Образовательные программы организации */
-  educational_programs: EducationalPrograsSchemaOutput[];
+  educational_programs: EducationalProgramSchemaOutput[];
   /** Наименование федерального округа */
   federal_district_name: OrganizationFederalDistrictName;
   /** Полное наименование организации */
@@ -440,61 +481,116 @@ export interface File {
 }
 
 /**
+ * Наименование направления подготовки
+ */
+export type EducationalProgramSchemaOutputUgsName = string | null;
+
+/**
+ * Код направления подготовки
+ */
+export type EducationalProgramSchemaOutputUgsCode = string | null;
+
+/**
  * Квалификация выпускника
  */
-export type EducationalPrograsSchemaOutputQualification = string | null;
+export type EducationalProgramSchemaOutputQualification = string | null;
+
+/**
+ * Код образовательной программы
+ */
+export type EducationalProgramSchemaOutputProgramCode = string | null;
 
 /**
  * Нормативный срок обучения
  */
-export type EducationalPrograsSchemaOutputEduNormativePeriod = string | null;
+export type EducationalProgramSchemaOutputEduNormativePeriod = string | null;
 
-export interface EducationalPrograsSchemaOutput {
+export interface EducationalProgramSchemaOutput {
   /** Наименование уровня образования */
   edu_level_name: string;
   /** Нормативный срок обучения */
-  edu_normative_period: EducationalPrograsSchemaOutputEduNormativePeriod;
+  edu_normative_period: EducationalProgramSchemaOutputEduNormativePeriod;
   /** Идентификатор образовательной программы в реестре */
   in_registry_id: string;
   /** Код образовательной программы */
-  program_code: string;
+  program_code: EducationalProgramSchemaOutputProgramCode;
   /** Наименование образовательной программы */
   program_name: string;
   /** Квалификация выпускника */
-  qualification: EducationalPrograsSchemaOutputQualification;
+  qualification: EducationalProgramSchemaOutputQualification;
   /** Код направления подготовки */
-  ugs_code: string;
+  ugs_code: EducationalProgramSchemaOutputUgsCode;
   /** Наименование направления подготовки */
-  ugs_name: string;
+  ugs_name: EducationalProgramSchemaOutputUgsName;
 }
 
 /**
+ * Наименование направления подготовки
+ */
+export type EducationalProgramSchemaInputUgsName = string | null;
+
+/**
+ * Код направления подготовки
+ */
+export type EducationalProgramSchemaInputUgsCode = string | null;
+
+/**
  * Квалификация выпускника
  */
-export type EducationalPrograsSchemaInputQualification = string | null;
+export type EducationalProgramSchemaInputQualification = string | null;
+
+/**
+ * Код образовательной программы
+ */
+export type EducationalProgramSchemaInputProgramCode = string | null;
 
 /**
  * Нормативный срок обучения
  */
-export type EducationalPrograsSchemaInputEduNormativePeriod = string | null;
+export type EducationalProgramSchemaInputEduNormativePeriod = string | null;
 
-export interface EducationalPrograsSchemaInput {
+export interface EducationalProgramSchemaInput {
   /** Наименование уровня образования */
   edu_level_name: string;
   /** Нормативный срок обучения */
-  edu_normative_period?: EducationalPrograsSchemaInputEduNormativePeriod;
+  edu_normative_period?: EducationalProgramSchemaInputEduNormativePeriod;
   /** Идентификатор образовательной программы в реестре */
   in_registry_id: string;
   /** Код образовательной программы */
-  program_code: string;
+  program_code?: EducationalProgramSchemaInputProgramCode;
   /** Наименование образовательной программы */
   program_name: string;
   /** Квалификация выпускника */
-  qualification?: EducationalPrograsSchemaInputQualification;
+  qualification?: EducationalProgramSchemaInputQualification;
   /** Код направления подготовки */
-  ugs_code: string;
+  ugs_code?: EducationalProgramSchemaInputUgsCode;
   /** Наименование направления подготовки */
-  ugs_name: string;
+  ugs_name?: EducationalProgramSchemaInputUgsName;
+}
+
+export type EducationalProgramOutUgsName = string | null;
+
+export type EducationalProgramOutUgsCode = string | null;
+
+export type EducationalProgramOutQualification = string | null;
+
+export type EducationalProgramOutProgramName = string | null;
+
+export type EducationalProgramOutProgramCode = string | null;
+
+export type EducationalProgramOutEduNormativePeriod = string | null;
+
+export type EducationalProgramOutEduLevelName = string | null;
+
+export interface EducationalProgramOut {
+  edu_level_name: EducationalProgramOutEduLevelName;
+  edu_normative_period: EducationalProgramOutEduNormativePeriod;
+  in_registry_id: string;
+  program_code: EducationalProgramOutProgramCode;
+  program_name: EducationalProgramOutProgramName;
+  qualification: EducationalProgramOutQualification;
+  ugs_code: EducationalProgramOutUgsCode;
+  ugs_name: EducationalProgramOutUgsName;
 }
 
 export interface DialogPair {
@@ -570,7 +666,7 @@ export interface CreateOrganization {
   /** Документы организации */
   documents?: unknown;
   /** Образовательные программы организации */
-  educational_programs?: EducationalPrograsSchemaInput[];
+  educational_programs?: EducationalProgramSchemaInput[];
   /** Наименование федерального округа */
   federal_district_name?: CreateOrganizationFederalDistrictName;
   /** Полное наименование организации */
@@ -605,6 +701,21 @@ export type ContactsSchemaOutputPostAddress = string | null;
 export type ContactsSchemaOutputPhone = string | null;
 
 /**
+ * ОГРН
+ */
+export type ContactsSchemaOutputOgrn = string | null;
+
+/**
+ * КПП
+ */
+export type ContactsSchemaOutputKpp = string | null;
+
+/**
+ * ИНН
+ */
+export type ContactsSchemaOutputInn = string | null;
+
+/**
  * Факс
  */
 export type ContactsSchemaOutputFax = string | null;
@@ -619,6 +730,12 @@ export interface ContactsSchemaOutput {
   email: ContactsSchemaOutputEmail;
   /** Факс */
   fax: ContactsSchemaOutputFax;
+  /** ИНН */
+  inn: ContactsSchemaOutputInn;
+  /** КПП */
+  kpp: ContactsSchemaOutputKpp;
+  /** ОГРН */
+  ogrn: ContactsSchemaOutputOgrn;
   /** Телефон */
   phone: ContactsSchemaOutputPhone;
   /** Почтовый адрес */
@@ -644,6 +761,21 @@ export type ContactsSchemaInputPostAddress = string | null;
 export type ContactsSchemaInputPhone = string | null;
 
 /**
+ * ОГРН
+ */
+export type ContactsSchemaInputOgrn = string | null;
+
+/**
+ * КПП
+ */
+export type ContactsSchemaInputKpp = string | null;
+
+/**
+ * ИНН
+ */
+export type ContactsSchemaInputInn = string | null;
+
+/**
  * Факс
  */
 export type ContactsSchemaInputFax = string | null;
@@ -658,6 +790,12 @@ export interface ContactsSchemaInput {
   email?: ContactsSchemaInputEmail;
   /** Факс */
   fax?: ContactsSchemaInputFax;
+  /** ИНН */
+  inn?: ContactsSchemaInputInn;
+  /** КПП */
+  kpp?: ContactsSchemaInputKpp;
+  /** ОГРН */
+  ogrn?: ContactsSchemaInputOgrn;
   /** Телефон */
   phone?: ContactsSchemaInputPhone;
   /** Почтовый адрес */
@@ -681,6 +819,29 @@ export interface CompactOrganization {
   name: string;
   /** Псевдоним организации (уникальный) */
   username: string;
+}
+
+export type CertificateOutTypeName = string | null;
+
+export type CertificateOutStatusName = string | null;
+
+export type CertificateOutRegionName = string | null;
+
+export type CertificateOutIsFederal = boolean | null;
+
+export type CertificateOutFederalDistrictName = string | null;
+
+export type CertificateOutActualEducationOrganization = ActualEducationOrganizationOut | null;
+
+export interface CertificateOut {
+  actual_education_organization: CertificateOutActualEducationOrganization;
+  educational_programs?: EducationalProgramOut[];
+  federal_district_name: CertificateOutFederalDistrictName;
+  in_registry_id: string;
+  is_federal: CertificateOutIsFederal;
+  region_name: CertificateOutRegionName;
+  status_name: CertificateOutStatusName;
+  type_name: CertificateOutTypeName;
 }
 
 export interface BodyOrganizationsImportOrganizations {
@@ -718,6 +879,105 @@ export interface ApprovedApprovement {
   /** ID организации к которой будет привязан студент */
   organization_id: string;
   status: ApprovedApprovementStatus;
+}
+
+/**
+ * Текст отзыва
+ */
+export type AnonymousReviewText = string | null;
+
+/**
+ * Поставлен ли лайк мной
+ */
+export type AnonymousReviewLikedByMe = boolean | null;
+
+export interface AnonymousReview {
+  /** Имя анонимного пользователя */
+  anonymous_name: string;
+  /** Дата и время создания отзыва */
+  at: string;
+  /** Идентификатор отзыва */
+  id: string;
+  /** Поставлен ли лайк мной */
+  liked_by_me: AnonymousReviewLikedByMe;
+  /** Количество лайков */
+  likes: number;
+  /** Отзыв оставлен мной */
+  mine: boolean;
+  /**
+   * Оценка
+   * @minimum 1
+   * @maximum 5
+   */
+  rate: number;
+  /** Текст отзыва */
+  text: AnonymousReviewText;
+}
+
+export type ActualEducationOrganizationOutWebsite = string | null;
+
+export type ActualEducationOrganizationOutTypeName = string | null;
+
+export type ActualEducationOrganizationOutShortName = string | null;
+
+export type ActualEducationOrganizationOutRegionName = string | null;
+
+export type ActualEducationOrganizationOutPostAddress = string | null;
+
+export type ActualEducationOrganizationOutPhone = string | null;
+
+export type ActualEducationOrganizationOutOgrn = string | null;
+
+export type ActualEducationOrganizationOutKpp = string | null;
+
+export type ActualEducationOrganizationOutKindName = string | null;
+
+export type ActualEducationOrganizationOutIsBranch = boolean | null;
+
+export type ActualEducationOrganizationOutInn = string | null;
+
+export type ActualEducationOrganizationOutInRegistryId = string | null;
+
+export type ActualEducationOrganizationOutHeadPost = string | null;
+
+export type ActualEducationOrganizationOutHeadName = string | null;
+
+export type ActualEducationOrganizationOutHeadEduOrgId = string | null;
+
+export type ActualEducationOrganizationOutFullName = string | null;
+
+export type ActualEducationOrganizationOutFormName = string | null;
+
+export type ActualEducationOrganizationOutFederalDistrictShortName = string | null;
+
+export type ActualEducationOrganizationOutFederalDistrictName = string | null;
+
+export type ActualEducationOrganizationOutFax = string | null;
+
+export type ActualEducationOrganizationOutEmail = string | null;
+
+export interface ActualEducationOrganizationOut {
+  email: ActualEducationOrganizationOutEmail;
+  fax: ActualEducationOrganizationOutFax;
+  federal_district_name: ActualEducationOrganizationOutFederalDistrictName;
+  federal_district_short_name: ActualEducationOrganizationOutFederalDistrictShortName;
+  form_name: ActualEducationOrganizationOutFormName;
+  full_name: ActualEducationOrganizationOutFullName;
+  head_edu_org_id: ActualEducationOrganizationOutHeadEduOrgId;
+  head_name: ActualEducationOrganizationOutHeadName;
+  head_post: ActualEducationOrganizationOutHeadPost;
+  in_registry_id: ActualEducationOrganizationOutInRegistryId;
+  inn: ActualEducationOrganizationOutInn;
+  is_branch: ActualEducationOrganizationOutIsBranch;
+  kind_name: ActualEducationOrganizationOutKindName;
+  kpp: ActualEducationOrganizationOutKpp;
+  ogrn: ActualEducationOrganizationOutOgrn;
+  phone: ActualEducationOrganizationOutPhone;
+  post_address: ActualEducationOrganizationOutPostAddress;
+  region_name: ActualEducationOrganizationOutRegionName;
+  short_name: ActualEducationOrganizationOutShortName;
+  type_name: ActualEducationOrganizationOutTypeName;
+  website: ActualEducationOrganizationOutWebsite;
 }
 
 
@@ -1193,6 +1453,66 @@ export const useUsersGetMe = <TData = Awaited<ReturnType<typeof usersGetMe>>, TE
   ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
 
   const queryOptions = getUsersGetMeQueryOptions(options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
+ * Получить отзывы пользователя
+ * @summary Get My Reviews
+ */
+export const usersGetMyReviews = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<Review[]>> => {
+    
+    return axios.get(
+      `/users/me/reviews`,options
+    );
+  }
+
+
+export const getUsersGetMyReviewsQueryKey = () => {
+    return ['users','me','reviews'] as const;
+    }
+
+    
+export const getUsersGetMyReviewsQueryOptions = <TData = Awaited<ReturnType<typeof usersGetMyReviews>>, TError = AxiosError<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getUsersGetMyReviewsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersGetMyReviews>>> = ({ signal }) => usersGetMyReviews({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData> 
+}
+
+export type UsersGetMyReviewsQueryResult = NonNullable<Awaited<ReturnType<typeof usersGetMyReviews>>>
+export type UsersGetMyReviewsQueryError = AxiosError<void>
+
+/**
+ * @summary Get My Reviews
+ */
+export const useUsersGetMyReviews = <TData = Awaited<ReturnType<typeof usersGetMyReviews>>, TError = AxiosError<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersGetMyReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getUsersGetMyReviewsQueryOptions(options)
 
   const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
 
@@ -2183,6 +2503,124 @@ export const useOrganizationsGetByUsername = <TData = Awaited<ReturnType<typeof 
 
 
 /**
+ * Оставить отзыв организации
+ * @summary Post Review
+ */
+export const organizationsPostReview = (
+    organizationId: MaybeRef<string>,
+    postReview: MaybeRef<PostReview>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<Review>> => {
+    organizationId = unref(organizationId);
+postReview = unref(postReview);
+    return axios.post(
+      `/organizations/${organizationId}/reviews/`,
+      postReview,options
+    );
+  }
+
+
+
+export const getOrganizationsPostReviewMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError,{organizationId: string;data: PostReview}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError,{organizationId: string;data: PostReview}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsPostReview>>, {organizationId: string;data: PostReview}> = (props) => {
+          const {organizationId,data} = props ?? {};
+
+          return  organizationsPostReview(organizationId,data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrganizationsPostReviewMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsPostReview>>>
+    export type OrganizationsPostReviewMutationBody = PostReview
+    export type OrganizationsPostReviewMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Post Review
+ */
+export const useOrganizationsPostReview = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsPostReview>>, TError,{organizationId: string;data: PostReview}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof organizationsPostReview>>,
+        TError,
+        {organizationId: string;data: PostReview},
+        TContext
+      > => {
+
+      const mutationOptions = getOrganizationsPostReviewMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Получить отзывы об организации
+ * @summary Get Reviews
+ */
+export const organizationsGetReviews = (
+    organizationId: MaybeRef<string>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<AnonymousReview[]>> => {
+    organizationId = unref(organizationId);
+    return axios.get(
+      `/organizations/${organizationId}/reviews/`,options
+    );
+  }
+
+
+export const getOrganizationsGetReviewsQueryKey = (organizationId: MaybeRef<string>,) => {
+    return ['organizations',organizationId,'reviews'] as const;
+    }
+
+    
+export const getOrganizationsGetReviewsQueryOptions = <TData = Awaited<ReturnType<typeof organizationsGetReviews>>, TError = AxiosError<void | HTTPValidationError>>(organizationId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  getOrganizationsGetReviewsQueryKey(organizationId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationsGetReviews>>> = ({ signal }) => organizationsGetReviews(organizationId, { signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: computed(() => !!(unref(organizationId))), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData> 
+}
+
+export type OrganizationsGetReviewsQueryResult = NonNullable<Awaited<ReturnType<typeof organizationsGetReviews>>>
+export type OrganizationsGetReviewsQueryError = AxiosError<void | HTTPValidationError>
+
+/**
+ * @summary Get Reviews
+ */
+export const useOrganizationsGetReviews = <TData = Awaited<ReturnType<typeof organizationsGetReviews>>, TError = AxiosError<void | HTTPValidationError>>(
+ organizationId: MaybeRef<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationsGetReviews>>, TError, TData>>, axios?: AxiosRequestConfig}
+
+  ): UseQueryReturnType<TData, TError> & { queryKey: QueryKey } => {
+
+  const queryOptions = getOrganizationsGetReviewsQueryOptions(organizationId,options)
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = unref(queryOptions).queryKey as QueryKey;
+
+  return query;
+}
+
+
+
+
+/**
  * Импортировать организации из JSON дампа (результат скрипта `parse_organizations.py`)
  * @summary Import Organizations
  */
@@ -2193,7 +2631,7 @@ formData.append('upload_file_obj', bodyOrganizationsImportOrganizations.upload_f
 
     bodyOrganizationsImportOrganizations = unref(bodyOrganizationsImportOrganizations);
     return axios.post(
-      `/organizations/upload`,
+      `/organizations/import`,
       formData,options
     );
   }
@@ -2236,6 +2674,64 @@ export const useOrganizationsImportOrganizations = <TError = AxiosError<void | H
       > => {
 
       const mutationOptions = getOrganizationsImportOrganizationsMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * Импортировать организации из JSON дампа (результат скрипта `parse_organizations.py`)
+ * @summary Import Specific Organization
+ */
+export const organizationsImportSpecificOrganization = (
+    organizationId: MaybeRef<string>,
+    certificateOut: MaybeRef<CertificateOut>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<OrganizationsImportSpecificOrganization201>> => {
+    organizationId = unref(organizationId);
+certificateOut = unref(certificateOut);
+    return axios.post(
+      `/organizations/import/${organizationId}`,
+      certificateOut,options
+    );
+  }
+
+
+
+export const getOrganizationsImportSpecificOrganizationMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError,{organizationId: string;data: CertificateOut}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError,{organizationId: string;data: CertificateOut}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, {organizationId: string;data: CertificateOut}> = (props) => {
+          const {organizationId,data} = props ?? {};
+
+          return  organizationsImportSpecificOrganization(organizationId,data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrganizationsImportSpecificOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>>
+    export type OrganizationsImportSpecificOrganizationMutationBody = CertificateOut
+    export type OrganizationsImportSpecificOrganizationMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Import Specific Organization
+ */
+export const useOrganizationsImportSpecificOrganization = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>, TError,{organizationId: string;data: CertificateOut}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof organizationsImportSpecificOrganization>>,
+        TError,
+        {organizationId: string;data: CertificateOut},
+        TContext
+      > => {
+
+      const mutationOptions = getOrganizationsImportSpecificOrganizationMutationOptions(options);
 
       return useMutation(mutationOptions);
     }
@@ -2988,3 +3484,62 @@ export const useChattingGetMyDialogs = <TData = Awaited<ReturnType<typeof chatti
 
 
 
+/**
+ * Поставить лайк/дизлайк отзыву, возвращает True если лайк поставлен, False если убран или 404 если отзыв не найден
+ * @summary Like Review
+ */
+export const reviewsLikeReview = (
+    reviewId: MaybeRef<string>,
+    params?: MaybeRef<ReviewsLikeReviewParams>, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<boolean>> => {
+    reviewId = unref(reviewId);
+params = unref(params);
+    return axios.post(
+      `/reviews/${reviewId}/like`,undefined,{
+    ...options,
+        params: {...unref(params), ...options?.params},}
+    );
+  }
+
+
+
+export const getReviewsLikeReviewMutationOptions = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError,{reviewId: string;params?: ReviewsLikeReviewParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError,{reviewId: string;params?: ReviewsLikeReviewParams}, TContext> => {
+const {mutation: mutationOptions, axios: axiosOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewsLikeReview>>, {reviewId: string;params?: ReviewsLikeReviewParams}> = (props) => {
+          const {reviewId,params} = props ?? {};
+
+          return  reviewsLikeReview(reviewId,params,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviewsLikeReviewMutationResult = NonNullable<Awaited<ReturnType<typeof reviewsLikeReview>>>
+    
+    export type ReviewsLikeReviewMutationError = AxiosError<void | HTTPValidationError>
+
+    /**
+ * @summary Like Review
+ */
+export const useReviewsLikeReview = <TError = AxiosError<void | HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewsLikeReview>>, TError,{reviewId: string;params?: ReviewsLikeReviewParams}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationReturnType<
+        Awaited<ReturnType<typeof reviewsLikeReview>>,
+        TError,
+        {reviewId: string;params?: ReviewsLikeReviewParams},
+        TContext
+      > => {
+
+      const mutationOptions = getReviewsLikeReviewMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
