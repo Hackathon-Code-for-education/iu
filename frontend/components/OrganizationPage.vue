@@ -39,20 +39,19 @@ const { me } = useMe()
         </div>
         <div class="flex flex-col gap-2 items-end">
           <div class="flex justify-between gap-2">
-            <UButton>Буду поступать</UButton>
-            <UButton variant="outline" @click="$emit('wantChatClick')">
+            <UButton @click="$emit('wantChatClick')">
               Написать студентам
             </UButton>
+            <UButton
+              v-if="me?.role === 'admin' || me?.role === 'moderator'"
+              variant="outline"
+              :to="`/${orgUsername}/edit/scenes`"
+              class="w-fit"
+              icon="i-mdi-pencil"
+            >
+              Редактировать
+            </UButton>
           </div>
-          <UButton
-            v-if="me?.role === 'admin' || me?.role === 'moderator'"
-            variant="outline"
-            :to="`/${orgUsername}/edit/scenes`"
-            class="w-fit"
-            icon="i-mdi-pencil"
-          >
-            Редактировать
-          </UButton>
         </div>
       </div>
     </Card>
